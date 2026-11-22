@@ -10,6 +10,7 @@
  *   ola, olb  partner near leg thigh / shin (kicks: 90 = towards the main figure)
  *   ol        partner far-leg stride
  *   g         0..1 — near hand grabs the main figure's joint `grab`
+ * draw() options: { cx, grab, gloves } — gloves draws boxing gloves on both hands.
  * Every frame of a clip must carry every key (use KTPartner.base).
  */
 (function (w) {
@@ -50,6 +51,7 @@
     out += S.circle(O.head, F.DIM.head * sc, '#fff', COL, 3.2);
     out += S.poly([O.shN, elbow, hand], COL, wd);
     if (opt.grab && p.g > 0.5) out += S.circle(hand, 5, COL, '#fff', 1.5);
+    if (opt.gloves) out = S.circle(O.hF, 6.5 * sc, COL_F, '#fff', 1.2) + out + S.circle(hand, 6.5 * sc, COL, '#fff', 1.2);
     O.hN = hand; O.eN = elbow;
     return { svg: out, O: O };
   }
