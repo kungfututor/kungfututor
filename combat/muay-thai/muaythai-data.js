@@ -104,7 +104,7 @@
         if (src.hit && c.pose.hit > 0.15) {
           var pt = src.hit === 'shinF' ? S.mid(J.kF, J.aF, 0.6) : src.hit === 'shinN' ? S.mid(J.kN, J.aN, 0.5) : J[src.hit];
           fr += KP.hit(pt, c.pose.hit);
-          if (c.pose.hit > 0.6) hud += S.text(18, 30, (lang === 'zh' ? '接觸點：' : 'CONTACT: ') + s.contact[lang], { size: 12, fill: C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
+          if (c.pose.hit > 0.6) hud += S.text(18, 30, (KT.pick('接觸點：', 'CONTACT: ')) + KT.t(s.contact), { size: 12, fill: C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
         }
         return { back: o.svg, front: fr, hud: hud };
       }

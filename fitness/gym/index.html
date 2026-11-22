@@ -1,10 +1,30 @@
 <!doctype html>
-<html lang="zh-Hant" data-default-lang="zh">
+<html lang="en" data-page-lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gym Exercises for Beginners: 10 Key Movements with Correct Form | KungfuTutor</title>
 <meta name="description" content="Learn correct form for 10 essential gym exercises with step-by-step animation: squat, deadlift, bench press, overhead press, bent-over row, pull-up, push-up, reverse lunge, plank and glute bridge — with beginner versions, common mistakes, sets and reps.">
+<!-- kt:alternates -->
+<link rel="alternate" hreflang="en" href="https://kungfututor.com/fitness/gym/">
+<link rel="alternate" hreflang="zh-Hans" href="https://kungfututor.com/zh-hans/fitness/gym/">
+<link rel="alternate" hreflang="zh-Hant" href="https://kungfututor.com/zh-hant/fitness/gym/">
+<link rel="alternate" hreflang="id" href="https://kungfututor.com/id/fitness/gym/">
+<link rel="alternate" hreflang="ms" href="https://kungfututor.com/ms/fitness/gym/">
+<link rel="alternate" hreflang="th" href="https://kungfututor.com/th/fitness/gym/">
+<link rel="alternate" hreflang="vi" href="https://kungfututor.com/vi/fitness/gym/">
+<link rel="alternate" hreflang="ja" href="https://kungfututor.com/ja/fitness/gym/">
+<link rel="alternate" hreflang="ko" href="https://kungfututor.com/ko/fitness/gym/">
+<link rel="alternate" hreflang="fil" href="https://kungfututor.com/fil/fitness/gym/">
+<link rel="alternate" hreflang="pt" href="https://kungfututor.com/pt/fitness/gym/">
+<link rel="alternate" hreflang="hi" href="https://kungfututor.com/hi/fitness/gym/">
+<link rel="alternate" hreflang="es" href="https://kungfututor.com/es/fitness/gym/">
+<link rel="alternate" hreflang="fr" href="https://kungfututor.com/fr/fitness/gym/">
+<link rel="alternate" hreflang="bn" href="https://kungfututor.com/bn/fitness/gym/">
+<link rel="alternate" hreflang="ar" href="https://kungfututor.com/ar/fitness/gym/">
+<link rel="alternate" hreflang="ur" href="https://kungfututor.com/ur/fitness/gym/">
+<link rel="alternate" hreflang="x-default" href="https://kungfututor.com/fitness/gym/">
+<!-- /kt:alternates -->
 <link rel="canonical" href="https://kungfututor.com/fitness/gym/">
 <meta property="og:title" content="Gym Basics — 10 Exercises with Correct Form, Animated">
 <meta property="og:type" content="article">
@@ -171,23 +191,23 @@
   w.KTLesson({
     list: L, prefix: 'gym',
     makeClip: w.GYM.makeClip,
-    info: function (s, lang) { return { a: lang === 'zh' ? s.zh : s.en, b: s.type[lang].toUpperCase(), note: s.note[lang] }; },
+    info: function (s, lang) { return { a: KT.pick(s.zh, s.en), b: KT.t(s.type).toUpperCase(), note: KT.t(s.note) }; },
     levelName: function (lv, T) { return T('目前程度：', 'Current level: ') + (lv < 1 ? T('初學版本', 'Beginner version') : T('標準動作', 'Standard')); },
-    cardPre: function (s, a) { return s.type[a.st.lang]; },
-    cardSub: function (s, a) { return s.muscles[a.st.lang]; },
-    pre: function (s, a) { return a.T('第 ' + s.n + ' 個動作 · ' + s.type.zh, 'Exercise ' + s.n + ' of 10 · ' + s.type.en) + (a.st.level < 1 && s.easy ? a.T(' · 初學版本', ' · beginner version') : ''); },
-    spec: [function (s, l) { return s.muscles[l]; }, function (s, l) { return s.equip[l]; }, function (s, l) { return s.dose[l]; }],
+    cardPre: function (s, a) { return KT.t(s.type); },
+    cardSub: function (s, a) { return KT.t(s.muscles); },
+    pre: function (s, a) { return a.T('第 {n} 個動作 · {type}', 'Exercise {n} of 10 · {type}', { n: s.n, type: KT.t(s.type) }) + (a.st.level < 1 && s.easy ? a.T(' · 初學版本', ' · beginner version') : ''); },
+    spec: [function (s, l) { return KT.t(s.muscles); }, function (s, l) { return KT.t(s.equip); }, function (s, l) { return KT.t(s.dose); }],
     timerGo: function (T) { return T('開始計時', 'Start hold'); },
     onRender: function (s, a) {
-      document.getElementById('st-mus').textContent = s.muscles[a.st.lang];
-      document.getElementById('st-type').textContent = s.type[a.st.lang];
-      document.getElementById('st-dose').textContent = s.dose[a.st.lang];
+      document.getElementById('st-mus').textContent = KT.t(s.muscles);
+      document.getElementById('st-type').textContent = KT.t(s.type);
+      document.getElementById('st-dose').textContent = KT.t(s.dose);
       document.getElementById('hold-timer').hidden = s.id !== 'plank';
     },
     guide: function (a) {
       var T = a.T, l = a.st.lang;
       var rows = L.map(function (s) {
-        return '<tr><td>' + esc(l === 'zh' ? s.zh : s.en) + '</td><td>' + esc(s.type[l]) + '</td><td>' + esc(s.muscles[l]) + '</td><td>' + esc(s.dose[l]) + '</td></tr>';
+        return '<tr><td>' + esc(KT.pick(s.zh, s.en)) + '</td><td>' + esc(KT.t(s.type)) + '</td><td>' + esc(KT.t(s.muscles)) + '</td><td>' + esc(KT.t(s.dose)) + '</td></tr>';
       }).join('');
       return '<h2>' + T('十個動作一覽', 'The ten exercises at a glance') + '</h2>' +
         '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>' + T('動作', 'Exercise') + '</th><th>' + T('類型', 'Pattern') + '</th><th>' + T('主要肌群', 'Main muscles') + '</th><th>' + T('組數 × 次數', 'Sets × reps') + '</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +

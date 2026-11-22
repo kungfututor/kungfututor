@@ -79,10 +79,10 @@
             var knee = r[0] === 'N' ? J.kN : J.kF, hip = r[0] === 'N' ? J.hipN : J.hipF, ank = r[0] === 'N' ? J.aN : J.aF;
             var deg = kneeAngle(hip, knee, ank);
             fr += S.circle(knee, 4.5, C.jade, '#fff', 1.5);
-            hud += S.text(18, 30 + i * 18, (lang === 'zh' ? r[1] : r[2]) + '  ' + deg + '°', { size: 12, fill: C.jade, family: "'JetBrains Mono',monospace" });
+            hud += S.text(18, 30 + i * 18, (KT.pick(r[1], r[2])) + '  ' + deg + '°', { size: 12, fill: C.jade, family: "'JetBrains Mono',monospace" });
           });
         } else {
-          hud += S.text(18, 30, lang === 'zh' ? '正面視角' : 'FRONT VIEW', { size: 11, fill: C.jade, family: "'JetBrains Mono',monospace" });
+          hud += S.text(18, 30, KT.pick('正面視角', 'FRONT VIEW'), { size: 11, fill: C.jade, family: "'JetBrains Mono',monospace" });
         }
         return { front: fr, hud: hud };
       }

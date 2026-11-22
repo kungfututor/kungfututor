@@ -100,7 +100,7 @@
         if (src.hit && c.pose.hit > 0.15) {
           var pt = src.hit === 'hNF' ? (c.seg < 2 ? J.hN : J.hF) : J[src.hit];
           fr += KP.hit(pt, c.pose.hit);
-          if (c.pose.hit > 0.6) hud += S.text(18, 30, (lang === 'zh' ? '目標：' : 'TARGET: ') + s.target[lang], { size: 12, fill: C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
+          if (c.pose.hit > 0.6) hud += S.text(18, 30, (KT.pick('目標：', 'TARGET: ')) + KT.t(s.target), { size: 12, fill: C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
         }
         return { back: o.svg, front: fr, hud: hud };
       }

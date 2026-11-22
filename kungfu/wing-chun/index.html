@@ -1,10 +1,30 @@
 <!doctype html>
-<html lang="zh-Hant" data-default-lang="zh">
+<html lang="en" data-page-lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wing Chun Basics: Stance, Vertical Punch, Chain Punch, Tan, Bong, Fuk &amp; Pak Sao — Interactive Guide | KungfuTutor</title>
 <meta name="description" content="Learn 8 Wing Chun basics from Siu Nim Tao — Yee Jee Kim Yeung Ma stance, vertical punch, chain punch, Tan Sao, Bong Sao, Fuk Sao, Pak Sao and the front kick — with step-by-step animation and a centreline guide.">
+<!-- kt:alternates -->
+<link rel="alternate" hreflang="en" href="https://kungfututor.com/kungfu/wing-chun/">
+<link rel="alternate" hreflang="zh-Hans" href="https://kungfututor.com/zh-hans/kungfu/wing-chun/">
+<link rel="alternate" hreflang="zh-Hant" href="https://kungfututor.com/zh-hant/kungfu/wing-chun/">
+<link rel="alternate" hreflang="id" href="https://kungfututor.com/id/kungfu/wing-chun/">
+<link rel="alternate" hreflang="ms" href="https://kungfututor.com/ms/kungfu/wing-chun/">
+<link rel="alternate" hreflang="th" href="https://kungfututor.com/th/kungfu/wing-chun/">
+<link rel="alternate" hreflang="vi" href="https://kungfututor.com/vi/kungfu/wing-chun/">
+<link rel="alternate" hreflang="ja" href="https://kungfututor.com/ja/kungfu/wing-chun/">
+<link rel="alternate" hreflang="ko" href="https://kungfututor.com/ko/kungfu/wing-chun/">
+<link rel="alternate" hreflang="fil" href="https://kungfututor.com/fil/kungfu/wing-chun/">
+<link rel="alternate" hreflang="pt" href="https://kungfututor.com/pt/kungfu/wing-chun/">
+<link rel="alternate" hreflang="hi" href="https://kungfututor.com/hi/kungfu/wing-chun/">
+<link rel="alternate" hreflang="es" href="https://kungfututor.com/es/kungfu/wing-chun/">
+<link rel="alternate" hreflang="fr" href="https://kungfututor.com/fr/kungfu/wing-chun/">
+<link rel="alternate" hreflang="bn" href="https://kungfututor.com/bn/kungfu/wing-chun/">
+<link rel="alternate" hreflang="ar" href="https://kungfututor.com/ar/kungfu/wing-chun/">
+<link rel="alternate" hreflang="ur" href="https://kungfututor.com/ur/kungfu/wing-chun/">
+<link rel="alternate" hreflang="x-default" href="https://kungfututor.com/kungfu/wing-chun/">
+<!-- /kt:alternates -->
 <link rel="canonical" href="https://kungfututor.com/kungfu/wing-chun/">
 <meta property="og:title" content="Wing Chun Basics — Interactive Step-by-Step Guide">
 <meta property="og:type" content="article">
@@ -178,30 +198,30 @@
       out += S.text(x + f[0] * 16, y + 4, '50%', { size: 12, fill: '#D92D20', anchor: f[0] < 0 ? 'end' : 'start' });
     });
     out += S.line({ x: cx - 34, y: cy + 30 }, { x: cx + 34, y: cy + 30 }, '#059669', 1.5, ' stroke-dasharray="4 3"');
-    out += S.text(cx, cy + 48, lang === 'zh' ? '約與肩同寬，腳尖內扣' : 'about shoulder-width, toes turned in', { size: 11, fill: '#059669', anchor: 'middle', weight: 600 });
-    out += S.text(cx, 12, lang === 'zh' ? '中線' : 'CENTRELINE', { size: 10, fill: '#D92D20', anchor: 'middle' });
+    out += S.text(cx, cy + 48, KT.pick('約與肩同寬，腳尖內扣', 'about shoulder-width, toes turned in'), { size: 11, fill: '#059669', anchor: 'middle', weight: 600 });
+    out += S.text(cx, 12, KT.pick('中線', 'CENTRELINE'), { size: 10, fill: '#D92D20', anchor: 'middle' });
     return out;
   }
 
   var api = w.KTLesson({
     list: L, prefix: 'wc',
     makeClip: WC.makeClip,
-    info: function (s, lang) { return { a: s.zh, b: s.py.toUpperCase(), note: s.note[lang] }; },
+    info: function (s, lang) { return { a: s.zh, b: s.py.toUpperCase(), note: KT.t(s.note) }; },
     feet: function (s, side, lang) { return s.feet ? feetSVG(s, side, lang) : ''; },
-    cardPre: function (s, a) { return s.type[a.st.lang]; },
+    cardPre: function (s, a) { return KT.t(s.type); },
     cardSub: function (s) { return s.py; },
-    pre: function (s, a) { return a.T('第 ' + s.n + ' 式 · ' + s.type.zh + ' · 粵語 ' + s.py, 'Technique ' + s.n + ' of 8 · ' + s.type.en + ' · Cantonese ' + s.py); },
-    spec: [function (s, l) { return s.key[l]; }, function (s, l) { return s.form[l]; }, function (s, l) { return s.ability[l]; }],
+    pre: function (s, a) { return a.T('第 {n} 式 · {type} · 粵語 {py}', 'Technique {n} of 8 · {type} · Cantonese {py}', { n: s.n, type: KT.t(s.type), py: s.py }); },
+    spec: [function (s, l) { return KT.t(s.key); }, function (s, l) { return KT.t(s.form); }, function (s, l) { return KT.t(s.ability); }],
     onRender: function (s, a) {
-      d.getElementById('st-key').textContent = s.key[a.st.lang];
-      d.getElementById('st-form').textContent = a.T('出自：', 'Found in: ') + s.form[a.st.lang];
+      d.getElementById('st-key').textContent = KT.t(s.key);
+      d.getElementById('st-form').textContent = a.T('出自：', 'Found in: ') + KT.t(s.form);
       d.getElementById('feet-panel').style.display = s.feet ? '' : 'none';
       [].forEach.call(d.querySelectorAll('[data-guide]'), function (b) { b.setAttribute('aria-pressed', String((b.getAttribute('data-guide') === '1') === WC.GUIDE.on)); });
     },
     guide: function (a) {
       var T = a.T, l = a.st.lang;
       var rows = L.map(function (s) {
-        return '<tr><td>' + esc(s.zh) + '</td><td>' + esc(s.py) + '</td><td>' + esc(s.en) + '</td><td>' + esc(s.type[l]) + '</td><td>' + esc(s.form[l]) + '</td></tr>';
+        return '<tr><td>' + esc(s.zh) + '</td><td>' + esc(s.py) + '</td><td>' + esc(s.en) + '</td><td>' + esc(KT.t(s.type)) + '</td><td>' + esc(KT.t(s.form)) + '</td></tr>';
       }).join('');
       return '<h2>' + T('詠春是什麼？', 'What is Wing Chun?') + '</h2>' +
         '<p>' + T('詠春拳是源自中國南方（廣東、福建一帶）的近身拳術，以簡潔、直接、經濟著稱。二十世紀經葉問在香港傳授後廣傳世界。詠春的核心概念包括中線理論、攻守同時、以及透過黐手訓練觸覺。',

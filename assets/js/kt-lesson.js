@@ -27,7 +27,7 @@
     };
     var hm = /s=(\d+)/.exec(w.location.hash);
     if (hm && +hm[1] >= 1 && +hm[1] <= L.length) st.idx = +hm[1] - 1;
-    function T(zh, en) { return st.lang === 'zh' ? zh : en; }
+    function T(zh, en, vars) { return KT.fmt(KT.pick(zh, en), vars); }
     function cur() { return L[st.idx]; }
     function pad(n) { return ('0' + n).slice(-2); }
     var api = { T: T, cur: cur, st: st };
@@ -65,7 +65,7 @@
       stepStarts = [];
       var acc = 0, html = '';
       clip.frames.forEach(function (fr, i) {
-        if (fr.c) { stepStarts.push({ i: i, t: acc }); html += '<li><button data-step="' + (stepStarts.length - 1) + '"><b>' + stepStarts.length + '</b> ' + esc(fr.c[st.lang]) + '</button></li>'; }
+        if (fr.c) { stepStarts.push({ i: i, t: acc }); html += '<li><button data-step="' + (stepStarts.length - 1) + '"><b>' + stepStarts.length + '</b> ' + esc(KT.t(fr.c)) + '</button></li>'; }
         acc += fr.d || 400;
       });
       if ($('steps')) { $('steps').innerHTML = html; $('steps').hidden = !html; }
@@ -106,28 +106,28 @@
       $('cards').innerHTML = L.map(function (s, i) {
         return '<button class="card' + (st.mastered.indexOf(s.n) > -1 ? ' done' : '') + '" data-i="' + i + '" aria-pressed="' + (i === st.idx) + '">' +
           '<span class="row1"><span class="num">' + pad(s.n) + '</span><span class="pre">' + esc(cfg.cardPre(s, api)) + '</span></span>' +
-          '<span class="nm">' + (st.lang === 'zh' ? esc(s.zh) + ' ' : '') + esc(s.en.replace(/ \(.*\)/, '')) + '</span>' +
+          '<span class="nm">' + (KT.lang === 'zh-Hant' ? esc(s.zh) + ' ' + esc(s.en.replace(/ \(.*\)/, '')) : esc(KT.name(s))) + '</span>' +
           '<span class="sp">' + esc(cfg.cardSub(s, api)) + '</span>' +
           '<span class="ok">✓ ' + T('已熟悉', 'MASTERED') + '</span></button>';
       }).join('');
     }
     function renderInspector() {
       var s = cur(), l = st.lang;
-      $('i-tags').innerHTML = '<span class="tag red">' + esc(s.tags[l][0]) + '</span><span class="tag">' + esc(s.tags[l][1]) + '</span>';
+      $('i-tags').innerHTML = '<span class="tag red">' + esc(KT.t(s.tags)[0]) + '</span><span class="tag">' + esc(KT.t(s.tags)[1]) + '</span>';
       $('i-pre').textContent = cfg.pre(s, api);
       $('i-num').textContent = pad(s.n);
-      $('i-name').textContent = l === 'zh' ? s.zh : s.en;
-      $('i-en').textContent = (l === 'zh' ? s.en : s.zh) + ' · ' + s.py;
+      $('i-name').textContent = KT.pick(s.zh, s.en);
+      $('i-en').textContent = (KT.pick(s.en, s.zh)) + ' · ' + s.py;
       cfg.spec.forEach(function (fn, k) { var e = $('i-spec' + (k + 1)); if (e) e.textContent = fn(s, l); });
-      $$('[data-field]').forEach(function (e) { var f = s[e.getAttribute('data-field')]; e.textContent = f ? f[l] : ''; });
+      $$('[data-field]').forEach(function (e) { var f = s[e.getAttribute('data-field')]; e.textContent = f ? KT.t(f) : ''; });
       var on = st.mastered.indexOf(s.n) > -1, mb = $('i-master');
       mb.classList.toggle('on', on);
       mb.textContent = on ? T('✓ 已標記為熟悉', '✓ Marked as mastered') : T('標記為已熟悉', 'Mark as mastered');
       $('i-master-s').textContent = T('進度只存在你的瀏覽器', 'Progress is saved in your browser only');
-      $('p-title').textContent = pad(s.n) + ' ' + (l === 'zh' ? s.zh + '動作示意' : s.en.replace(/ \(.*\)/, '') + ' — demo');
+      $('p-title').textContent = pad(s.n) + ' ' + KT.name(s) + KT.pick('動作示意', ' — demo');
       if ($('p-py')) $('p-py').textContent = s.py;
       $('bars').innerHTML = s.bars.map(function (b) {
-        return '<div class="bar"><span>' + esc(l === 'zh' ? b[0] : b[1]) + '</span><i><b style="width:0%" data-w="' + b[2] + '"></b></i><em>' + b[2] + '%</em></div>';
+        return '<div class="bar"><span>' + esc(KT.pick(b[0], b[1])) + '</span><i><b style="width:0%" data-w="' + b[2] + '"></b></i><em>' + b[2] + '%</em></div>';
       }).join('');
       w.requestAnimationFrame(function () { $$('#bars b').forEach(function (b) { b.style.width = b.getAttribute('data-w') + '%'; }); });
       renderBest();

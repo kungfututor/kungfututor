@@ -116,11 +116,11 @@
         if (GUIDE.on) {
           if (front) {
             bk += S.line({ x: J.hip.x, y: J.head.y - 24 }, { x: J.hip.x, y: c.gy }, C.red, 1.5, ' stroke-dasharray="5 4" opacity=".6"');
-            hud += S.text(18, 30, lang === 'zh' ? '紅虛線 = 中線' : 'RED DASHES = CENTRELINE', { size: 11, fill: C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
+            hud += S.text(18, 30, KT.pick('紅虛線 = 中線', 'RED DASHES = CENTRELINE'), { size: 11, fill: C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
           } else if (cl.strike && cl.strike.charAt(0) === 'h') {
             bk += S.line({ x: J.sh.x, y: J.sh.y + 6 }, { x: 415, y: J.sh.y + 6 }, C.red, 1.5, ' stroke-dasharray="5 4" opacity=".55"');
             fr += S.circle(J.eN, 4, C.jade, '#fff', 1.5);
-            hud += S.text(18, 30, lang === 'zh' ? '紅虛線 = 中線出拳路線 · 綠點 = 手肘（向下）' : 'RED DASHES = CENTRELINE · GREEN = ELBOW (DOWN)', { size: 11, fill: C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
+            hud += S.text(18, 30, KT.pick('紅虛線 = 中線出拳路線 · 綠點 = 手肘（向下）', 'RED DASHES = CENTRELINE · GREEN = ELBOW (DOWN)'), { size: 11, fill: C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
           }
         }
         if (cl.palm === 'up') fr += S.line({ x: J.hN.x - 2, y: J.hN.y }, { x: J.hN.x + 9, y: J.hN.y - 1 }, C.ink, 5);

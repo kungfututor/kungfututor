@@ -23,27 +23,27 @@
     if (pts.length === 2) {
       var a = pts[0], b = pts[1];
       out += S.line(a, b, '#059669', 1.5, ' stroke-dasharray="4 3"');
-      out += S.text((a.x + b.x) / 2, Math.max(a.y, b.y) + 34, s.width[lang], { size: 11, fill: '#059669', anchor: 'middle', weight: 600 });
+      out += S.text((a.x + b.x) / 2, Math.max(a.y, b.y) + 34, KT.t(s.width), { size: 11, fill: '#059669', anchor: 'middle', weight: 600 });
     }
-    out += S.text(cx, 12, (lang === 'zh' ? '前' : 'FRONT'), { size: 10, fill: '#60687E', anchor: 'middle' });
+    out += S.text(cx, 12, (KT.pick('前', 'FRONT')), { size: 10, fill: '#60687E', anchor: 'middle' });
     return out;
   }
 
   w.KTLesson({
     list: L, prefix: 'st',
     makeClip: function (s, view, level, lang) { return w.STANCES.makeClip(s.id, view, level, lang); },
-    info: function (s, lang) { return { a: s.zh + ' ' + s.py, b: s.en.replace(/ \(.*\)/, '').toUpperCase(), note: s.note[lang] }; },
+    info: function (s, lang) { return { a: s.zh + ' ' + s.py, b: (KT.isZh() ? s.en.replace(/ \(.*\)/, '') : KT.name(s)).toUpperCase(), note: KT.t(s.note) }; },
     feet: feetSVG,
     levelName: function (lv, T) { return T('目前程度：', 'Current level: ') + (lv < 1 ? T('初學', 'Beginner') : T('標準', 'Standard')); },
     cardPre: function (s) { return s.py; },
     cardSub: function (s, a) { return a.T('重心 ', 'Weight ') + s.weight; },
-    pre: function (s, a) { return a.T('第 ' + s.n + ' 式 · 拼音 ' + s.py, 'Stance ' + s.n + ' of 5 · Pinyin ' + s.py); },
-    spec: [function (s) { return s.weight; }, function (s, l) { return s.width[l]; }, function (s, l) { return s.ability[l]; }],
+    pre: function (s, a) { return a.T('第 {n} 式 · 拼音 {py}', 'Stance {n} of 5 · Pinyin {py}', { n: s.n, py: s.py }); },
+    spec: [function (s) { return s.weight; }, function (s, l) { return KT.t(s.width); }, function (s, l) { return KT.t(s.ability); }],
     onRender: function (s) { document.getElementById('st-weight').textContent = s.weight; },
     guide: function (api) {
       var T = api.T, st = api.st;
       var rows = L.map(function (s) {
-        return '<tr><td>' + esc(s.zh + ' ' + s.py) + '</td><td>' + esc(s.en) + '</td><td>' + esc(s.weight) + '</td><td>' + esc(s.width[st.lang]) + '</td><td>' + esc(s.ability[st.lang]) + '</td></tr>';
+        return '<tr><td>' + esc(s.zh + ' ' + s.py) + '</td><td>' + esc(s.en) + '</td><td>' + esc(s.weight) + '</td><td>' + esc(KT.t(s.width)) + '</td><td>' + esc(KT.t(s.ability)) + '</td></tr>';
       }).join('');
       return (
       '<h2>' + T('為什麼要先練步型？', 'Why learn stances first?') + '</h2>' +

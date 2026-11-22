@@ -1,10 +1,30 @@
 <!doctype html>
-<html lang="zh-Hant" data-default-lang="zh">
+<html lang="en" data-page-lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tai Chi 24-Form: All 24 Postures with Animation &amp; Breathing Guide | KungfuTutor</title>
 <meta name="description" content="Learn the simplified Tai Chi 24-form (Yang style) posture by posture: animated demos of all 24 movements, step-by-step breakdowns, a breathing cue, key points, common mistakes and a play-the-whole-form mode.">
+<!-- kt:alternates -->
+<link rel="alternate" hreflang="en" href="https://kungfututor.com/kungfu/tai-chi/">
+<link rel="alternate" hreflang="zh-Hans" href="https://kungfututor.com/zh-hans/kungfu/tai-chi/">
+<link rel="alternate" hreflang="zh-Hant" href="https://kungfututor.com/zh-hant/kungfu/tai-chi/">
+<link rel="alternate" hreflang="id" href="https://kungfututor.com/id/kungfu/tai-chi/">
+<link rel="alternate" hreflang="ms" href="https://kungfututor.com/ms/kungfu/tai-chi/">
+<link rel="alternate" hreflang="th" href="https://kungfututor.com/th/kungfu/tai-chi/">
+<link rel="alternate" hreflang="vi" href="https://kungfututor.com/vi/kungfu/tai-chi/">
+<link rel="alternate" hreflang="ja" href="https://kungfututor.com/ja/kungfu/tai-chi/">
+<link rel="alternate" hreflang="ko" href="https://kungfututor.com/ko/kungfu/tai-chi/">
+<link rel="alternate" hreflang="fil" href="https://kungfututor.com/fil/kungfu/tai-chi/">
+<link rel="alternate" hreflang="pt" href="https://kungfututor.com/pt/kungfu/tai-chi/">
+<link rel="alternate" hreflang="hi" href="https://kungfututor.com/hi/kungfu/tai-chi/">
+<link rel="alternate" hreflang="es" href="https://kungfututor.com/es/kungfu/tai-chi/">
+<link rel="alternate" hreflang="fr" href="https://kungfututor.com/fr/kungfu/tai-chi/">
+<link rel="alternate" hreflang="bn" href="https://kungfututor.com/bn/kungfu/tai-chi/">
+<link rel="alternate" hreflang="ar" href="https://kungfututor.com/ar/kungfu/tai-chi/">
+<link rel="alternate" hreflang="ur" href="https://kungfututor.com/ur/kungfu/tai-chi/">
+<link rel="alternate" hreflang="x-default" href="https://kungfututor.com/kungfu/tai-chi/">
+<!-- /kt:alternates -->
 <link rel="canonical" href="https://kungfututor.com/kungfu/tai-chi/">
 <meta property="og:title" content="Tai Chi 24-Form — All 24 Postures, Animated">
 <meta property="og:type" content="article">
@@ -169,20 +189,20 @@
   var api = w.KTLesson({
     list: L, prefix: 'tc',
     makeClip: TC.makeClip,
-    info: function (s, lang) { return { a: s.zh, b: s.py.toUpperCase(), note: s.key[lang] }; },
+    info: function (s, lang) { return { a: s.zh, b: s.py.toUpperCase(), note: KT.t(s.key) }; },
     levelName: function (lv, T) { return T('目前速度：', 'Current pace: ') + (lv < 1 ? T('初學慢速', 'Beginner (slower)') : T('標準', 'Standard')); },
-    cardPre: function (s, a) { return TC.GROUPS[s.g][a.st.lang]; },
+    cardPre: function (s, a) { return KT.t(TC.GROUPS[s.g]); },
     cardSub: function (s) { return s.py; },
-    pre: function (s, a) { return a.T('第 ' + s.n + ' 式 · ' + TC.GROUPS[s.g].zh + ' · 拼音 ' + s.py, 'Posture ' + s.n + ' of 24 · ' + TC.GROUPS[s.g].en + ' · Pinyin ' + s.py); },
-    spec: [function (s, l) { return TC.TYPE_NAME[s.type][l]; }, function (s, l) { return TC.GROUPS[s.g][l]; }, function (s, l) { return s.key[l]; }],
+    pre: function (s, a) { return a.T('第 {n} 式 · {group} · 拼音 {py}', 'Posture {n} of 24 · {group} · Pinyin {py}', { n: s.n, group: KT.t(TC.GROUPS[s.g]), py: s.py }); },
+    spec: [function (s, l) { return KT.t(TC.TYPE_NAME[s.type]); }, function (s, l) { return KT.t(TC.GROUPS[s.g]); }, function (s, l) { return KT.t(s.key); }],
     onRender: function (s, a) {
-      d.getElementById('st-cur').textContent = (s.n < 10 ? '0' : '') + s.n + ' ' + (a.st.lang === 'zh' ? s.zh : s.en);
-      d.getElementById('st-grp').textContent = TC.GROUPS[s.g][a.st.lang] + ' · ' + TC.TYPE_NAME[s.type][a.st.lang];
+      d.getElementById('st-cur').textContent = (s.n < 10 ? '0' : '') + s.n + ' ' + (KT.pick(s.zh, s.en));
+      d.getElementById('st-grp').textContent = KT.t(TC.GROUPS[s.g]) + ' · ' + KT.t(TC.TYPE_NAME[s.type]);
     },
     guide: function (a) {
       var T = a.T, l = a.st.lang;
       var rows = L.map(function (s) {
-        return '<tr><td>' + s.n + '</td><td>' + esc(s.zh) + '</td><td>' + esc(s.py) + '</td><td>' + esc(s.en) + '</td><td>' + esc(TC.GROUPS[s.g][l]) + '</td></tr>';
+        return '<tr><td>' + s.n + '</td><td>' + esc(s.zh) + '</td><td>' + esc(s.py) + '</td><td>' + esc(s.en) + '</td><td>' + esc(KT.t(TC.GROUPS[s.g])) + '</td></tr>';
       }).join('');
       return '<h2>' + T('24 式太極拳的由來', 'Where the 24-form comes from') + '</h2>' +
         '<p>' + T('1956 年，中國國家體育運動委員會以傳統楊式太極拳為基礎，刪去重複動作、整理出由簡到難的 24 個動作，稱為「簡化太極拳」。因為容易學、時間短，它成為全世界最普及的太極拳套路，也是許多比賽與晨練的標準套路。',

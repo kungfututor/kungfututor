@@ -1,10 +1,30 @@
 <!doctype html>
-<html lang="zh-Hant" data-default-lang="zh">
+<html lang="en" data-page-lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KungfuTutor — Interactive Kung Fu, Martial Arts &amp; Sports Movement Lessons</title>
 <meta name="description" content="Learn kung fu, fighting, self-defence and sports skills from animated, interactive movement demos. Slow it down, step through it, and understand why it works.">
+<!-- kt:alternates -->
+<link rel="alternate" hreflang="en" href="https://kungfututor.com/">
+<link rel="alternate" hreflang="zh-Hans" href="https://kungfututor.com/zh-hans/">
+<link rel="alternate" hreflang="zh-Hant" href="https://kungfututor.com/zh-hant/">
+<link rel="alternate" hreflang="id" href="https://kungfututor.com/id/">
+<link rel="alternate" hreflang="ms" href="https://kungfututor.com/ms/">
+<link rel="alternate" hreflang="th" href="https://kungfututor.com/th/">
+<link rel="alternate" hreflang="vi" href="https://kungfututor.com/vi/">
+<link rel="alternate" hreflang="ja" href="https://kungfututor.com/ja/">
+<link rel="alternate" hreflang="ko" href="https://kungfututor.com/ko/">
+<link rel="alternate" hreflang="fil" href="https://kungfututor.com/fil/">
+<link rel="alternate" hreflang="pt" href="https://kungfututor.com/pt/">
+<link rel="alternate" hreflang="hi" href="https://kungfututor.com/hi/">
+<link rel="alternate" hreflang="es" href="https://kungfututor.com/es/">
+<link rel="alternate" hreflang="fr" href="https://kungfututor.com/fr/">
+<link rel="alternate" hreflang="bn" href="https://kungfututor.com/bn/">
+<link rel="alternate" hreflang="ar" href="https://kungfututor.com/ar/">
+<link rel="alternate" hreflang="ur" href="https://kungfututor.com/ur/">
+<link rel="alternate" hreflang="x-default" href="https://kungfututor.com/">
+<!-- /kt:alternates -->
 <link rel="canonical" href="https://kungfututor.com/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -157,9 +177,7 @@
   var hero = new KTFigure.Player(document.getElementById('hero-fig'));
   hero.load(punch); hero.setSpeed(0.75);
   KT.onLang(function (l) {
-    hero.setInfo(l === 'zh'
-      ? { a: '弓步沖拳', b: 'GONG BU CHONG QUAN', note: '前膝對腳尖 · 後腿蹬直' }
-      : { a: 'Bow-stance punch', b: 'GONG BU CHONG QUAN', note: 'FRONT KNEE OVER TOES · BACK LEG STRAIGHT' });
+    hero.setInfo({ a: KT.pick('弓步沖拳', 'Bow-stance punch'), b: 'GONG BU CHONG QUAN', note: KT.pick('前膝對腳尖 · 後腿蹬直', 'FRONT KNEE OVER TOES · BACK LEG STRAIGHT') });
   });
   var tile = new KTFigure.Player(document.getElementById('tile-hyrox'));
   tile.load(HYROX.CLIPS.push); tile.setInfo({ b: '' });

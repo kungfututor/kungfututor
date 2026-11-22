@@ -220,8 +220,8 @@
           else { b.x += k * cfg.fly[0]; b.y -= k * cfg.fly[1]; }
           fr += S.circle(b, 3.6, '#fff', C.ink, 1.6);
         }
-        if (isSide) hud += S.text(18, 30, lang === 'zh' ? '紅線＝背部角度（保持平直）' : 'RED LINE = SPINE ANGLE (KEEP IT FLAT)', { size: 11, fill: C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
-        else hud += S.text(18, 30, lang === 'zh' ? '綠圈＝頭部保持穩定' : 'GREEN RING = KEEP THE HEAD STEADY', { size: 11, fill: C.jade, family: "'JetBrains Mono','Noto Sans TC',monospace" });
+        if (isSide) hud += S.text(18, 30, KT.pick('紅線＝背部角度（保持平直）', 'RED LINE = SPINE ANGLE (KEEP IT FLAT)'), { size: 11, fill: C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
+        else hud += S.text(18, 30, KT.pick('綠圈＝頭部保持穩定', 'GREEN RING = KEEP THE HEAD STEADY'), { size: 11, fill: C.jade, family: "'JetBrains Mono','Noto Sans TC',monospace" });
         return { back: back, front: fr, hud: hud };
       }
     };

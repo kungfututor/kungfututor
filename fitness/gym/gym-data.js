@@ -232,9 +232,9 @@
           J.bar = b;
           back += S.circle(b, PLATE * sc, '#E9E7E1', C.ink, 2.5, ' opacity=".92"') + S.circle(b, 4 * sc, C.ink);
         }
-        if (s.id === 'plank') hud += S.text(18, 30, lang === 'zh' ? '綠線＝頭到腳跟一直線' : 'GREEN LINE = HEAD TO HEELS IN ONE LINE', { size: 11, fill: C.jade, family: "'JetBrains Mono','Noto Sans TC',monospace" });
+        if (s.id === 'plank') hud += S.text(18, 30, KT.pick('綠線＝頭到腳跟一直線', 'GREEN LINE = HEAD TO HEELS IN ONE LINE'), { size: 11, fill: C.jade, family: "'JetBrains Mono','Noto Sans TC',monospace" });
         if (s.id === 'plank' || s.id === 'pushup') fr += S.line(J.head, beginner && s.id === 'pushup' ? J.kN : J.aN, C.jade, 1.6, ' stroke-dasharray="5 4" opacity=".8"');
-        if (barbell && s.id !== 'bench') hud += S.text(18, 30, lang === 'zh' ? '虛線＝腳掌中間（槓鈴保持在上方）' : 'DASHED LINE = MID-FOOT (KEEP THE BAR OVER IT)', { size: 11, fill: '#7C8191', family: "'JetBrains Mono','Noto Sans TC',monospace" });
+        if (barbell && s.id !== 'bench') hud += S.text(18, 30, KT.pick('虛線＝腳掌中間（槓鈴保持在上方）', 'DASHED LINE = MID-FOOT (KEEP THE BAR OVER IT)'), { size: 11, fill: '#7C8191', family: "'JetBrains Mono','Noto Sans TC',monospace" });
         return { back: back, front: fr, hud: hud };
       }
     };

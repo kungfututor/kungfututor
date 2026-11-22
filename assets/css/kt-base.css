@@ -46,6 +46,10 @@ button { font: inherit; color: inherit; }
 .kt-lang { display: flex; border: 1px solid var(--hair); border-radius: 999px; overflow: hidden; flex: none; }
 .kt-lang button { border: 0; background: none; padding: 5px 11px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: var(--f-mono); }
 .kt-lang button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.kt-lang-select { appearance: none; -webkit-appearance: none; border: 0; background: var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23fff' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 10px center; color: #fff; padding: 6px 28px 6px 12px; font: 700 12px var(--f-body, system-ui), 'Noto Sans TC', sans-serif; cursor: pointer; max-width: 150px; }
+.kt-lang-select:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+/* right-to-left pages (Arabic, Urdu): the animations and code-like labels keep reading left to right */
+[dir="rtl"] .stage, [dir="rtl"] svg { direction: ltr; }
 
 /* ---------- ad slots (reserved space = no layout jump) ---------- */
 .ad-slot { position: relative; margin: 40px auto; background: var(--paper); border: 1px solid var(--hair-2); border-radius: 4px; min-height: 120px; display: grid; place-items: center; max-width: 970px; }

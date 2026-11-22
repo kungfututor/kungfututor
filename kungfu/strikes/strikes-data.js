@@ -94,7 +94,7 @@
         }
         if (s.kind === 'stretch' && J.tN.y < J.head.y + 30) fr += S.circle(J.head, 16, 'none', C.red, 1.5, ' stroke-dasharray="3 3"');
         fr += S.circle(p, extended ? 7 : 4.5, extended ? C.red : '#E3B4AF', '#fff', 1.5);
-        if (extended && s.kind !== 'stretch') hud += S.text(18, 30, (lang === 'zh' ? '力點：' : 'STRIKING POINT: ') + s.point[lang], { size: 12, fill: C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
+        if (extended && s.kind !== 'stretch') hud += S.text(18, 30, (KT.pick('力點：', 'STRIKING POINT: ')) + KT.t(s.point), { size: 12, fill: C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
         return { front: fr, hud: hud };
       }
     };

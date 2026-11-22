@@ -1,10 +1,30 @@
 <!doctype html>
-<html lang="zh-Hant" data-default-lang="zh">
+<html lang="en" data-page-lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Golf Swing Basics: Setup, Backswing, Impact &amp; Finish — Interactive Guide | KungfuTutor</title>
 <meta name="description" content="Learn the golf swing step by step with animation: setup posture, takeaway, top of the backswing, downswing, impact and finish, plus the full iron swing, driver, chip shot and putting stroke. Includes tempo, common mistakes and drills.">
+<!-- kt:alternates -->
+<link rel="alternate" hreflang="en" href="https://kungfututor.com/sports/golf/">
+<link rel="alternate" hreflang="zh-Hans" href="https://kungfututor.com/zh-hans/sports/golf/">
+<link rel="alternate" hreflang="zh-Hant" href="https://kungfututor.com/zh-hant/sports/golf/">
+<link rel="alternate" hreflang="id" href="https://kungfututor.com/id/sports/golf/">
+<link rel="alternate" hreflang="ms" href="https://kungfututor.com/ms/sports/golf/">
+<link rel="alternate" hreflang="th" href="https://kungfututor.com/th/sports/golf/">
+<link rel="alternate" hreflang="vi" href="https://kungfututor.com/vi/sports/golf/">
+<link rel="alternate" hreflang="ja" href="https://kungfututor.com/ja/sports/golf/">
+<link rel="alternate" hreflang="ko" href="https://kungfututor.com/ko/sports/golf/">
+<link rel="alternate" hreflang="fil" href="https://kungfututor.com/fil/sports/golf/">
+<link rel="alternate" hreflang="pt" href="https://kungfututor.com/pt/sports/golf/">
+<link rel="alternate" hreflang="hi" href="https://kungfututor.com/hi/sports/golf/">
+<link rel="alternate" hreflang="es" href="https://kungfututor.com/es/sports/golf/">
+<link rel="alternate" hreflang="fr" href="https://kungfututor.com/fr/sports/golf/">
+<link rel="alternate" hreflang="bn" href="https://kungfututor.com/bn/sports/golf/">
+<link rel="alternate" hreflang="ar" href="https://kungfututor.com/ar/sports/golf/">
+<link rel="alternate" hreflang="ur" href="https://kungfututor.com/ur/sports/golf/">
+<link rel="alternate" hreflang="x-default" href="https://kungfututor.com/sports/golf/">
+<!-- /kt:alternates -->
 <link rel="canonical" href="https://kungfututor.com/sports/golf/">
 <meta property="og:title" content="Golf Swing Basics — Interactive Step-by-Step Guide">
 <meta property="og:type" content="article">
@@ -166,20 +186,20 @@
   w.KTLesson({
     list: L, prefix: 'golf',
     makeClip: w.GOLF.makeClip,
-    info: function (s, lang) { return { a: lang === 'zh' ? s.zh : s.en, b: CLUB[s.club][lang].toUpperCase(), note: s.note[lang] }; },
+    info: function (s, lang) { return { a: KT.pick(s.zh, s.en), b: KT.t(CLUB[s.club]).toUpperCase(), note: KT.t(s.note) }; },
     levelName: function (lv, T) { return T('目前速度：', 'Current speed: ') + (lv < 1 ? T('學習（慢 3 倍）', 'Learning (3× slower)') : T('實際節奏', 'Real tempo')); },
-    cardPre: function (s, a) { return s.type[a.st.lang]; },
-    cardSub: function (s, a) { return s.key[a.st.lang]; },
-    pre: function (s, a) { return a.T('第 ' + s.n + ' 課 · ' + s.type.zh + ' · ' + CLUB[s.club].zh, 'Lesson ' + s.n + ' of 10 · ' + s.type.en + ' · ' + CLUB[s.club].en); },
-    spec: [function (s, l) { return s.key[l]; }, function (s, l) { return CLUB[s.club][l]; }, function (s, l) { return s.ability[l]; }],
+    cardPre: function (s, a) { return KT.t(s.type); },
+    cardSub: function (s, a) { return KT.t(s.key); },
+    pre: function (s, a) { return a.T('第 {n} 課 · {type} · {club}', 'Lesson {n} of 10 · {type} · {club}', { n: s.n, type: KT.t(s.type), club: KT.t(CLUB[s.club]) }); },
+    spec: [function (s, l) { return KT.t(s.key); }, function (s, l) { return KT.t(CLUB[s.club]); }, function (s, l) { return KT.t(s.ability); }],
     onRender: function (s, a) {
-      document.getElementById('st-key').textContent = s.key[a.st.lang];
-      document.getElementById('st-type').textContent = s.type[a.st.lang];
+      document.getElementById('st-key').textContent = KT.t(s.key);
+      document.getElementById('st-type').textContent = KT.t(s.type);
     },
     guide: function (a) {
       var T = a.T, l = a.st.lang;
       var rows = L.map(function (s) {
-        return '<tr><td>' + esc(l === 'zh' ? s.zh : s.en) + '</td><td>' + esc(s.type[l]) + '</td><td>' + esc(CLUB[s.club][l]) + '</td><td>' + esc(s.key[l]) + '</td></tr>';
+        return '<tr><td>' + esc(KT.pick(s.zh, s.en)) + '</td><td>' + esc(KT.t(s.type)) + '</td><td>' + esc(KT.t(CLUB[s.club])) + '</td><td>' + esc(KT.t(s.key)) + '</td></tr>';
       }).join('');
       return '<h2>' + T('先學會握桿', 'First, the grip') + '</h2>' +
         '<p>' + T('右手球員：左手先握，球桿斜放在手指根部，握好後從上往下看能看到左手 2–3 個指節；右手接著握上，右手掌心面向目標，蓋住左手拇指。三種常見握法——重疊式、交錯式、十指式——都可以，選最舒服的。握力大約是 10 分中的 4–5 分，太緊會讓手臂僵硬、揮不快。',

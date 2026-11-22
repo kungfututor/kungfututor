@@ -1,10 +1,30 @@
 <!doctype html>
-<html lang="zh-Hant" data-default-lang="zh">
+<html lang="en" data-page-lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Basic Kung Fu Punches &amp; Kicks: 6 Essential Techniques — Interactive Guide | KungfuTutor</title>
 <meta name="description" content="Learn six basic kung fu techniques — straight punch, palm strike, snap kick, heel thrust kick, side kick and front stretch kick — with step-by-step animation, striking points, common mistakes and practice tips.">
+<!-- kt:alternates -->
+<link rel="alternate" hreflang="en" href="https://kungfututor.com/kungfu/strikes/">
+<link rel="alternate" hreflang="zh-Hans" href="https://kungfututor.com/zh-hans/kungfu/strikes/">
+<link rel="alternate" hreflang="zh-Hant" href="https://kungfututor.com/zh-hant/kungfu/strikes/">
+<link rel="alternate" hreflang="id" href="https://kungfututor.com/id/kungfu/strikes/">
+<link rel="alternate" hreflang="ms" href="https://kungfututor.com/ms/kungfu/strikes/">
+<link rel="alternate" hreflang="th" href="https://kungfututor.com/th/kungfu/strikes/">
+<link rel="alternate" hreflang="vi" href="https://kungfututor.com/vi/kungfu/strikes/">
+<link rel="alternate" hreflang="ja" href="https://kungfututor.com/ja/kungfu/strikes/">
+<link rel="alternate" hreflang="ko" href="https://kungfututor.com/ko/kungfu/strikes/">
+<link rel="alternate" hreflang="fil" href="https://kungfututor.com/fil/kungfu/strikes/">
+<link rel="alternate" hreflang="pt" href="https://kungfututor.com/pt/kungfu/strikes/">
+<link rel="alternate" hreflang="hi" href="https://kungfututor.com/hi/kungfu/strikes/">
+<link rel="alternate" hreflang="es" href="https://kungfututor.com/es/kungfu/strikes/">
+<link rel="alternate" hreflang="fr" href="https://kungfututor.com/fr/kungfu/strikes/">
+<link rel="alternate" hreflang="bn" href="https://kungfututor.com/bn/kungfu/strikes/">
+<link rel="alternate" hreflang="ar" href="https://kungfututor.com/ar/kungfu/strikes/">
+<link rel="alternate" hreflang="ur" href="https://kungfututor.com/ur/kungfu/strikes/">
+<link rel="alternate" hreflang="x-default" href="https://kungfututor.com/kungfu/strikes/">
+<!-- /kt:alternates -->
 <link rel="canonical" href="https://kungfututor.com/kungfu/strikes/">
 <meta property="og:title" content="Kung Fu Punches &amp; Kicks — Interactive Step-by-Step Guide">
 <meta property="og:type" content="article">
@@ -164,20 +184,20 @@
   w.KTLesson({
     list: L, prefix: 'sk',
     makeClip: w.STRIKES.makeClip,
-    info: function (s, lang) { return { a: s.zh + ' ' + s.py, b: s.en.toUpperCase(), note: s.note[lang] }; },
+    info: function (s, lang) { return { a: s.zh + ' ' + s.py, b: s.en.toUpperCase(), note: KT.t(s.note) }; },
     levelName: function (lv, T) { return T('目前程度：', 'Current level: ') + (lv < 1 ? T('初學（低踢）', 'Beginner (low kicks)') : T('標準高度', 'Standard height')); },
-    cardPre: function (s, a) { return s.type[a.st.lang]; },
-    cardSub: function (s, a) { return a.T('力點：', 'Strikes with: ') + s.point[a.st.lang]; },
-    pre: function (s, a) { return a.T('第 ' + s.n + ' 式 · ' + s.type.zh + ' · 拼音 ' + s.py, 'Technique ' + s.n + ' of 6 · ' + s.type.en + ' · Pinyin ' + s.py); },
-    spec: [function (s, l) { return s.point[l]; }, function (s, l) { return s.height[l]; }, function (s, l) { return s.ability[l]; }],
+    cardPre: function (s, a) { return KT.t(s.type); },
+    cardSub: function (s, a) { return a.T('力點：', 'Strikes with: ') + KT.t(s.point); },
+    pre: function (s, a) { return a.T('第 {n} 式 · {type} · 拼音 {py}', 'Technique {n} of 6 · {type} · Pinyin {py}', { n: s.n, type: KT.t(s.type), py: s.py }); },
+    spec: [function (s, l) { return KT.t(s.point); }, function (s, l) { return KT.t(s.height); }, function (s, l) { return KT.t(s.ability); }],
     onRender: function (s, a) {
-      document.getElementById('st-point').textContent = s.point[a.st.lang];
-      document.getElementById('st-type').textContent = s.type[a.st.lang];
+      document.getElementById('st-point').textContent = KT.t(s.point);
+      document.getElementById('st-type').textContent = KT.t(s.type);
     },
     guide: function (a) {
       var T = a.T, l = a.st.lang;
       var rows = L.map(function (s) {
-        return '<tr><td>' + esc(s.zh + ' ' + s.py) + '</td><td>' + esc(s.en) + '</td><td>' + esc(s.type[l]) + '</td><td>' + esc(s.point[l]) + '</td><td>' + esc(s.height[l]) + '</td></tr>';
+        return '<tr><td>' + esc(s.zh + ' ' + s.py) + '</td><td>' + esc(s.en) + '</td><td>' + esc(KT.t(s.type)) + '</td><td>' + esc(KT.t(s.point)) + '</td><td>' + esc(KT.t(s.height)) + '</td></tr>';
       }).join('');
       return '<h2>' + T('先學會握拳', 'First, make a proper fist') + '</h2>' +
         '<p>' + T('四指併攏用力捲入掌心，拇指橫扣在食指與中指的第二節上，不要包在四指裡面。手腕要直，讓拳面與前臂成一直線——手腕彎曲是初學者最常見的受傷原因。',

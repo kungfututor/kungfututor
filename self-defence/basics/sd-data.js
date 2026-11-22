@@ -140,15 +140,15 @@
           fr += S.line(a, b, C.jade, 2, ' stroke-dasharray="5 4"');
           fr += S.line({ x: a.x, y: y - 6 }, { x: a.x, y: y + 6 }, C.jade, 2) + S.line({ x: b.x, y: y - 6 }, { x: b.x, y: y + 6 }, C.jade, 2);
         }
-        hud += S.text(18, 30, lang === 'zh' ? '安全距離：一臂以上' : 'SAFE GAP: MORE THAN AN ARM', { size: 12, fill: C.jade, family: "'JetBrains Mono','Noto Sans TC',monospace" });
+        hud += S.text(18, 30, KT.pick('安全距離：一臂以上', 'SAFE GAP: MORE THAN AN ARM'), { size: 12, fill: C.jade, family: "'JetBrains Mono','Noto Sans TC',monospace" });
       }
       if (src.hitJ && p.hit > 0.15) {
         var hp = J[src.hitJ];
         fr += S.circle(hp, 5 + 9 * p.hit, 'none', C.red, 2.5, ' opacity="' + Math.min(1, p.hit) + '"');
         fr += S.circle(hp, 5, C.red, '#fff', 1.5);
-        if (p.hit > 0.6) hud += S.text(18, 30, (lang === 'zh' ? '目標：' : 'TARGET: ') + s.target[lang], { size: 12, fill: C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
+        if (p.hit > 0.6) hud += S.text(18, 30, (KT.pick('目標：', 'TARGET: ')) + KT.t(s.target), { size: 12, fill: C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
       }
-      if (p.say > 0.5) hud += S.text(18, p.dist > 0.5 ? 50 : 30, lang === 'zh' ? '「退後！」' : '"STAY BACK!"', { size: 15, fill: C.red });
+      if (p.say > 0.5) hud += S.text(18, p.dist > 0.5 ? 50 : 30, KT.pick('「退後！」', '"STAY BACK!"'), { size: 15, fill: C.red });
       return { back: o.svg, front: fr, hud: hud };
     };
     return clip;

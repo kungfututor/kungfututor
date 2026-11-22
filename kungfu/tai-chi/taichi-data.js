@@ -278,7 +278,7 @@
       farColor: front ? '#596075' : undefined, trail: 'hN', frames: frames,
       props: function (J, c) {
         var fr = frames[c.seg] || frames[0], inhale = fr.br === 'in';
-        var hud = S.text(18, 30, inhale ? (lang === 'zh' ? '吸氣 ↑' : 'INHALE ↑') : (lang === 'zh' ? '呼氣 ↓' : 'EXHALE ↓'),
+        var hud = S.text(18, 30, inhale ? (KT.pick('吸氣 ↑', 'INHALE ↑')) : (KT.pick('呼氣 ↓', 'EXHALE ↓')),
           { size: 13, fill: inhale ? C.jade : C.red, family: "'JetBrains Mono','Noto Sans TC',monospace" });
         var r = 6 + 6 * (inhale ? c.k : 1 - c.k);   // breathing circle grows on the in-breath
         hud += S.circle({ x: 120, y: 26 }, r, 'none', inhale ? C.jade : C.red, 2, ' opacity=".7"');

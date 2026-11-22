@@ -23,7 +23,7 @@
     }
   })();
 
-  function T(zh, en) { return st.lang === 'zh' ? zh : en; }
+  function T(zh, en, vars) { return KT.fmt(KT.pick(zh, en), vars); }
   function div() { return H.DIVS.filter(function (x) { return x.id === st.div; })[0] || H.DIVS[3]; }
   function sub() { var D = div(); return D.subs ? (D.subs.filter(function (s) { return s.id === st.sub; })[0] || D.subs[0]) : null; }
   function weights() { var s = sub(); return s ? s.w : div().w; }
@@ -73,7 +73,7 @@
       var n = ('0' + s.n).slice(-2);
       return '<button class="card' + (st.mastered.indexOf(s.n) > -1 ? ' done' : '') + '" data-i="' + i + '" aria-pressed="' + (i === st.idx) + '">' +
         '<span class="row1"><span class="num">' + n + '</span><span class="pre">' + T('1km 跑後', 'after 1 km') + '</span></span>' +
-        '<span class="nm">' + (st.lang === 'zh' ? esc(s.zh) + ' ' : '') + esc(s.en) + '</span>' +
+        '<span class="nm">' + (KT.lang === 'zh-Hant' ? esc(s.zh) + ' ' + esc(s.en) : esc(KT.pick(s.zh, s.en))) + '</span>' +
         '<span class="sp">' + esc(s.spec(W, st.lang)) + '</span>' +
         '<span class="ok">✓ ' + T('已熟悉', 'MASTERED') + '</span></button>';
     }).join('');
@@ -81,33 +81,33 @@
 
   function renderInspector() {
     var s = H.STATIONS[st.idx], W = weights(), L = st.lang, n = ('0' + s.n).slice(-2);
-    var tags = s.tags[L];
+    var tags = KT.t(s.tags);
     $('i-tags').innerHTML = '<span class="tag red">' + esc(tags[0]) + '</span><span class="tag">' + esc(tags[1]) + '</span>';
-    $('i-pre').textContent = T('前置賽段：第 ' + s.n + ' 段 1,000m 跑步後進入 RoxZone', 'Comes after run ' + s.n + ' of 8 (1,000 m), via the RoxZone');
+    $('i-pre').textContent = T('前置賽段：第 {n} 段 1,000m 跑步後進入 RoxZone', 'Comes after run {n} of 8 (1,000 m), via the RoxZone', { n: s.n });
     $('i-num').textContent = n;
-    $('i-name').textContent = L === 'zh' ? s.zh : s.en;
-    $('i-en').textContent = L === 'zh' ? s.en : '';
+    $('i-name').textContent = KT.pick(s.zh, s.en);
+    $('i-en').textContent = KT.pick(s.en, '');
     $('i-dist').textContent = s.dist === '100 reps' ? T('100 次', '100 reps') : s.dist;
     $('i-load-k').textContent = divName() + T('規格／負重', ' — load');
     $('i-load').textContent = s.load(W, L);
-    $('i-abil').textContent = s.ability[L];
-    $('i-move').textContent = s.move[L];
-    $('i-rules').textContent = s.rules[L];
-    $('i-train').textContent = s.train[L];
+    $('i-abil').textContent = KT.t(s.ability);
+    $('i-move').textContent = KT.t(s.move);
+    $('i-rules').textContent = KT.t(s.rules);
+    $('i-train').textContent = KT.t(s.train);
     var on = st.mastered.indexOf(s.n) > -1, mb = $('i-master');
     mb.classList.toggle('on', on);
     mb.textContent = on ? T('✓ 已標記為熟悉', '✓ Marked as mastered') : T('標記為已熟悉', 'Mark as mastered');
     $('i-master-s').textContent = T('進度只存在你的瀏覽器', 'Progress is saved in your browser only');
-    $('p-title').textContent = n + ' ' + (L === 'zh' ? s.zh + T('動作與距離示意', '') : s.en + ' — movement demo');
+    $('p-title').textContent = n + ' ' + KT.pick(s.zh, s.en) + KT.pick('動作與距離示意', ' — movement demo');
     $('p-dist').textContent = s.dist === '100 reps' ? T('100 次', '100 reps') : s.dist;
     $('bars').innerHTML = s.bars.map(function (b) {
-      return '<div class="bar"><span>' + esc(L === 'zh' ? b[0] : b[1]) + '</span><i><b style="width:0%" data-w="' + b[2] + '"></b></i><em>' + b[2] + '%</em></div>';
+      return '<div class="bar"><span>' + esc(KT.pick(b[0], b[1])) + '</span><i><b style="width:0%" data-w="' + b[2] + '"></b></i><em>' + b[2] + '%</em></div>';
     }).join('');
     w.requestAnimationFrame(function () {
       [].forEach.call(d.querySelectorAll('#bars b'), function (b) { b.style.width = b.getAttribute('data-w') + '%'; });
     });
     if (player.clipKey !== s.clip) { player.load(H.CLIPS[s.clip]); player.clipKey = s.clip; }
-    player.setInfo({ a: s.dist === '100 reps' ? T('100 次', '100 reps') : s.dist, b: s.load(W, L), note: s.note, targets: W.tgtM });
+    player.setInfo({ a: s.dist === '100 reps' ? T('100 次', '100 reps') : s.dist, b: s.load(W, L), note: KT.pick(null, s.note), targets: W.tgtM });
   }
 
   function renderGuide() {
