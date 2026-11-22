@@ -164,7 +164,7 @@
       $('t-best').textContent = b ? T('你的最佳紀錄：', 'Your best hold: ') + fmt(b) : T('完成一次計時就會記下你的最佳紀錄', 'Finish a hold to record your best time');
       $$('[data-sec]').forEach(function (x) { x.setAttribute('aria-pressed', String(+x.getAttribute('data-sec') === tm.sec)); });
       if (!tm.id) $('t-clock').textContent = fmt(tm.sec);
-      $('t-go').textContent = tm.id ? T('停止', 'Stop') : T('開始站樁', 'Start hold');
+      $('t-go').textContent = tm.id ? T('停止', 'Stop') : (cfg.timerGo ? cfg.timerGo(T) : T('開始站樁', 'Start hold'));
     }
     function stopTimer(completed) {
       if (!tm.id) return;
