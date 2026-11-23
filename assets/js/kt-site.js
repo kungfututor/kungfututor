@@ -154,16 +154,42 @@
     });
   }
 
+  /* ----- member sign-in (assets/js/kt-auth.js, loaded only when needed) ----- */
+  var authMod = null;
+  function loadAuth() {
+    if (!authMod) authMod = import(ASSETS + 'js/kt-auth.js');
+    return authMod;
+  }
+  function initAuth() {
+    var top = d.querySelector('.kt-top .wrap');
+    if (top && !d.querySelector('[data-kt-auth]')) {
+      var b = d.createElement('button');
+      b.type = 'button'; b.className = 'kt-signin'; b.setAttribute('data-kt-auth', '');
+      b.textContent = pick('登入', 'Sign in');
+      top.appendChild(b);
+    }
+    d.addEventListener('click', function (e) {
+      var t = e.target.closest && e.target.closest('[data-kt-auth],[data-kt-auth-open]');
+      if (!t) return;
+      e.preventDefault();
+      loadAuth().then(function (m) { m.open(); });
+    });
+    // signed in on this browser before: restore the name on the button
+    if (store.get('kt.member', 0)) loadAuth().then(function (m) { if (m.ready) m.load(); });
+  }
+
   d.addEventListener('DOMContentLoaded', function () {
     buildPicker();
     apply();
     initAds();
+    initAuth();
     var y = d.getElementById('kt-year');
     if (y) y.textContent = new Date().getFullYear();
   });
 
   w.KT = {
     store: store, LANGS: LANGS, lang: LANG, pick: pick, t: t, name: name, fmt: fmt, urlFor: urlFor,
+    home: (ROOT || '/') + (info(LANG)[1] ? info(LANG)[1] + '/' : ''),   // this language's home folder
     isZh: function () { return LANG === 'zh-Hant' || LANG === 'zh-Hans'; },
     getLang: function () { return LANG; }, setLang: setLang,
     onLang: function (fn) { listeners.push(fn); }
