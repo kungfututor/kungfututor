@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>3D Movement Lab — Turn the Instructor Round, Slow It Down | KungfuTutor</title>
-<meta name="description" content="A 3D martial arts and fitness instructor you can rotate 360°, slow down to quarter speed and scrub frame by frame: flying knee, roundhouse kick, push kick, 1-2, kung fu punch, side kick, squat and lunge.">
+<meta name="description" content="A 3D martial arts and fitness instructor you can rotate 360°, slow down to quarter speed and scrub frame by frame — 50 moves from kung fu stances and tai chi to Muay Thai, boxing, grappling, self-defence and gym lifts.">
 <meta property="og:title" content="KungfuTutor 3D Movement Lab — See Every Angle">
 <!-- kt:alternates -->
 <link rel="alternate" hreflang="en" href="https://kungfututor.com/lab/3d/">
@@ -63,7 +63,11 @@
   .scrub { display: flex; align-items: center; gap: 12px; margin-top: 12px; font: 600 12px var(--f-ui); color: var(--muted); }
   .scrub input { flex: 1; accent-color: #365749; }
   .moves h2 { font: 500 22px var(--f-serif); margin: 4px 0 12px; }
-  #lab-moves { display: grid; gap: 8px; }
+  .lab-cats { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .lab-cats button { border: 0; cursor: pointer; padding: 7px 12px; border-radius: 999px; font: 600 12px var(--f-ui); background: var(--bg-mid); color: var(--ink-2); white-space: nowrap; }
+  .lab-cats button[aria-pressed="true"] { background: var(--terra); color: #fff; }
+  #lab-moves { display: grid; gap: 8px; max-height: 560px; overflow-y: auto; padding: 2px 6px 8px 2px; }
+  #lab-moves button[hidden] { display: none; }
   #lab-moves button { text-align: start; border: 0; cursor: pointer; background: var(--card); border-radius: 16px; padding: 12px 14px; box-shadow: var(--sh-1); font: 600 15px var(--f-ui); color: var(--ink); }
   #lab-moves button small { display: block; font: 700 10px var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--terra); margin-bottom: 2px; }
   #lab-moves button:hover { box-shadow: var(--sh-2); }
@@ -75,7 +79,7 @@
   .lab-note h2 { margin: 0 0 6px; font: 500 20px var(--f-serif); color: var(--ink); }
   .lab-note ul { margin: 6px 0 0; padding-inline-start: 20px; }
   .lab-fail { padding: 40px 20px; text-align: center; color: var(--ink-2); }
-  @media (max-width: 980px) { .lab { grid-template-columns: 1fr; } #lab-moves { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
+  @media (max-width: 980px) { .lab { grid-template-columns: 1fr; } #lab-moves { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); max-height: none; } }
   @media (max-width: 640px) { #lab-stage { height: 56vh; min-height: 300px; } .lab-hud .hint { display: none; } .viewer { padding: 10px; border-radius: 20px; } }
 </style>
 <script type="importmap">
@@ -140,6 +144,7 @@
       </div>
       <aside class="moves">
         <h2 data-zh="選擇動作" data-en="Pick a move"></h2>
+        <div class="lab-cats" id="lab-cats" role="group" aria-label="Categories"></div>
         <div id="lab-moves"></div>
         <a class="more" id="lab-link" href="../../"><span data-zh="打開完整課程：要領、錯誤與練習 →" data-en="Open the full lesson: cues, mistakes and drills →"></span></a>
       </aside>
@@ -148,6 +153,7 @@
     <div class="lab-note">
       <h2 data-zh="關於這個 3D 教練" data-en="About this 3D instructor"></h2>
       <p data-zh="3D 教練跟著我們側面課程的關鍵動作移動，所以主要的動作在身體側面的平面上；像泰拳中段踢這類需要轉髖的動作，在 3D 中是簡化的。學習時請同時閱讀完整課程，並盡可能在合格教練指導下練習。" data-en="The 3D instructor follows the key positions of our side-view lessons, so most of the movement happens in the side plane; moves that turn the hips, such as the Muay Thai roundhouse, are simplified in 3D. Read the full lesson as well, and practise under a qualified coach where possible."></p>
+      <p data-zh="3D 人體模型：Quaternius 的 Universal Base Characters（CC0 公眾領域授權）。" data-en="3D body model: Universal Base Characters by Quaternius (CC0 public-domain licence)."></p>
     </div>
 
     <div class="ad-slot" data-slot="mid" data-label="Advertisement"></div>
@@ -171,6 +177,14 @@
 <script src="../../combat/boxing/boxing-data.js"></script>
 <script src="../../kungfu/strikes/strikes-data.js"></script>
 <script src="../../fitness/gym/gym-data.js"></script>
+<script src="../../kungfu/stances/stances-data.js"></script>
+<script src="../../kungfu/tai-chi/taichi-data.js"></script>
+<script src="../../combat/mma/mma-data.js"></script>
+<script src="../../combat/judo/judo-data.js"></script>
+<script src="../../combat/bjj/bjj-data.js"></script>
+<script src="../../combat/wrestling/wrestling-data.js"></script>
+<script src="../../self-defence/basics/sd-data.js"></script>
+<script src="../../self-defence/krav-maga/krav-data.js"></script>
 <script type="module" src="lab3d.js"></script>
 </body>
 </html>
