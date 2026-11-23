@@ -209,82 +209,59 @@ function pose3d(t) {
   return { J: Js, V: V, theta: theta, pose: S ? S.pose : F.pose, seg: (S ? sideP : frontP).poseAt(t).seg };
 }
 
-/* ---------- the skinned human model (Quaternius Universal Base Characters, CC0) ----------
- * Each frame the bones are aimed at the same 3D joint points the simple figure uses:
- * spine → shoulders, neck → head, upper arm → elbow, forearm → hand, thigh → knee,
- * calf → ankle, foot → toes. N (near, +z) is the body's right side, F its left.
- * The outfit is painted per body region from the skin weights (cream jacket,
- * black joggers, white trainers) on top of the model's skin texture.
+/* ---------- the skinned instructor model (made for KungfuTutor with Meshy, private licence) ----------
+ * One .glb file: the textured instructor (cream hooded jacket, black joggers, white
+ * trainers) with a standard humanoid skeleton (Mixamo bone names). Each frame the bones
+ * are aimed at the same 3D joint points the simple figure uses: spine → shoulders,
+ * neck → head, upper arm → elbow, forearm → hand, thigh → knee, shin → ankle,
+ * foot → toes. N (near, +z) is the body's right side, F its left.
  */
-var MODEL_DIR = '/assets/models/instructor/';
+var MODEL_URL = '/assets/models/instructor/kt-instructor.glb';
 var avatar = null;
 var AV = { v1: new THREE.Vector3(), v2: new THREE.Vector3(), q1: new THREE.Quaternion(), q2: new THREE.Quaternion(), q3: new THREE.Quaternion() };
-function regionOf(name) {
-  if (/^(pelvis|thigh|calf)/.test(name)) return 'pants';
-  if (/^(foot|ball)/.test(name)) return 'shoe';
-  if (/^(spine|clavicle|upperarm|lowerarm)/.test(name)) return 'jacket';
-  return 'skin';
-}
-function paintOutfit(mesh) {
-  var geo = mesh.geometry, si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight, bones = mesh.skeleton.bones;
-  var col = { pants: new THREE.Color('#1E2026'), shoe: new THREE.Color('#ECEDE9'), jacket: new THREE.Color('#D9CDB7') };
-  var arr = new Float32Array(si.count * 4);
-  for (var i = 0; i < si.count; i++) {
-    var sum = { skin: 0, pants: 0, shoe: 0, jacket: 0 };
-    for (var k = 0; k < 4; k++) {
-      var w = sw.getComponent(i, k);
-      if (w) sum[regionOf(bones[si.getComponent(i, k)].name)] += w;
+// three.js drops the colon from "mixamorig:Hips", so match on the part after the prefix
+function boneKey(name) { return name.replace(/^mixamorig[:_]?/i, ''); }
+var NEED = ['Hips', 'Spine', 'Neck', 'Head', 'RightArm', 'RightForeArm', 'RightHand', 'LeftArm', 'LeftForeArm', 'LeftHand',
+  'RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase'];
+// closed fists: each finger joint turns towards the palm (palms face down in the model's T-pose)
+var FINGERS = ['Index', 'Middle', 'Ring', 'Pinky'], CURL = [0.95, 0.95, 0.55], THUMB = [0.2, 0.35, 0.35];
+function fistTurns(B) {
+  var out = {}, down = new THREE.Vector3(0, -1, 0), wq = new THREE.Quaternion();
+  ['Right', 'Left'].forEach(function (side) {
+    function add(name, child, ang) {
+      var b = B[side + 'Hand' + name], c = B[side + 'Hand' + child];
+      if (!b || !c) return;
+      var dir = c.getWorldPosition(new THREE.Vector3()).sub(b.getWorldPosition(new THREE.Vector3())).normalize();
+      var axis = new THREE.Vector3().crossVectors(dir, down).normalize();          // turning about this moves the finger towards the palm
+      axis.applyQuaternion(b.getWorldQuaternion(wq).invert());                     // into the joint's own frame
+      out[side + 'Hand' + name] = new THREE.Quaternion().setFromAxisAngle(axis, ang);
     }
-    // each vertex takes its strongest region, so hems and cuffs are clean lines, not fades
-    var best = 'skin';
-    ['pants', 'shoe', 'jacket'].forEach(function (rg) { if (sum[rg] > sum[best]) best = rg; });
-    var c = col[best];
-    arr[i * 4] = c ? c.r : 0; arr[i * 4 + 1] = c ? c.g : 0; arr[i * 4 + 2] = c ? c.b : 0; arr[i * 4 + 3] = c ? 1 : 0;
-  }
-  geo.setAttribute('cloth', new THREE.BufferAttribute(arr, 4));
-  var mat = mesh.material;
-  mat.onBeforeCompile = function (sh) {
-    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute vec4 cloth;\nvarying vec4 vCloth;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvCloth = cloth;\ntransformed += normalize(objectNormal) * 0.012 * cloth.a;');   // clothes sit a little off the skin
-    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec4 vCloth;')
-      .replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb = mix(diffuseColor.rgb, vCloth.rgb, vCloth.a);')
-      .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\nnormal = normalize(mix(normal, nonPerturbedNormal, vCloth.a * 0.9));')   // fabric hides the muscle detail
-      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 0.92, vCloth.a);');
-  };
-  mat.needsUpdate = true;
+    FINGERS.forEach(function (f) { [1, 2, 3].forEach(function (j) { add(f + j, f + (j + 1), CURL[j - 1]); }); });
+    [1, 2, 3].forEach(function (j) { add('Thumb' + j, 'Thumb' + (j + 1), THUMB[j - 1]); });
+  });
+  return out;
 }
-function setupAvatar(root, hairRoot) {
+function setupAvatar(root) {
   var B = {}, rig = new THREE.Group(), body3d = null;
   rig.add(root);
   root.traverse(function (o) {
-    if (o.isBone) B[o.name] = o;
-    if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; if (o.name === 'SuperHero_Male') body3d = o; }
+    if (o.isBone) B[boneKey(o.name)] = o;
+    if (o.isSkinnedMesh) { o.castShadow = true; o.frustumCulled = false; body3d = body3d || o; }
   });
-  if (!B.pelvis || !body3d) return null;
+  if (!body3d || NEED.some(function (n) { return !B[n]; })) return null;
   rig.updateMatrixWorld(true);
   var W = function (n) { return B[n].getWorldPosition(new THREE.Vector3()); };
   // scale the model so its legs match the lesson figure (thigh + shin = 88 units)
-  var leg = W('thigh_r').distanceTo(W('calf_r')) + W('calf_r').distanceTo(W('foot_r'));
-  var s = (88 * K) / leg;
-  rig.scale.setScalar(s); rig.updateMatrixWorld(true);
-  var ankle = W('foot_r').y;                                   // ankle height above the floor at rest
-  var right = W('thigh_r').sub(W('thigh_l')); right.y = 0; right.normalize();
+  var leg = W('RightUpLeg').distanceTo(W('RightLeg')) + W('RightLeg').distanceTo(W('RightFoot'));
+  rig.scale.setScalar((88 * K) / leg); rig.updateMatrixWorld(true);
+  var ankle = W('RightFoot').y;                                // ankle height above the floor at rest
+  var right = W('RightUpLeg').sub(W('LeftUpLeg')); right.y = 0; right.normalize();
   var fwd = new THREE.Vector3().crossVectors(UPV, right).normalize();
-  paintOutfit(body3d);
-  // hair: placed at the model's rest origin, then pinned to the head bone
-  if (hairRoot) {
-    hairRoot.traverse(function (o) { if (o.isMesh) { o.castShadow = true; o.material.color = new THREE.Color('#2A2420'); } });
-    root.add(hairRoot); rig.updateMatrixWorld(true); B.Head.attach(hairRoot);
-  }
-  // the 拳 badge on the chest
-  var chest = W('spine_03'), badge3 = new THREE.Mesh(new THREE.PlaneGeometry(0.07, 0.07), new THREE.MeshBasicMaterial({ map: badgeTex, transparent: true }));
-  badge3.position.copy(chest).addScaledVector(fwd, 0.135).addScaledVector(right, 0.08).add(new THREE.Vector3(0, 0.03, 0));
-  badge3.lookAt(badge3.position.clone().add(fwd));
-  rig.add(badge3); B.spine_03.attach(badge3);
   var rest = {};
   Object.keys(B).forEach(function (n) { rest[n] = B[n].quaternion.clone(); });
+  var fist = fistTurns(B);
   scene.add(rig);
-  return { rig: rig, B: B, rest: rest, ankle: ankle, fwd: fwd };
+  return { rig: rig, B: B, rest: rest, fist: fist, ankle: ankle, fwd: fwd };
 }
 function aimBone(bone, child, dir) {
   if (!bone || !child || dir.lengthSq() < 1e-8) return;
@@ -296,48 +273,33 @@ function aimBone(bone, child, dir) {
   bone.quaternion.copy(pw.multiply(wq));
   bone.updateMatrixWorld(true);
 }
-// closed fists: finger joints bend about their local X axis
-var XAX = new THREE.Vector3(1, 0, 0), FQ = new THREE.Quaternion();
-var CURL = { '01': 1.35, '02': 1.5, '03': 1.1 }, THUMB = { '01': 0.15, '02': 0.55, '03': 0.7 };
-function makeFists(B) {
-  ['r', 'l'].forEach(function (s) {
-    ['index', 'middle', 'ring', 'pinky'].forEach(function (f) {
-      ['01', '02', '03'].forEach(function (j) { var b = B[f + '_' + j + '_' + s]; if (b) b.quaternion.multiply(FQ.setFromAxisAngle(XAX, CURL[j])); });
-    });
-    ['01', '02', '03'].forEach(function (j) { var b = B['thumb_' + j + '_' + s]; if (b) b.quaternion.multiply(FQ.setFromAxisAngle(XAX, THUMB[j])); });
-  });
-}
 function poseAvatar(n, theta) {
   var A = avatar, B = A.B;
   Object.keys(B).forEach(function (k) { B[k].quaternion.copy(A.rest[k]); });
-  makeFists(B);
+  Object.keys(A.fist).forEach(function (k) { B[k].quaternion.multiply(A.fist[k]); });
   // turn the whole model so it faces +X (turned round by theta)
   var want = new THREE.Vector3(1, 0, 0).applyAxisAngle(UPV, theta);
   A.rig.quaternion.setFromUnitVectors(A.fwd, want);
   A.rig.position.set(0, 0, 0);
   A.rig.updateMatrixWorld(true);
   var d = function (a, b) { return new THREE.Vector3().subVectors(b, a); };
-  aimBone(B.spine_01, B.neck_01, d(n.hip, n.sh));
-  aimBone(B.neck_01, B.Head, d(n.sh, n.head));
-  aimBone(B.upperarm_r, B.lowerarm_r, d(n.shN, n.eN)); aimBone(B.lowerarm_r, B.hand_r, d(n.eN, n.hN));
-  aimBone(B.upperarm_l, B.lowerarm_l, d(n.shF, n.eF)); aimBone(B.lowerarm_l, B.hand_l, d(n.eF, n.hF));
-  aimBone(B.thigh_r, B.calf_r, d(n.hipN, n.kN)); aimBone(B.calf_r, B.foot_r, d(n.kN, n.aN)); aimBone(B.foot_r, B.ball_r, d(n.aN, n.tN));
-  aimBone(B.thigh_l, B.calf_l, d(n.hipF, n.kF)); aimBone(B.calf_l, B.foot_l, d(n.kF, n.aF)); aimBone(B.foot_l, B.ball_l, d(n.aF, n.tF));
+  aimBone(B.Spine, B.Neck, d(n.hip, n.sh));
+  aimBone(B.Neck, B.Head, d(n.sh, n.head));
+  aimBone(B.RightArm, B.RightForeArm, d(n.shN, n.eN)); aimBone(B.RightForeArm, B.RightHand, d(n.eN, n.hN));
+  aimBone(B.LeftArm, B.LeftForeArm, d(n.shF, n.eF)); aimBone(B.LeftForeArm, B.LeftHand, d(n.eF, n.hF));
+  aimBone(B.RightUpLeg, B.RightLeg, d(n.hipN, n.kN)); aimBone(B.RightLeg, B.RightFoot, d(n.kN, n.aN)); aimBone(B.RightFoot, B.RightToeBase, d(n.aN, n.tN));
+  aimBone(B.LeftUpLeg, B.LeftLeg, d(n.hipF, n.kF)); aimBone(B.LeftLeg, B.LeftFoot, d(n.kF, n.aF)); aimBone(B.LeftFoot, B.LeftToeBase, d(n.aF, n.tF));
   // put the hips where the lesson figure's hips are (ankles sit at their real height)
-  var mid = B.thigh_r.getWorldPosition(new THREE.Vector3()).add(B.thigh_l.getWorldPosition(new THREE.Vector3())).multiplyScalar(0.5);
+  var mid = B.RightUpLeg.getWorldPosition(new THREE.Vector3()).add(B.LeftUpLeg.getWorldPosition(new THREE.Vector3())).multiplyScalar(0.5);
   A.rig.position.set(n.hip.x - mid.x, n.hip.y - mid.y + A.ankle, n.hip.z - mid.z);
 }
 (function loadAvatar() {
-  var loader = new GLTFLoader();
-  loader.load(MODEL_DIR + 'instructor.gltf', function (g) {
-    loader.load(MODEL_DIR + 'hair_simpleparted.gltf', function (h) { done(g, h.scene); }, undefined, function () { done(g, null); });
-  }, undefined, function () { /* keep the simple figure */ });
-  function done(g, hair) {
-    var a = setupAvatar(g.scene, hair);
+  new GLTFLoader().load(MODEL_URL, function (g) {
+    var a = setupAvatar(g.scene);
     if (!a) return;
     avatar = a; body.visible = false;
     if (clip) draw();
-  }
+  }, undefined, function () { /* keep the simple figure */ });
 })();
 
 function drawBody(time) {
