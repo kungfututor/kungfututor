@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ja" data-page-lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3Dムーブメントラボ — 指導者を回して、スローで見る | KungfuTutor</title>
+<meta name="description" content="360°回転でき、4分の1の速さにスローダウンし、コマ送りもできる3Dの武術・フィットネス指導者。飛び膝、回し蹴り、プッシュキック、1-2、カンフーパンチ、横蹴り、スクワット、ランジ。">
+<meta property="og:title" content="KungfuTutor 3Dムーブメントラボ — あらゆる角度から見る">
+<!-- kt:alternates -->
+<link rel="alternate" hreflang="en" href="https://kungfututor.com/lab/3d/">
+<link rel="alternate" hreflang="zh-Hans" href="https://kungfututor.com/zh-hans/lab/3d/">
+<link rel="alternate" hreflang="zh-Hant" href="https://kungfututor.com/zh-hant/lab/3d/">
+<link rel="alternate" hreflang="id" href="https://kungfututor.com/id/lab/3d/">
+<link rel="alternate" hreflang="ms" href="https://kungfututor.com/ms/lab/3d/">
+<link rel="alternate" hreflang="th" href="https://kungfututor.com/th/lab/3d/">
+<link rel="alternate" hreflang="vi" href="https://kungfututor.com/vi/lab/3d/">
+<link rel="alternate" hreflang="ja" href="https://kungfututor.com/ja/lab/3d/">
+<link rel="alternate" hreflang="ko" href="https://kungfututor.com/ko/lab/3d/">
+<link rel="alternate" hreflang="fil" href="https://kungfututor.com/fil/lab/3d/">
+<link rel="alternate" hreflang="pt" href="https://kungfututor.com/pt/lab/3d/">
+<link rel="alternate" hreflang="hi" href="https://kungfututor.com/hi/lab/3d/">
+<link rel="alternate" hreflang="es" href="https://kungfututor.com/es/lab/3d/">
+<link rel="alternate" hreflang="fr" href="https://kungfututor.com/fr/lab/3d/">
+<link rel="alternate" hreflang="bn" href="https://kungfututor.com/bn/lab/3d/">
+<link rel="alternate" hreflang="ar" href="https://kungfututor.com/ar/lab/3d/">
+<link rel="alternate" hreflang="ur" href="https://kungfututor.com/ur/lab/3d/">
+<link rel="alternate" hreflang="x-default" href="https://kungfututor.com/lab/3d/">
+<!-- /kt:alternates -->
+<link rel="canonical" href="https://kungfututor.com/ja/lab/3d/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;700&family=Noto+Serif+TC:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../../assets/css/kt-base.css">
+<link rel="stylesheet" href="../../../assets/css/kt-home.css">
+<style>
+  .lab-hero { position: relative; overflow: hidden; padding: 36px 0 12px; }
+  .lab-hero .glow.a { top: -160px; left: 50%; width: 900px; height: 380px; margin-left: -450px; background: radial-gradient(closest-side, rgba(205, 233, 220, .8), transparent); }
+  .lab-hero .wrap { position: relative; z-index: 1; }
+  .lab-hero .crumb { font: 600 13px var(--f-ui); color: var(--muted); }
+  .lab-hero .crumb a { color: var(--sage); text-decoration: none; }
+  .lab-hero h1 { font: 400 clamp(32px, 5vw, 52px)/1.12 var(--f-serif); letter-spacing: -.02em; margin: 14px 0 12px; }
+  .lab-hero h1 em { color: var(--sage); }
+  .lab-hero p { color: var(--ink-2); max-width: 680px; margin: 0; font-size: 17px; line-height: 1.7; }
+  .lab { display: grid; grid-template-columns: 1fr 300px; gap: 22px; margin-top: 26px; align-items: start; }
+  .viewer { background: var(--card); border-radius: 24px; box-shadow: var(--sh-1); padding: 14px; }
+  #lab-stage { position: relative; height: min(64vh, 600px); min-height: 340px; border-radius: 16px; overflow: hidden; background: #F4EFE6; touch-action: none; }
+  #lab-stage canvas { display: block; width: 100% !important; height: 100% !important; cursor: grab; }
+  #lab-stage canvas:active { cursor: grabbing; }
+  .lab-hud { position: absolute; left: 12px; right: 12px; top: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 14px; background: rgba(254, 249, 240, .86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, .6); box-shadow: var(--sh-1); pointer-events: none; }
+  .lab-hud small { display: block; font: 700 11px var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--terra); }
+  .lab-hud b { display: block; font: 500 20px/1.2 var(--f-serif); }
+  .lab-hud .hint { font: 600 12px var(--f-ui); color: var(--muted); text-align: end; }
+  .lab-step { margin: 12px 4px 4px; min-height: 2.6em; font: 600 14px/1.5 var(--f-ui); color: var(--ink); }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+  .bar .grp { display: flex; flex-wrap: wrap; gap: 4px; background: var(--bg-mid); border-radius: 20px; padding: 4px; }
+  .bar button { white-space: nowrap; }
+  .bar button { border: 0; cursor: pointer; padding: 8px 13px; border-radius: 999px; font: 600 13px var(--f-ui); background: transparent; color: var(--ink-2); }
+  .bar button:hover { background: var(--bg-high); }
+  .bar button[aria-pressed="true"] { background: var(--sage); color: #fff; }
+  .bar .main { background: var(--sage); color: #fff; padding: 9px 18px; }
+  .bar .main:hover { background: var(--sage-2); }
+  .bar .soft { background: var(--bg-mid); }
+  .scrub { display: flex; align-items: center; gap: 12px; margin-top: 12px; font: 600 12px var(--f-ui); color: var(--muted); }
+  .scrub input { flex: 1; accent-color: #365749; }
+  .moves h2 { font: 500 22px var(--f-serif); margin: 4px 0 12px; }
+  #lab-moves { display: grid; gap: 8px; }
+  #lab-moves button { text-align: start; border: 0; cursor: pointer; background: var(--card); border-radius: 16px; padding: 12px 14px; box-shadow: var(--sh-1); font: 600 15px var(--f-ui); color: var(--ink); }
+  #lab-moves button small { display: block; font: 700 10px var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--terra); margin-bottom: 2px; }
+  #lab-moves button:hover { box-shadow: var(--sh-2); }
+  #lab-moves button[aria-pressed="true"] { background: var(--sage); color: #fff; }
+  #lab-moves button[aria-pressed="true"] small { color: #CDE9DC; }
+  .moves .more { display: inline-block; margin-top: 14px; font: 700 13px var(--f-ui); color: var(--sage); text-decoration: none; }
+  .moves .more:hover { text-decoration: underline; }
+  .lab-note { margin-top: 26px; background: var(--bg-low); border-radius: 20px; padding: 20px 22px; color: var(--ink-2); font-size: 14px; line-height: 1.7; }
+  .lab-note h2 { margin: 0 0 6px; font: 500 20px var(--f-serif); color: var(--ink); }
+  .lab-note ul { margin: 6px 0 0; padding-inline-start: 20px; }
+  .lab-fail { padding: 40px 20px; text-align: center; color: var(--ink-2); }
+  @media (max-width: 980px) { .lab { grid-template-columns: 1fr; } #lab-moves { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
+  @media (max-width: 640px) { #lab-stage { height: 56vh; min-height: 300px; } .lab-hud .hint { display: none; } .viewer { padding: 10px; border-radius: 20px; } }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
+</script>
+</head>
+<body class="home">
+<header class="h-top">
+  <div class="wrap">
+    <a class="h-logo" href="../../"><b>功</b><span>KungfuTutor</span></a>
+    <nav class="h-nav" aria-label="Main">
+      <a href="../../#kungfu" data-zh="傳統功夫" data-en="Kung Fu">Kung Fu</a>
+      <a href="../../#combat" data-zh="格鬥技" data-en="Fighting">Fighting</a>
+      <a href="../../#defence" data-zh="自我防衛" data-en="Self-Defence">Self-Defence</a>
+      <a href="../../#sports" data-zh="運動技巧" data-en="Sports">Sports</a>
+      <a href="../../#fitness" data-zh="體能訓練" data-en="Fitness">Fitness</a>
+      <a href="./" aria-current="page" data-zh="3D 動作實驗室" data-en="3D Lab">3D Lab</a>
+    </nav>
+    <div class="h-right">
+      <div class="kt-lang" role="group" aria-label="Language"></div>
+      <button class="btn btn-terra btn-sm" type="button" data-kt-auth data-zh="登入" data-en="Sign in">Sign in</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="lab-hero">
+    <div class="glow a"></div>
+    <div class="wrap">
+      <div class="crumb"><a href="../../">KungfuTutor</a> / <span data-zh="3D 動作實驗室" data-en="3D Movement Lab"></span></div>
+      <h1><span data-zh="3D 動作實驗室：" data-en="3D Movement Lab:"></span> <em data-zh="從每個角度看清楚" data-en="see every angle"></em></h1>
+      <p data-zh="拖動畫面把教練轉一圈，從正面、背面、側面或上方看動作；放慢到 0.25 倍，或拉動進度條一格一格看。動作來自我們的課程動畫。" data-en="Drag to turn the instructor all the way round and watch from the front, back, side or above; slow it to a quarter speed, or pull the slider to step through it frame by frame. The moves come from our lesson animations."></p>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="lab">
+      <div class="viewer">
+        <div id="lab-stage">
+          <div class="lab-hud"><div><small id="lab-cat"></small><b id="lab-name"></b></div><div class="hint" data-zh="拖動旋轉 · 滾輪或雙指縮放" data-en="Drag to rotate · scroll or pinch to zoom"></div></div>
+        </div>
+        <p class="lab-step" id="lab-step" aria-live="polite"></p>
+        <div class="bar">
+          <button class="main" type="button" id="lab-play" aria-pressed="true">❚❚ Pause</button>
+          <button class="soft" type="button" id="lab-next" data-zh="下一步 ▸" data-en="Next step ▸"></button>
+          <button class="soft" type="button" id="lab-reset" data-zh="重來" data-en="Reset"></button>
+          <div class="grp" role="group" aria-label="Speed">
+            <button type="button" data-speed="0.25" aria-pressed="false">0.25×</button><button type="button" data-speed="0.5" aria-pressed="false">0.5×</button><button type="button" data-speed="1" aria-pressed="true">1×</button>
+          </div>
+        </div>
+        <div class="bar">
+          <div class="grp" role="group" aria-label="View">
+            <button type="button" data-view="front" data-zh="正面" data-en="Front"></button>
+            <button type="button" data-view="back" data-zh="背面" data-en="Back"></button>
+            <button type="button" data-view="left" data-zh="左側" data-en="Left"></button>
+            <button type="button" data-view="right" data-zh="右側" data-en="Right"></button>
+            <button type="button" data-view="angle" data-zh="斜角" data-en="3/4"></button>
+            <button type="button" data-view="top" data-zh="上方" data-en="Top"></button>
+          </div>
+        </div>
+        <label class="scrub"><span data-zh="進度（拖動會暫停）" data-en="Scrub (dragging pauses)"></span><input type="range" id="lab-scrub" min="0" max="1000" value="0"></label>
+      </div>
+      <aside class="moves">
+        <h2 data-zh="選擇動作" data-en="Pick a move"></h2>
+        <div id="lab-moves"></div>
+        <a class="more" id="lab-link" href="../../"><span data-zh="打開完整課程：要領、錯誤與練習 →" data-en="Open the full lesson: cues, mistakes and drills →"></span></a>
+      </aside>
+    </div>
+
+    <div class="lab-note">
+      <h2 data-zh="關於這個 3D 教練" data-en="About this 3D instructor"></h2>
+      <p data-zh="3D 教練跟著我們側面課程的關鍵動作移動，所以主要的動作在身體側面的平面上；像泰拳中段踢這類需要轉髖的動作，在 3D 中是簡化的。學習時請同時閱讀完整課程，並盡可能在合格教練指導下練習。" data-en="The 3D instructor follows the key positions of our side-view lessons, so most of the movement happens in the side plane; moves that turn the hips, such as the Muay Thai roundhouse, are simplified in 3D. Read the full lesson as well, and practise under a qualified coach where possible."></p>
+    </div>
+
+    <div class="ad-slot" data-slot="mid" data-label="Advertisement"></div>
+  </div>
+</main>
+
+<footer class="h-foot">
+  <div class="wrap">
+    <div class="legal">
+      <span data-zh="本站內容僅供教育參考。練習前請評估自身健康狀況，並盡可能在合格教練指導下進行。" data-en="Content is for education only. Check your health before training and practise under a qualified instructor where possible."></span>
+      <span><a href="../../about.html" data-zh="關於我們" data-en="About">About</a> · <a href="../../privacy.html" data-zh="隱私權政策" data-en="Privacy">Privacy</a> · <a href="../../terms.html" data-zh="使用條款與安全聲明" data-en="Terms &amp; Safety">Terms &amp; Safety</a> · © <span id="kt-year"></span> KungfuTutor.com</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../../../assets/js/kt-site.js"></script>
+<script src="../../../assets/js/kt-figure.js"></script>
+<script src="../../../assets/js/kt-partner.js"></script>
+<script src="../../combat/lethwei/lethwei-data.js"></script>
+<script src="../../combat/muay-thai/muaythai-data.js"></script>
+<script src="../../combat/boxing/boxing-data.js"></script>
+<script src="../../kungfu/strikes/strikes-data.js"></script>
+<script src="../../fitness/gym/gym-data.js"></script>
+<script type="module" src="lab3d.js"></script>
+</body>
+</html>
