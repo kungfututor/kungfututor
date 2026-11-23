@@ -21,6 +21,8 @@
  *   fN, fF      optional foot targets {x,y}
  *               Targets are absolute when y is given, else relative to the hip.
  *   s           ground scroll (px) — makes travelling moves look like travel
+ *   face        1 = faces +x (default), -1 = turned round (mirrored about the hip);
+ *               tweening between them squeezes the figure, which reads as a turn
  *   any other numeric key is interpolated and handed to props() as ctx.pose
  */
 (function (w) {
@@ -92,6 +94,8 @@
       eN: aN.e, hN: aN.h, eF: aF.e, hF: aF.h,
       kN: lN.k, aN: lN.a, tN: lN.t, kF: lF.k, aF: lF.a, tF: lF.t };
     var n, gy = o.groundY, s = o.scale, cx = o.cx;
+    // face: 1 = facing +x (default), -1 = turned round; values in between squeeze the figure (reads as a turn)
+    if (typeof p.face === 'number' && p.face !== 1) for (n in J) J[n] = { x: hip.x + (J[n].x - hip.x) * p.face, y: J[n].y };
     if (!abs) {
       var m = -1e9;
       for (n in J) if (n !== 'head') m = Math.max(m, J[n].y);
