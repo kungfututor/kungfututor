@@ -10,6 +10,7 @@
  *   ola, olb  partner near leg thigh / shin (kicks: 90 = towards the main figure)
  *   ol        partner far-leg stride
  *   g         0..1 — near hand grabs the main figure's joint `grab`
+ *   olift     raises the partner off the floor (throws); 0 = standing on the floor
  * draw() options: { cx, grab, gloves, wraps } — gloves draws boxing gloves, wraps draws taped bare fists.
  * Every frame of a clip must carry every key (use KTPartner.base).
  */
@@ -17,7 +18,7 @@
   'use strict';
   var F = w.KTFigure, S = F.S;
   var COL = '#AEB3BE', COL_F = '#CDD0D7';
-  var base = { ox: 270, ot: 0, oh: 0, oa1: 10, oa2: 15, ob1: -8, ob2: -2, ola: 4, olb: 1, ol: 4, g: 0 };
+  var base = { ox: 270, ot: 0, oh: 0, oa1: 10, oa2: 15, ob1: -8, ob2: -2, ola: 4, olb: 1, ol: 4, g: 0, olift: 0 };
 
   function reach(sh, tg, L1, L2) {          // 2-bone arm in screen space, elbow hangs down
     var dx = tg.x - sh.x, dy = tg.y - sh.y, d0 = Math.sqrt(dx * dx + dy * dy) || 1;
@@ -33,7 +34,7 @@
   function draw(J, c, opt) {
     var p = c.pose, sc = c.scale;
     var q = { x: p.ox, t: p.ot, h: p.oh, su: p.oa1, sl: p.oa2, fu: p.ob1, fl: p.ob2,
-      tu: p.ola, tl: p.olb, bu: -p.ol, bl: -p.ol * 0.6, lift: 0 };
+      tu: p.ola, tl: p.olb, bu: -p.ol, bl: -p.ol * 0.6, lift: p.olift || 0 };
     var O = F.solve(q, { groundY: c.gy, scale: sc, cx: opt.cx });
     var X = O.hip.x;
     for (var n in O) O[n] = { x: 2 * X - O[n].x, y: O[n].y };      // turn to face the main figure
