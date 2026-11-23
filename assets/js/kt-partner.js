@@ -11,6 +11,7 @@
  *   ol        partner far-leg stride
  *   g         0..1 — near hand grabs the main figure's joint `grab`
  *   olift     raises the partner off the floor (throws); 0 = standing on the floor
+ *   olf       optional far-leg shin (+ = towards the main figure); default follows ol (kneeling needs it)
  * draw() options: { cx, grab, gloves, wraps } — gloves draws boxing gloves, wraps draws taped bare fists.
  * Every frame of a clip must carry every key (use KTPartner.base).
  */
@@ -34,7 +35,7 @@
   function draw(J, c, opt) {
     var p = c.pose, sc = c.scale;
     var q = { x: p.ox, t: p.ot, h: p.oh, su: p.oa1, sl: p.oa2, fu: p.ob1, fl: p.ob2,
-      tu: p.ola, tl: p.olb, bu: -p.ol, bl: -p.ol * 0.6, lift: p.olift || 0 };
+      tu: p.ola, tl: p.olb, bu: -p.ol, bl: typeof p.olf === 'number' ? -p.olf : -p.ol * 0.6, lift: p.olift || 0 };
     var O = F.solve(q, { groundY: c.gy, scale: sc, cx: opt.cx });
     var X = O.hip.x;
     for (var n in O) O[n] = { x: 2 * X - O[n].x, y: O[n].y };      // turn to face the main figure
