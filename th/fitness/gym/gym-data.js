@@ -208,6 +208,7 @@
   }
   /* ---------- glute bridge (on the back, head to the left) ---------- */
   var BX = 110;
+  var BTOP = 23.2;                 // top lift: shoulders, hips and knees exactly in line with these feet (higher = arching)
   function bridge(phi) {
     var sh = { x: BX, y: 207 };
     var hip = { x: BX + 58 * cos(phi), y: 207 - 58 * sin(phi) };
@@ -278,8 +279,8 @@
     } else if (id === 'bridge') {
       F = [{ d: 700, p: bridge(0), c: cap('躺下屈膝，腳跟靠近臀部', 'Lie on your back, knees bent, heels close to the seat') },
         { d: 600, p: bridge(14), c: cap('腳跟踩地，臀部往上推', 'Press through the heels and lift the hips') },
-        { d: 900, p: bridge(28), c: cap('肩膀到膝蓋成一直線，臀部夾緊 1–2 秒', 'Shoulders to knees in one line; squeeze the glutes for 1–2 seconds') },
-        { d: 700, p: bridge(28) }, { d: 700, p: bridge(14), c: cap('慢慢放下', 'Lower slowly') }];
+        { d: 900, p: bridge(BTOP), c: cap('肩膀到膝蓋成一直線，臀部夾緊 1–2 秒', 'Shoulders to knees in one line; squeeze the glutes for 1–2 seconds') },
+        { d: 700, p: bridge(BTOP) }, { d: 700, p: bridge(14), c: cap('慢慢放下', 'Lower slowly') }];
     }
     return F;
   }
