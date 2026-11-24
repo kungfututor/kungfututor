@@ -197,13 +197,19 @@ function pose3d(t) {
   var Js = S ? S.J : F.J, Jf = F ? F.J : null;
   var face = S ? S.face : 1, theta = (1 - face) / 2 * Math.PI;
   var hx = mode === 'front' ? 0 : (Js.hip.x - x0) * K, cos = Math.cos(theta), sin = Math.sin(theta);
-  var wide = cur.bar && cur.bar !== 'back' ? 0.25 : cur.bar === 'back' ? 0.3 : 0;
+  var wide = cur.bar && cur.bar !== 'back' ? 0.25 : cur.bar === 'back' ? 0.3 : 0, P0 = S ? S.pose : F.pose;
+  // a lesson upper arm drawn shorter than full length (luN / luF) points out towards the viewer: put that elbow out to the side
+  function elbowZ(name) {
+    var lu = P0[name === 'eN' ? 'luN' : 'luF'];
+    lu = typeof lu === 'number' ? Math.min(1, lu) : 1;
+    return Math.max(wide + 0.04, 0.19 + 30 * K * Math.sqrt(1 - lu * lu));
+  }
   function V(name, pt) {
     var j = pt || Js[name];
     var x = mode === 'front' ? 0 : (j.x - x0) * K - hx, y = (FLOOR - j.y) * K;
     var z = Jf && !pt ? (Jf[name].x - Jf.hip.x) * K : (DEPTH[name] || 0);
     if (wide && (name === 'hN' || name === 'hF')) z = name === 'hN' ? wide : -wide;
-    if (wide && (name === 'eN' || name === 'eF')) z = name === 'eN' ? wide + 0.04 : -wide - 0.04;
+    if (wide && (name === 'eN' || name === 'eF')) z = name === 'eN' ? elbowZ(name) : -elbowZ(name);
     return new THREE.Vector3(hx + x * cos + z * sin, y, -x * sin + z * cos);
   }
   return { J: Js, V: V, theta: theta, pose: S ? S.pose : F.pose, seg: (S ? sideP : frontP).poseAt(t).seg };

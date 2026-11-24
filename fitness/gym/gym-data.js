@@ -60,11 +60,22 @@
     return stand(hip, t, { hN: bar, hF: { x: bar.x - 2, y: bar.y } });
   }
   /* ---------- overhead press ---------- */
+  // standing tall with locked knees; the bar starts on the front of the shoulders and ends straight overhead
+  // with straight arms; the forearms stay upright under the bar the whole way (elbows slightly ahead at the start)
   function press(k, h) {          // k: 0 rack → 1 lockout
-    var hip = { x: FX + 1, y: 124 }, t = -3 - 3 * Math.sin(k * Math.PI);
+    var hip = { x: FX + 2, y: GA - 87.9 }, t = -3 - 3 * Math.sin(k * Math.PI);
     var sh = shoulder(hip, t);
-    var bar = { x: sh.x + 9 - 6 * k, y: sh.y + 5 - 63 * k };
-    return stand(hip, t, { h: h, hN: bar, hF: { x: bar.x - 2, y: bar.y + 1 } });
+    // rack: bar on the front of the shoulders, a little above the shoulder joints (collar-bone height)
+    var bar = { x: sh.x + 10 - 4 * k, y: sh.y - 5 - (Math.sqrt(57.98 * 57.98 - 36) - 5) * k };
+    var ex = 5 * (1 - k), el = { x: bar.x + ex, y: bar.y + Math.sqrt(28 * 28 - ex * ex) };
+    // part-way up the elbows also point out to the sides, so from the side the upper arm looks shorter
+    var lu = Math.min(1, Math.sqrt((el.x - sh.x) * (el.x - sh.x) + (el.y - sh.y) * (el.y - sh.y)) / 30);
+    var r = limb(sh, bar, 30 * lu, 28, function (a, b) {
+      return (a.x - el.x) * (a.x - el.x) + (a.y - el.y) * (a.y - el.y) < (b.x - el.x) * (b.x - el.x) + (b.y - el.y) * (b.y - el.y) ? a : b;
+    });
+    // angles kept on one side of "straight up" (180°) so the tween between frames never swings the arm the long way round
+    var su = r[0] < -90 ? r[0] + 360 : r[0], sl = r[1] < -90 ? r[1] + 360 : r[1];
+    return stand(hip, t, { h: h, su: su, sl: sl, fu: su - 1.5, fl: sl - 1.5, luN: lu, luF: lu });
   }
   // two-bone limb from base to target, picking the elbow/knee with pick(a, b) → chosen point; returns absolute angles
   function limb(base, tg, L1, L2, pick) {
