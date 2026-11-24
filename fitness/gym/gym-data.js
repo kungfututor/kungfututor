@@ -22,11 +22,14 @@
   }
 
   /* ---------- squat: bar on the upper back, kept over mid-foot ---------- */
-  function squat(t, hy, beginner) {
-    var back = { x: -cos(t), y: -sin(t) };                 // points behind the back
-    var rel = { x: 58 * sin(t) + back.x * 6, y: -58 * cos(t) + back.y * 6 };
-    var hip = { x: MF - rel.x, y: hy };
-    if (beginner) { hip.x = FX - 3 - 34 * (hy - 124) / 40; return stand(hip, t, { su: 90 - t * 0.3, sl: 90, fu: 86 - t * 0.3, fl: 88 }); }
+  // legs set by the shin angle s (forward of vertical) and the thigh angle phi (from vertical: 90 = thigh level,
+  // over 90 = hip below the knee), so knees travel forward steadily all the way down and are straight at the top
+  function squat(s, phi, beginner, tb) {
+    var knee = { x: FX + 3 + 44 * sin(s), y: GA - 44 * cos(s) };
+    var hip = { x: knee.x - 44 * sin(phi), y: knee.y - 44 * cos(phi) };
+    if (beginner) return stand(hip, tb, { su: 90 - tb * 0.3, sl: 90, fu: 86 - tb * 0.3, fl: 88 });
+    // torso leans just enough to keep the bar (6 units behind the shoulder line) over mid-foot
+    var t = Math.atan2(6, 58) / D2R + Math.asin((MF - hip.x) / Math.sqrt(58 * 58 + 36)) / D2R;
     // hands hold the bar beside the neck: elbows point down and back (angle mode)
     return stand(hip, t, { su: -40 + t, sl: 160 + t, fu: -44 + t, fl: 158 + t });
   }
@@ -158,7 +161,9 @@
   function clips(id, beginner) {
     var F = [], i;
     if (id === 'squat') {
-      var top = squat(4, 124, beginner), mid = squat(beginner ? 18 : 24, 146, beginner), bot = squat(beginner ? 30 : 42, 164, beginner);
+      // standard: hips end just below the knees (thighs past parallel); beginner: sits back onto the box
+      var top = squat(2, 3, beginner, 4), mid = beginner ? squat(6, 50, true, 18) : squat(18, 55),
+        bot = beginner ? squat(8, 85, true, 30) : squat(27, 95);
       F = [{ d: 700, p: top, c: beginner ? cap('雙腳與肩同寬，腳尖微向外，手向前伸', 'Feet shoulder-width, toes slightly out, arms forward') : cap('槓鈴放在上背，吸氣、核心收緊', 'Bar on the upper back; breathe in and brace') },
         { d: 700, p: mid, c: cap('臀部往後往下坐，膝蓋朝腳尖方向', 'Sit the hips back and down; knees track over the toes') },
         { d: 350, p: bot, c: beginner ? cap('坐到箱子上輕碰即起', 'Lightly touch the box, then stand') : cap('大腿至少與地面平行，背部保持平直', 'Thighs at least parallel; back stays flat') },
