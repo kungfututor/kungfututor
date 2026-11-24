@@ -240,6 +240,7 @@ var NEED = ['Hips', 'Spine', 'Neck', 'Head', 'RightArm', 'RightForeArm', 'RightH
   'RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase'];
 var SIDES = [{ X: 'Right', k: 'N', foot: 1, hand: 3, arm: 7, leg: 9 }, { X: 'Left', k: 'F', foot: 2, hand: 4, arm: 8, leg: 10 }];   // skin regions (0 = trunk and head)
 var DEG = Math.PI / 180, IDQ = new THREE.Quaternion();
+var BAR_R = 0.014 * 1.155;                                 // barbell shaft radius at the model's size
 var PLATE_R = 0.225;                                     // barbell plate radius (m); scaled up with the model when it loads
 function v3(x, y, z) { return new THREE.Vector3(x, y, z); }
 function wpos(b) { return b.getWorldPosition(new THREE.Vector3()); }
@@ -637,6 +638,7 @@ function poseAvatar(n, theta, move) {
       bend = C.up.clone().multiplyScalar(-1).addScaledVector(C.pFwd, -0.4);
     }
     if (wb) { T.y += (H.barW - T.y) * wb; T.x += (H.barX - T.x) * wb; }   // bar resting on the floor: hands on the bar itself
+    if (barPush) T.addScaledVector(FW, barPush);             // the bar kept just in front of the model's legs (they have thickness, the lesson's lines do not)
     if (H.w > 0) {                                           // hand on the floor: under where the lesson's arm reaches, as far as the arm allows
       var wy = d.wristH + H.adj, dy = S.y - wy, hl = Math.hypot(H.rel.x, H.rel.z), far = Math.sqrt(Math.max(0, reach * reach - dy * dy)), hd = Math.min(hl, far);
       H.slide = (hl - hd) * H.w;
@@ -644,8 +646,10 @@ function poseAvatar(n, theta, move) {
     }
     // hand on the floor a few millimetres closer than the lesson's arm length (the two shoulders never sit at
     // exactly the height each arm wants): the shoulder blade moves the shoulder out, so the elbow keeps the lesson's angle
-    if (sb && H.w > 0) {
-      var gapA = Math.min(0.02, Math.min(H.rel.length(), d.upper + d.fore - 0.0002) - S.distanceTo(T)) * H.w;
+    // (the same for hands holding a barbell: arms the lesson keeps straight stay straight)
+    var wBlade = Math.max(H.w, bar === 'hands' ? 1 : 0);
+    if (sb && wBlade > 0) {
+      var gapA = Math.min(0.02, Math.min(H.rel.length(), d.upper + d.fore - 0.0002) - S.distanceTo(T)) * wBlade;
       if (gapA > 0.0003) {
         var P = wpos(sb), a0 = S.clone().sub(P), a1 = S.clone().addScaledVector(S.clone().sub(T).normalize(), gapA).sub(P);
         setWQ(sb, new THREE.Quaternion().setFromUnitVectors(a0.normalize(), a1.normalize()).multiply(wquat(sb)));
@@ -681,6 +685,7 @@ function poseAvatar(n, theta, move) {
 
   var barShift = 0;                                        // a barbell on the floor moved forward over the model's mid-foot
   var kneeDrop = 0;                                        // how much deeper than the lesson the body went for a low knee
+  var barPush = 0;                                         // how far the bar was moved forward to clear the model's legs
   var C = core(n), feet = SIDES.map(function (s) { return planFoot(s, n); }), hands = SIDES.map(function (s) { return planHand(s, n, C); });
   var wF = feet.map(function (f) { return f.w; }), wH = hands.map(function (H) { return H.w; }), maxFoot = Math.max(wF[0], wF[1]);
   var lying = Math.max(feet[0].touch - wF[0], feet[1].touch - wF[1]);   // a foot on the floor that is not a standing foot (toes pointing back)
@@ -818,6 +823,27 @@ function poseAvatar(n, theta, move) {
     if (Math.abs(dl) >= 0.0015) lift += dl;
     if (low < 0) liftMin = Math.max(liftMin, lift);
   }
+  // a barbell in the hands can touch the legs but not pass through them: find the front of the legs (and belly)
+  // at the bar's height and move the hands forward until the bar sits just in front of it
+  if (bar === 'hands') {
+    var sk = A.full, vv = AV.v1;                             // every vertex: a kneecap is small
+    for (var bp = 0; bp < 4; bp++) {
+      var gr = SIDES.map(function (s) { var w = wpos(B[s.X + 'Hand']); return w.add(wpos(B[s.X + 'HandMiddle1']).sub(w).multiplyScalar(0.62)); });
+      var bc = gr[0].add(gr[1]).multiplyScalar(0.5), front = -1e9;
+      sk.refresh();
+      for (var j = 0; j < sk.count; j++) {
+        var rg = sk.region[j];
+        if (rg !== 0 && rg !== 9 && rg !== 10) continue;
+        sk.at(j, vv);
+        if (Math.abs(vv.y - bc.y) < 0.02) front = Math.max(front, vv.dot(FW));
+      }
+      var need = Math.max(-barPush, front + BAR_R + 0.002 - bc.dot(FW));   // (may also come back if an earlier step went too far)
+      if (Math.abs(need) < 0.002) break;
+      barPush += need;
+      hands.forEach(function (H) { solveArm(H, n, C, wb); });
+    }
+  }
+  info.barPush = barPush;
   info.kneeDrop = kneeDrop; info.rest = rest; info.g = g; info.wb = wb; info.C = C; info.n = n;
   return info;
 }

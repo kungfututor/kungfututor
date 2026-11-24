@@ -34,22 +34,30 @@
     return stand(hip, t, { su: -40 + t, sl: 160 + t, fu: -44 + t, fl: 158 + t });
   }
   /* ---------- deadlift / row: hands on the bar, arms hanging ---------- */
-  function hinge(t, by, bx) {
-    bx = bx === undefined ? MF : bx;
-    var sh = { x: bx + 2, y: by - 56 };
+  // arms hanging straight to the bar, shoulders d units in front of it, back at angle t
+  function onBar(bar, d, t) {
+    var sh = { x: bar.x + d, y: bar.y - Math.sqrt(57.97 * 57.97 - d * d) };
     var hip = { x: sh.x - 58 * sin(t), y: sh.y + 58 * cos(t) };
-    return stand(hip, t, { hN: { x: bx, y: by }, hF: { x: bx - 2, y: by } });
+    return stand(hip, t, { hN: bar, hF: { x: bar.x - 2, y: bar.y } });
   }
   // deadlift start: shins a few degrees forward so the bar touches them, hips a little above the knees,
-  // flat back, shoulders slightly in front of the bar, arms straight down to it
+  // flat back, shoulders slightly in front of the bar, arms straight down to it (64.36° = straight arms)
   function pullStart() {
     var knee = { x: FX + 3 + 44 * sin(6), y: GA - 44 * cos(6) };
     var hip = { x: knee.x - Math.sqrt(44 * 44 - 6 * 6), y: knee.y - 6 };
-    return stand(hip, 64.6, { hN: { x: MF, y: 192 }, hF: { x: MF - 2, y: 192 } });
+    return stand(hip, 64.36, { hN: { x: MF, y: 192 }, hF: { x: MF - 2, y: 192 } });
   }
+  // early in the pull (bar halfway up the shins): the knees are already moving back (shins 2° forward), so the bar
+  // never runs into the shins
+  function earlyPull() { return onBar({ x: MF, y: 176 }, 9.7, 60.0); }
+  // bar just above the knees: the knees have moved back out of its way (shins upright, knee at the ankle line),
+  // back a little more upright than at the start, arms still straight
+  function pastKnees() { return onBar({ x: MF, y: 160 }, 8, 50.79); }
+  // bar at mid-thigh: hips coming forward, knees about 36° and shins near upright, the bar sliding up the thighs
+  function midThigh() { return onBar({ x: MF, y: 140 }, 12, 37.83); }
   // deadlift lockout: standing tall, hips over the feet, knees straight, arms hanging with the bar against the thighs
   function lockPose() {
-    var hip = { x: FX + 3, y: GA - 87.95 }, sh = shoulder(hip, 0), bar = { x: sh.x + 5, y: sh.y + Math.sqrt(57.9 * 57.9 - 25) };
+    var hip = { x: FX + 3, y: GA - 87.95 }, sh = shoulder(hip, 0), bar = { x: sh.x + 5, y: sh.y + Math.sqrt(57.97 * 57.97 - 25) };
     return stand(hip, 0, { hN: bar, hF: { x: bar.x - 2, y: bar.y } });
   }
   // bent-over row: shins upright, hips back until the shoulders sit over the bar (just in front of the knees,
@@ -232,12 +240,15 @@
         { d: 350, p: bot, c: beginner ? cap('坐到箱子上輕碰即起', 'Lightly touch the box, then stand') : cap('大腿至少與地面平行，背部保持平直', 'Thighs at least parallel; back stays flat') },
         { d: 650, p: bot }, { d: 700, p: mid, c: cap('腳掌全掌踩地發力站起，吐氣', 'Drive up through the whole foot; breathe out') }];
     } else if (id === 'deadlift') {
-      var start = pullStart(), knee = hinge(32, 158), lock = lockPose();
+      var start = pullStart(), early = earlyPull(), knee = pastKnees(), mid = midThigh(), lock = lockPose();
       F = [{ d: 800, p: start, c: cap('槓鈴在腳掌中間上方，背部平直、肩膀在槓前', 'Bar over mid-foot; flat back, shoulders just in front of the bar') },
-        { d: 500, p: start, c: cap('吸氣收緊，把地板「推開」', 'Brace and "push the floor away"') },
-        { d: 500, p: knee, c: cap('槓鈴貼著小腿往上，過膝後髖部向前', 'Bar slides up the shins; past the knees, drive the hips forward') },
+        { d: 250, p: start, c: cap('吸氣收緊，把地板「推開」', 'Brace and "push the floor away"') },
+        { d: 250, p: early },
+        { d: 300, p: knee, c: cap('槓鈴貼著小腿往上，過膝後髖部向前', 'Bar slides up the shins; past the knees, drive the hips forward') },
+        { d: 250, p: mid },
         { d: 700, p: lock, c: cap('站直鎖定，不要後仰', 'Stand tall and lock out — don\'t lean back') },
-        { d: 700, p: knee, c: cap('髖部先往後，沿原路放下', 'Hips back first, lower along the same path') }];
+        { d: 350, p: mid, c: cap('髖部先往後，沿原路放下', 'Hips back first, lower along the same path') },
+        { d: 200, p: knee }, { d: 200, p: early }];
     } else if (id === 'bench') {
       F = [{ d: 700, p: bench(1, 3), c: cap('雙腳踩地、肩胛骨收緊，手臂伸直', 'Feet planted, shoulder blades squeezed, arms straight') },
         { d: 900, p: bench(0.5, 3), c: cap('慢慢放下，手肘約 45° 而非向外張開', 'Lower under control, elbows about 45° — not flared out') },
