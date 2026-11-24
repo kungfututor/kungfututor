@@ -209,7 +209,9 @@ function pose3d(t) {
     var x = mode === 'front' ? 0 : (j.x - x0) * K - hx, y = (FLOOR - j.y) * K;
     var z = Jf && !pt ? (Jf[name].x - Jf.hip.x) * K : (DEPTH[name] || 0);
     if (wide && (name === 'hN' || name === 'hF')) z = name === 'hN' ? wide : -wide;
-    if (wide && (name === 'eN' || name === 'eF')) z = name === 'eN' ? elbowZ(name) : -elbowZ(name);
+    // push-up hands (lesson gives luN/luF): planted on the floor at shoulder width, straight under the shoulders
+    else if (!Jf && (name === 'hN' || name === 'hF') && typeof P0.luN === 'number' && y < 0.04) z = name === 'hN' ? 0.2 : -0.2;
+    if ((wide || (!Jf && typeof P0[name === 'eN' ? 'luN' : 'luF'] === 'number')) && (name === 'eN' || name === 'eF')) z = name === 'eN' ? elbowZ(name) : -elbowZ(name);
     return new THREE.Vector3(hx + x * cos + z * sin, y, -x * sin + z * cos);
   }
   return { J: Js, V: V, theta: theta, pose: S ? S.pose : F.pose, seg: (S ? sideP : frontP).poseAt(t).seg };

@@ -146,16 +146,30 @@
   /* ---------- push-up (head to the right) ---------- */
   var HX = 268;
   function pushup(k, knees) {     // k: 0 top → 1 bottom
-    var shY = 155 + 42 * k, pivot, len, sh;
+    var pivot, len, sh;
     if (knees) { pivot = { x: HX - 2 - 87.7, y: 207 }; len = 102; }
     else { pivot = { x: HX - 2 - 137.9, y: 203 }; len = 146; }
-    var dy = pivot.y - shY, dx = Math.sqrt(len * len - dy * dy);
-    sh = { x: pivot.x + dx, y: shY };
+    var shAt = function (y) { return { x: pivot.x + Math.sqrt(len * len - (pivot.y - y) * (pivot.y - y)), y: y }; };
+    // top: shoulders high enough that the arms are straight (body pivots on the toes / knees)
+    var lo = 140, hi = 175;
+    for (var i = 0; i < 30; i++) { var mid = (lo + hi) / 2, s0 = shAt(mid); if (Math.hypot(HX - s0.x, 211 - s0.y) > 57.97) lo = mid; else hi = mid; }
+    sh = shAt(lo + (197 - lo) * k);
+    var dy = pivot.y - sh.y, dx = sh.x - pivot.x;
     var legL = knees ? 44 : 88;
     var hip = { x: pivot.x + legL / len * dx, y: pivot.y - legL / len * dy };
     var t = Math.atan2(sh.x - hip.x, -(sh.y - hip.y)) / D2R;
-    // elbows bend back towards the feet
-    var A = arms(sh, { x: HX, y: 211 }, leftOf);
+    // forearms stay nearly upright (wrists under the elbows, 15° lean); the elbows point back about 45°,
+    // so going down the upper arm also points out to the side and looks shorter from the side
+    function arm(hand) {
+      var el = { x: hand.x - 28 * sin(15), y: hand.y - 28 * cos(15) }, ex = el.x - sh.x, ey = el.y - sh.y;
+      var lu = Math.min(1, Math.sqrt(ex * ex + ey * ey) / 30);
+      var r = limb(sh, hand, 30 * lu, 28, function (a, b) {
+        return (a.x - el.x) * (a.x - el.x) + (a.y - el.y) * (a.y - el.y) < (b.x - el.x) * (b.x - el.x) + (b.y - el.y) * (b.y - el.y) ? a : b;
+      });
+      return [r[0], r[1], lu];
+    }
+    var aN = arm({ x: HX, y: 211 }), aF = arm({ x: HX - 3, y: 212 });
+    var A = { su: aN[0], sl: aN[1], luN: aN[2], fu: aF[0], fl: aF[1], luF: aF[2] };
     if (knees) {   // knee on the floor, shin raised behind
       var ank = { x: pivot.x - 41, y: pivot.y - 15 };
       var th = Math.atan2(pivot.x - hip.x, pivot.y - hip.y) / D2R, sn = Math.atan2(ank.x - pivot.x, ank.y - pivot.y) / D2R;
