@@ -127,7 +127,7 @@
     var t = Math.atan2(sh.x - hip.x, -(sh.y - hip.y)) / D2R;
     var foot = { x: ank.x + (knee.x - 41 - ank.x) * (1 - k), y: ank.y + (192 - ank.y) * (1 - k) };
     return { x: hip.x, y: hip.y, t: t, h: -t + 82, su: 0, sl: 90, fu: 2, fl: 92,
-      fN: foot, fF: { x: foot.x - 3, y: foot.y }, ftN: 37 - 97 * (1 - k), ftF: 37 - 97 * (1 - k), kbN: k < 0.5 ? -1 : 1, kbF: k < 0.5 ? -1 : 1 };
+      fN: foot, fF: { x: foot.x - 3, y: foot.y }, ftN: 37 - 97 * (1 - k), ftF: 37 - 97 * (1 - k), kbN: 1, kbF: 1 };
   }
   /* ---------- glute bridge (on the back, head to the left) ---------- */
   var BX = 110;
