@@ -496,7 +496,7 @@ function poseAvatar(n, theta, move) {
     var dl = H.rel.length(), hd = Math.hypot(H.rel.x, H.rel.z);
     H.c = d.wristH + Math.sqrt(Math.max(0, dl * dl - hd * hd)) - S.y;   // body lift that keeps the lesson's elbow angle with this hand down
     var h0 = n0['h' + s.k];
-    H.barX = h0.x;
+    H.barX = h0.x + barShift;
     H.barY = Math.max(h0.y, PLATE_R) + d.grip * Math.max(0, -H.rel.y / Math.max(dl, 1e-4));  // wrist height that puts the grip on the bar
     H.barW = Math.max(h0.y, PLATE_R) + d.grip;                           // the same with the arm hanging straight down
     // forearm on the floor too (forearm plank): the shoulder sits one upper arm above the elbow
@@ -659,6 +659,7 @@ function poseAvatar(n, theta, move) {
     info.hands[H.k] = H;
   }
 
+  var barShift = 0;                                        // a barbell on the floor moved forward over the model's mid-foot
   var C = core(n), feet = SIDES.map(function (s) { return planFoot(s, n); }), hands = SIDES.map(function (s) { return planHand(s, n, C); });
   var wF = feet.map(function (f) { return f.w; }), wH = hands.map(function (H) { return H.w; }), maxFoot = Math.max(wF[0], wF[1]);
   var lying = Math.max(feet[0].touch - wF[0], feet[1].touch - wF[1]);   // a foot on the floor that is not a standing foot (toes pointing back)
@@ -683,30 +684,61 @@ function poseAvatar(n, theta, move) {
     Object.keys(n).forEach(function (k) { n2[k] = n[k].clone().sub(pt.pivot).applyAxisAngle(pt.axis, pt.phi).add(pt.pivot); });
     n = n2; info.pitch += pt.phi; replan();
   }
-  // barbell resting on the floor: hinge at the hips just far enough for straight arms to reach it (the bar stays where the lesson has it)
+  // barbell resting on the floor (deadlift start): the bar sits over the model's mid-foot and straight arms must reach it.
+  // First the knees bend a little more (the hips stay above the knees, the back keeps the lesson's angle);
+  // only if that is not enough does the back hinge further.
   var wb = bar === 'hands' ? 1 - smooth(PLATE_R + 0.02, PLATE_R + 0.2, Math.min(n0.hN.y, n0.hF.y)) : 0;
   var lift = feetLift(feet), barDrop = 0;
   if (wb) {
+    var midX = 0, mfw = 0;
+    feet.forEach(function (f, i) { midX += (n['a' + SIDES[i].k].x + f.head.x * 0.065) * f.w; mfw += f.w; });
+    if (mfw > 0.5) { barShift = Math.max(0, midX / mfw - Math.max(n0.hN.x, n0.hF.x)) * wb; replan(); }
     var ax = new THREE.Vector3().crossVectors(C.up, C.pFwd).normalize(), hipC = n.hip.clone(), armReach = D.Right.upper + D.Right.fore - 0.004;
     hipC.y += lift;
-    var gap = function (dlt) {                               // how far the wrists are from the bar with the torso hinged dlt further
+    var gap = function (dlt, dd) {                           // how far the wrists are from the bar with the torso hinged dlt further and the body dd lower
       var worst = -1e9;
       hands.forEach(function (H) {
         var S = C.Sh[H.X].clone().sub(n.hip).applyAxisAngle(ax, dlt).add(hipC);
+        S.y -= dd;
         worst = Math.max(worst, S.distanceTo(v3(H.barX, H.barW, S.z + H.rel.z)) - armReach);
       });
       return worst;
     };
-    var most = Math.max(0, 82 * DEG - Math.acos(Math.max(-1, Math.min(1, C.up.y)))), lean = 0;
-    if (gap(0) > 0) {
-      if (gap(most) > 0) lean = most;
-      else { var lo = 0, hi = most; for (var bi = 0; bi < 14; bi++) { var md = (lo + hi) / 2; if (gap(md) > 0) lo = md; else hi = md; } lean = hi; }
+    var hipOver = function (dd) {                            // how far the hip joints sit above the knees with the body dd lower (feet stay put, knees go forward)
+      var worst = 1e9;
+      feet.forEach(function (f) {
+        var d = D[f.X], hl = Math.hypot(f.rel.x, f.rel.z), dy = C.Hs[f.X].y + lift - dd - f.Ay, L = Math.max(Math.hypot(hl, dy), 1e-4);
+        if (L >= d.thigh + d.shin) { worst = Math.min(worst, dy * d.thigh / L); return; }
+        var al = (d.thigh * d.thigh - d.shin * d.shin + L * L) / (2 * L), hh = Math.sqrt(Math.max(0, d.thigh * d.thigh - al * al));
+        worst = Math.min(worst, (dy * al - hl * hh) / L);
+      });
+      return worst;
+    };
+    var most = Math.max(0, 82 * DEG - Math.acos(Math.max(-1, Math.min(1, C.up.y)))), lean = 0, drop = 0, lo, hi, bi, md;
+    if (gap(0, 0) > 0) {
+      var maxDrop = 0;                                       // lowest the hips may go: 3 cm above the knees
+      if (hipOver(0) > 0.03) {
+        lo = 0; hi = 0.25;
+        if (hipOver(hi) >= 0.03) lo = hi;
+        else for (bi = 0; bi < 16; bi++) { md = (lo + hi) / 2; if (hipOver(md) >= 0.03) lo = md; else hi = md; }
+        maxDrop = lo;
+      }
+      if (gap(0, maxDrop) <= 0) {
+        lo = 0; hi = maxDrop;
+        for (bi = 0; bi < 16; bi++) { md = (lo + hi) / 2; if (gap(0, md) > 0) lo = md; else hi = md; }
+        drop = hi;
+      } else {
+        drop = maxDrop;
+        if (gap(most, drop) > 0) lean = most;
+        else { lo = 0; hi = most; for (bi = 0; bi < 14; bi++) { md = (lo + hi) / 2; if (gap(md, drop) > 0) lo = md; else hi = md; } lean = hi; }
+      }
     }
-    lean *= wb;
+    lean *= wb; drop *= wb;
+    barDrop = drop + Math.max(0, gap(lean, drop)) * 1.15 * wb;   // still short with the back as flat as it goes: sit a little lower
+    info.drop = drop;
     if (lean > 0.002) {
       var n3 = {};
       Object.keys(n).forEach(function (k) { n3[k] = /^(sh|head|e|h[NF])/.test(k) ? n[k].clone().sub(n.hip).applyAxisAngle(ax, lean).add(n.hip) : n[k]; });
-      barDrop = Math.max(0, gap(lean)) * 1.15 * wb;         // still short with the back as flat as it goes: sit a little lower
       n = n3; info.lean = lean; replan(); lift = feetLift(feet);
     }
   }
