@@ -498,7 +498,7 @@ function poseAvatar(n, theta, move) {
   function planHand(s, n, C, w) {
     var d = D[s.X], h = n['h' + s.k], sh = n['sh' + s.k], S = C.Sh[s.X], H = { X: s.X, k: s.k, region: s.hand, slide: 0, adj: 0 };
     H.w = w === undefined ? (bar ? 0 : (1 - smooth(0.045, 0.075, Math.max(0, h.y))) * grounded) : w;
-    H.rel = h.clone().sub(sh).multiplyScalar(A.armScale);    // the lesson's shoulder → hand, at the model's arm length
+    H.rel = h.clone().sub(sh).multiplyScalar((d.upper + d.fore) / ((KTFigure.DIM.upper + KTFigure.DIM.fore) * K));   // the lesson's shoulder → hand, at this arm's length
     H.bendDir = perp(n['e' + s.k].clone().sub(sh), H.rel.clone().normalize());
     H.at = v3(S.x + H.rel.x, 0, S.z + H.rel.z);              // the spot on the floor under that hand
     var dl = H.rel.length(), hd = Math.hypot(H.rel.x, H.rel.z);
@@ -628,8 +628,9 @@ function poseAvatar(n, theta, move) {
     info.feet[f.k] = f;
   }
   function solveArm(H, n, C, wb) {
-    var d = D[H.X], S = wpos(B[H.X + 'Arm']), side = H.X === 'Right' ? 1 : -1, reach = d.upper + d.fore - 0.001;
-    var T = S.clone().add(H.rel), bend = H.bendDir;
+    var d = D[H.X], sb = B[H.X + 'Shoulder'], side = H.X === 'Right' ? 1 : -1, reach = d.upper + d.fore - 0.0002;
+    if (sb) { sb.quaternion.copy(A.rest[H.X + 'Shoulder']); sb.updateMatrixWorld(true); }
+    var S = wpos(B[H.X + 'Arm']), T = S.clone().add(H.rel), bend = H.bendDir;
     if (bar === 'back') {                                    // hands on the bar across the upper back, elbows down and back
       T = wpos(B.Neck).addScaledVector(C.pFwd, -0.1).addScaledVector(C.up, -0.02).addScaledVector(C.hr, 0.36 * side);
       bend = C.up.clone().multiplyScalar(-1).addScaledVector(C.pFwd, -0.4);
@@ -640,8 +641,18 @@ function poseAvatar(n, theta, move) {
       H.slide = (hl - hd) * H.w;
       T.lerp(v3(S.x + (hl > 1e-4 ? H.rel.x * hd / hl : 0), wy, S.z + (hl > 1e-4 ? H.rel.z * hd / hl : 0)), H.w);
     }
+    // hand on the floor a few millimetres closer than the lesson's arm length (the two shoulders never sit at
+    // exactly the height each arm wants): the shoulder blade moves the shoulder out, so the elbow keeps the lesson's angle
+    if (sb && H.w > 0) {
+      var gapA = Math.min(0.02, Math.min(H.rel.length(), d.upper + d.fore - 0.0002) - S.distanceTo(T)) * H.w;
+      if (gapA > 0.0003) {
+        var P = wpos(sb), a0 = S.clone().sub(P), a1 = S.clone().addScaledVector(S.clone().sub(T).normalize(), gapA).sub(P);
+        setWQ(sb, new THREE.Quaternion().setFromUnitVectors(a0.normalize(), a1.normalize()).multiply(wquat(sb)));
+        S = wpos(B[H.X + 'Arm']);                        // the hand stays on its spot
+      }
+    }
     var fdn = n['h' + H.k].clone().sub(n['e' + H.k]).normalize().y;
-    var hf = d.wristH + (0.03 + 0.1 * Math.max(0, -fdn)) * (1 - H.w);   // a hand cannot go under the floor (a fist hanging below the wrist needs more room than a flat palm)
+    var hf = d.wristH + Math.min(0, H.adj) * H.w + (0.03 + 0.1 * Math.max(0, -fdn)) * (1 - H.w);   // a hand cannot go under the floor (a planted palm seen hovering may come down to it) (a fist hanging below the wrist needs more room than a flat palm)
     if (T.y < hf) T.y = hf;
     var r = ik2(S, T, d.upper, d.fore, bend, UPV.clone().negate(), 148 * DEG);
     var ud = r.M.clone().sub(S), fd = r.E.clone().sub(r.M);
@@ -752,8 +763,11 @@ function poseAvatar(n, theta, move) {
   }
   hands.forEach(function (H) { lift += (Math.min(lift, H.c) - lift) * H.w * (1 - torsoRest); });   // a hand on the floor: the shoulder can be no higher than the arm is long
   lift -= barDrop;
-  var noDrop = false, penFix = 0, gapLeft = 0;
+  var noDrop = false, penFix = 0, gapLeft = 0, liftMin = -1e9;
   for (var it = 0; it < 6; it++) {
+    // a planted hand lowered to touch the floor: the shoulder comes down with it, or the arm could no longer reach its spot
+    // (never below a height already found to keep the body out of the floor)
+    if (it > 0) hands.forEach(function (H) { if (H.w > 0 && H.adj < 0) lift += Math.min(0, Math.max(liftMin, H.c + H.adj) - lift) * H.w * (1 - torsoRest); });
     A.rig.position.copy(C.pos0); A.rig.position.y += lift; A.rig.updateMatrixWorld(true);
     feet.forEach(function (f) { solveLeg(f, n, C); });
     hands.forEach(function (H) { solveArm(H, n, C, wb); });
@@ -786,6 +800,7 @@ function poseAvatar(n, theta, move) {
     }
     if (Math.abs(dl) < 0.0015 && !again) break;
     if (Math.abs(dl) >= 0.0015) lift += dl;
+    if (low < 0) liftMin = Math.max(liftMin, lift);
   }
   info.rest = rest; info.g = g; info.wb = wb; info.C = C; info.n = n;
   return info;
