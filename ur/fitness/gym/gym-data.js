@@ -120,13 +120,28 @@
       arms(sh, bar, lowerOf, 0.85 + 0.15 * k - 0.37 * Math.sin(Math.PI * k)));
   }
   /* ---------- pull-up ---------- */
-  var BAR = { x: 205, y: 22 };
-  function pullup(k) {            // k: 0 dead hang → 1 chin over the bar
-    var t = -5 - 7 * k;
-    var sh = { x: BAR.x + 2 - 12 * k, y: BAR.y + 56 - 42 * k };
+  // bar high enough that a body hanging with straight arms and bent knees keeps its feet off the floor
+  var BAR = { x: 205, y: 0 };
+  // k: 0 dead hang (straight arms) → 0.08 shoulders pulled down → 1 chin clearly over the bar, bar at the collar-bone.
+  // Elbows stay under the hands (forearms upright); part-way up they point out to the sides, so from the side the
+  // upper arm looks shorter. onBox: beginner's bottom position, feet resting flat on the box.
+  function pullup(k, onBox) {
+    var e = Math.max(0, (k - 0.08) / 0.92), t = -5 - 7 * e;
+    var sh = { x: BAR.x + 2 - 10 * e, y: BAR.y + 57.96 - 52.96 * e };
     var hip = { x: sh.x - 58 * sin(t), y: sh.y + 58 * cos(t) };
-    return { x: hip.x, y: hip.y, t: t, h: 4 * k, hN: { x: BAR.x + 3, y: BAR.y }, hF: { x: BAR.x - 3, y: BAR.y },
-      fN: { x: hip.x - 16, y: hip.y + 72 }, fF: { x: hip.x - 20, y: hip.y + 70 }, ftN: 20, ftF: 20, kbN: 1, kbF: 1 };
+    function arm(hand) {
+      var el = { x: hand.x + 2, y: hand.y + 28 }, dx = el.x - sh.x, dy = el.y - sh.y;
+      var lu = Math.min(1, Math.sqrt(dx * dx + dy * dy) / 30);
+      var r = limb(sh, hand, 30 * lu, 28, function (a, b) {
+        return (a.x - el.x) * (a.x - el.x) + (a.y - el.y) * (a.y - el.y) < (b.x - el.x) * (b.x - el.x) + (b.y - el.y) * (b.y - el.y) ? a : b;
+      });
+      // angles kept on one side of "straight up" so tweens never swing the arm the long way round
+      return [r[0] < -90 ? r[0] + 360 : r[0], r[1] < -90 ? r[1] + 360 : r[1], lu];
+    }
+    var aN = arm({ x: BAR.x + 3, y: BAR.y }), aF = arm({ x: BAR.x - 3, y: BAR.y });
+    var feet = onBox ? { fN: { x: 185, y: 182 }, fF: { x: 181, y: 182 }, ftN: 90, ftF: 90 }
+      : { fN: { x: hip.x - 16, y: hip.y + 72 }, fF: { x: hip.x - 20, y: hip.y + 70 }, ftN: 20, ftF: 20 };
+    return m({ x: hip.x, y: hip.y, t: t, h: 4 * e, su: aN[0], sl: aN[1], luN: aN[2], fu: aF[0], fl: aF[1], luF: aF[2], kbN: 1, kbF: 1 }, feet);
   }
   /* ---------- push-up (head to the right) ---------- */
   var HX = 268;
@@ -220,7 +235,7 @@
     } else if (id === 'pullup') {
       if (beginner) F = [{ d: 900, p: pullup(1), c: cap('從箱子跳或站到頂點，下巴過槓', 'Jump or step up to the top, chin over the bar') },
         { d: 1800, p: pullup(1), c: cap('用 3–5 秒慢慢放下（離心）', 'Lower yourself slowly over 3–5 seconds') },
-        { d: 600, p: pullup(0), c: cap('到底後再站回去，重複', 'At the bottom, step back up and repeat') }];
+        { d: 600, p: pullup(0, true), c: cap('到底後再站回去，重複', 'At the bottom, step back up and repeat') }];
       else F = [{ d: 800, p: pullup(0), c: cap('雙手略寬於肩，掌心朝前，手臂伸直懸吊', 'Hands just wider than shoulders, palms forward, hang with straight arms') },
         { d: 300, p: pullup(0.08), c: cap('先把肩膀往下壓（肩胛下沉）', 'First pull the shoulders down away from the ears') },
         { d: 700, p: pullup(1), c: cap('手肘往下往後拉，直到下巴過槓', 'Drive the elbows down and back until the chin clears the bar') },
