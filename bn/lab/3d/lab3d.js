@@ -567,7 +567,7 @@ function poseAvatar(n, theta, move) {
     var r, td, sd, hinge, h0, shinUp, p = 0, flex0 = 0;
     if (f.toes > 0) {                                        // on the ball of the foot: raise or lower the heel so the leg keeps the lesson's shape
       var fb = tw(d.fromBall), R = Math.hypot(fb.y, fb.dot(FW)), th0 = Math.atan2(fb.y, -fb.dot(FW));
-      var q = Math.asin(Math.max(-1, Math.min(1, (Tfree.y - d.ballH) / R)));
+      var q = Math.asin(Math.max(-1, Math.min(1, (Tfree.y + kneeDrop - d.ballH) / R)));   // (a body sunk deeper for a low knee keeps the foot as it was)
       var bs = (f.beta0 + th0 > Math.PI / 2 ? Math.PI - q : q) - th0;
       f.beta = f.beta0 + (Math.max(3 * DEG, Math.min(88 * DEG, bs)) - f.beta0) * f.toes; footShape(f);
     }
@@ -622,7 +622,7 @@ function poseAvatar(n, theta, move) {
     sf = legFwd.clone().multiplyScalar(Math.cos(pf)).addScaledVector(shinUp, -Math.sin(pf)).multiplyScalar(Math.sqrt(1 - out * out)).addScaledVector(hinge, out);
     var rot = frameRot(FW, LF, sf, hinge).slerp(f.rot, f.wo);
     setWQ(B[f.X + 'Foot'], rot.clone().multiply(W0(f.X + 'Foot')));
-    setWQ(B[f.X + 'ToeBase'], (f.beta > 0 ? rot.clone().slerp(f.rotFlat, f.wo * (1 - smooth(75 * DEG, 100 * DEG, f.beta))) : rot).clone().multiply(W0(f.X + 'ToeBase')));
+    setWQ(B[f.X + 'ToeBase'], (f.beta > 0 ? rot.clone().slerp(f.rotFlat, f.wo * (1 - smooth(92 * DEG, 115 * DEG, f.beta))) : rot).clone().multiply(W0(f.X + 'ToeBase')));
     f.ankle = pf + (p - pf) * f.wo; f.twist = hinge.angleTo(C.pLeft.clone().applyQuaternion(new THREE.Quaternion().setFromUnitVectors(C.up.clone().negate(), td.clone().normalize())));
     f.knee = td.angleTo(sd); f.short = r.short; f.hip = C.up.clone().negate().angleTo(td);
     info.feet[f.k] = f;
@@ -679,6 +679,7 @@ function poseAvatar(n, theta, move) {
   }
 
   var barShift = 0;                                        // a barbell on the floor moved forward over the model's mid-foot
+  var kneeDrop = 0;                                        // how much deeper than the lesson the body went for a low knee
   var C = core(n), feet = SIDES.map(function (s) { return planFoot(s, n); }), hands = SIDES.map(function (s) { return planHand(s, n, C); });
   var wF = feet.map(function (f) { return f.w; }), wH = hands.map(function (H) { return H.w; }), maxFoot = Math.max(wF[0], wF[1]);
   var lying = Math.max(feet[0].touch - wF[0], feet[1].touch - wF[1]);   // a foot on the floor that is not a standing foot (toes pointing back)
@@ -764,6 +765,7 @@ function poseAvatar(n, theta, move) {
   hands.forEach(function (H) { lift += (Math.min(lift, H.c) - lift) * H.w * (1 - torsoRest); });   // a hand on the floor: the shoulder can be no higher than the arm is long
   lift -= barDrop;
   var noDrop = false, penFix = 0, gapLeft = 0, liftMin = -1e9;
+  kneeDrop = 0;
   for (var it = 0; it < 6; it++) {
     // a planted hand lowered to touch the floor: the shoulder comes down with it, or the arm could no longer reach its spot
     // (never below a height already found to keep the body out of the floor)
@@ -782,6 +784,19 @@ function poseAvatar(n, theta, move) {
     if (low < 0) dl = -low;
     else if (!noDrop && it < 4 && rest > 0 && low > gapLeft + 0.0015) dl = gapLeft - low;
     else if (pen < -0.003 && penFix < 3) { dl = -pen * 0.9; penFix++; noDrop = true; }
+    // a knee the lesson holds just off the floor over a foot on its toes, the other foot flat (bottom of a lunge):
+    // the model's knees sit higher than the lesson figure's, so the body goes a little deeper until that knee hovers ~3.5 cm up
+    if (!dl && !noDrop && it < 5) {
+      feet.forEach(function (f, i) {
+        var o = feet[1 - i], ky = Math.max(0, n0['k' + f.k].y);
+        var wk = f.w * f.toes * o.w * (1 - o.toes) * smooth(0.02, 0.035, ky) * (1 - smooth(0.05, 0.15, ky));
+        if (it === 0) f.kLow0 = lows[f.region + 8];                     // the knee's height before going any deeper
+        if (wk < 0.001) return;
+        var e =lows[f.region + 8] - (f.kLow0 + Math.min(0, 0.035 - f.kLow0) * wk);   // aim part-way down as the lesson's knee rises
+        if (e > 0.0015) dl = Math.min(dl, -e);
+      });
+      kneeDrop -= dl;
+    }
     info.low = low; info.lift = lift; info.passes = it + 1;
     // planted feet and hands: measure the skin and press it exactly onto the floor
     // (sinking is always corrected; hovering only once the lesson has the foot or hand fully down)
@@ -802,7 +817,7 @@ function poseAvatar(n, theta, move) {
     if (Math.abs(dl) >= 0.0015) lift += dl;
     if (low < 0) liftMin = Math.max(liftMin, lift);
   }
-  info.rest = rest; info.g = g; info.wb = wb; info.C = C; info.n = n;
+  info.kneeDrop = kneeDrop; info.rest = rest; info.g = g; info.wb = wb; info.C = C; info.n = n;
   return info;
 }
 (function loadAvatar() {
