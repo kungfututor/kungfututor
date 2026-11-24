@@ -52,11 +52,19 @@
     var hip = { x: FX + 3, y: GA - 87.95 }, sh = shoulder(hip, 0), bar = { x: sh.x + 5, y: sh.y + Math.sqrt(57.9 * 57.9 - 25) };
     return stand(hip, 0, { hN: bar, hF: { x: bar.x - 2, y: bar.y } });
   }
+  // bent-over row: shins upright, hips back until the shoulders sit over the bar (just in front of the knees,
+  // over the front of mid-foot), back flat at about 42°. Arms hang straight; the elbows drive back with the
+  // forearms upright while the bar slides up the thighs, then the bar comes in to the stomach.
   function rowPose(pull) {
-    var t = 48, hip = { x: FX - 35, y: 136 }, sh = shoulder(hip, t);
-    var hang = { x: MF, y: sh.y + 55 };
-    var torso = { x: hip.x + 0.62 * (sh.x - hip.x) + 0.669 * 9, y: hip.y + 0.62 * (sh.y - hip.y) + 0.743 * 9 };
-    var bar = { x: hang.x + (torso.x - hang.x) * pull, y: hang.y + (torso.y - hang.y) * pull };
+    var t = 42, knee = { x: FX + 3, y: GA - 44 };
+    var hip = { x: MF + 4 - 58 * sin(t), y: 0 };
+    hip.y = knee.y - Math.sqrt(44 * 44 - (knee.x - hip.x) * (knee.x - hip.x));
+    var sh = shoulder(hip, t);
+    var hang = { x: sh.x, y: sh.y + 57.9 };                                   // straight arms
+    var half = { x: sh.x - 30 * sin(30), y: sh.y + 30 * cos(30) + 28 };          // upper arm 30° back, forearm upright
+    var top = { x: hip.x + 0.4 * (sh.x - hip.x) + 9 * cos(t), y: hip.y + 0.4 * (sh.y - hip.y) + 9 * sin(t) };   // on the stomach
+    var a = pull <= 0.5 ? hang : half, b = pull <= 0.5 ? half : top, k = pull <= 0.5 ? pull * 2 : pull * 2 - 1;
+    var bar = { x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k };
     return stand(hip, t, { hN: bar, hF: { x: bar.x - 2, y: bar.y } });
   }
   /* ---------- overhead press ---------- */
