@@ -79,19 +79,26 @@
   }
   var lowerOf = function (a, b) { return a.y > b.y ? a : b; };
   var leftOf = function (a, b) { return a.x < b.x ? a : b; };
-  function arms(sh, hand, pick) {
-    var r1 = limb(sh, hand, 30, 28, pick), r2 = limb(sh, { x: hand.x - 3, y: hand.y + 1 }, 30, 28, pick);
-    return { su: r1[0], sl: r1[1], fu: r2[0], fl: r2[1] };
+  // lu = apparent upper-arm length (an elbow pointing out towards the viewer looks shorter from the side)
+  function arms(sh, hand, pick, lu) {
+    lu = lu || 1;
+    var r1 = limb(sh, hand, 30 * lu, 28, pick), r2 = limb(sh, { x: hand.x - 3, y: hand.y + 1 }, 30 * lu, 28, pick);
+    return { su: r1[0], sl: r1[1], fu: r2[0], fl: r2[1], luN: lu, luF: lu };
   }
 
   /* ---------- bench press (lying, head to the left) ---------- */
   var BENCH = { hip: { x: 230, y: 164 }, top: 170 };
   function bench(k, arch) {      // k: 0 chest → 1 lockout
     var hip = BENCH.hip, sh = { x: hip.x - 58, y: hip.y - (arch || 0) };
-    var bar = { x: sh.x + 14 - 8 * k, y: sh.y - 12 - 44 * k };
-    // elbows drop below the bar, towards the feet
+    // bar over the shoulders at the top, on the lower chest at the bottom — there the forearms stand almost
+    // upright with the elbows just under the bar
+    var bar = { x: sh.x + 20 - 14 * k, y: sh.y - 12 - 44 * k };
+    // knees bent up (about bench height), shins near upright, feet flat on the floor
     return m({ x: hip.x, y: hip.y, t: -90 + (arch ? 2 : 0), h: 0,
-      fN: { x: hip.x + 46, y: GA }, fF: { x: hip.x + 42, y: GA }, ftN: 90, ftF: 90, kbN: -1, kbF: -1 }, arms(sh, bar, lowerOf));
+      fN: { x: hip.x + 46, y: GA }, fF: { x: hip.x + 42, y: GA }, ftN: 90, ftF: 90, kbN: 1, kbF: 1 },
+      // elbows tucked about 45° also point out to the side, so the upper arm looks shorter part-way down;
+      // that keeps the forearms upright under the bar the whole way
+      arms(sh, bar, lowerOf, 0.85 + 0.15 * k - 0.37 * Math.sin(Math.PI * k)));
   }
   /* ---------- pull-up ---------- */
   var BAR = { x: 205, y: 22 };
