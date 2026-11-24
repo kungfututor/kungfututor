@@ -44,6 +44,11 @@
     var hip = { x: knee.x - Math.sqrt(44 * 44 - 6 * 6), y: knee.y - 6 };
     return stand(hip, 64.6, { hN: { x: MF, y: 192 }, hF: { x: MF - 2, y: 192 } });
   }
+  // deadlift lockout: standing tall, hips over the feet, knees straight, arms hanging with the bar against the thighs
+  function lockPose() {
+    var hip = { x: FX + 3, y: GA - 87.95 }, sh = shoulder(hip, 0), bar = { x: sh.x + 5, y: sh.y + Math.sqrt(57.9 * 57.9 - 25) };
+    return stand(hip, 0, { hN: bar, hF: { x: bar.x - 2, y: bar.y } });
+  }
   function rowPose(pull) {
     var t = 48, hip = { x: FX - 35, y: 136 }, sh = shoulder(hip, t);
     var hang = { x: MF, y: sh.y + 55 };
@@ -159,7 +164,7 @@
         { d: 350, p: bot, c: beginner ? cap('坐到箱子上輕碰即起', 'Lightly touch the box, then stand') : cap('大腿至少與地面平行，背部保持平直', 'Thighs at least parallel; back stays flat') },
         { d: 650, p: bot }, { d: 700, p: mid, c: cap('腳掌全掌踩地發力站起，吐氣', 'Drive up through the whole foot; breathe out') }];
     } else if (id === 'deadlift') {
-      var start = pullStart(), knee = hinge(32, 158), lock = hinge(-2, 124);
+      var start = pullStart(), knee = hinge(32, 158), lock = lockPose();
       F = [{ d: 800, p: start, c: cap('槓鈴在腳掌中間上方，背部平直、肩膀在槓前', 'Bar over mid-foot; flat back, shoulders just in front of the bar') },
         { d: 500, p: start, c: cap('吸氣收緊，把地板「推開」', 'Brace and "push the floor away"') },
         { d: 500, p: knee, c: cap('槓鈴貼著小腿往上，過膝後髖部向前', 'Bar slides up the shins; past the knees, drive the hips forward') },
