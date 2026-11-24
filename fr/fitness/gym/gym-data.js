@@ -179,9 +179,14 @@
       fN: { x: pivot.x, y: pivot.y }, fF: { x: pivot.x - 3, y: pivot.y }, ftN: 37, ftF: 37, kbN: 1, kbF: 1 }, A);
   }
   /* ---------- reverse lunge ---------- */
+  // front leg built from its shin angle s and thigh angle phi: straight when standing, the shin stays close to
+  // upright all the way down (the hips go back and down, the knee does not rock forward), front thigh just above
+  // level at the bottom so the back knee stops a few centimetres off the floor
   function lunge(k) {             // k: 0 standing → 1 bottom
-    var hip = { x: FX - 3 - 37 * k, y: 124 + 42 * k };
-    var backAnkle = { x: FX - 4 - 86 * Math.min(1, k * 1.4), y: GA - 10 * k };
+    var s = (1 - k) + 2 * Math.sin(Math.PI * k), phi = 2.6 + 83.4 * k;
+    var knee = { x: FX + 3 + 44 * sin(s), y: GA - 44 * cos(s) };
+    var hip = { x: knee.x - 44 * sin(phi), y: knee.y - 44 * cos(phi) };
+    var backAnkle = { x: FX - 1 - 89 * Math.min(1, k * 1.4), y: GA - 10 * k };
     return { x: hip.x, y: hip.y, t: 3, h: 0, su: 6, sl: 10, fu: -6, fl: -4,
       fN: { x: FX + 3, y: GA }, fF: backAnkle, ftN: 90, ftF: 90 - 60 * k, kbN: 1, kbF: 1 };
   }
