@@ -544,12 +544,13 @@ function poseAvatar(n, theta, move) {
     hands.forEach(function (H) { Hm.addScaledVector(H.at, H.w); cH += H.c * H.w; sw += H.w; });
     Hm.divideScalar(sw); cH /= sw;
     // rear support: the feet, or the knees when the feet are off the floor
-    var wFt = Math.max(feet[0].w, feet[1].w), Rf = v3(0, 0, 0), Rk = v3(0, 0, 0), cK = 0, wK = 0, sf = 0, sk = 0;
+    var wFt = Math.max(feet[0].w, feet[1].w), Rf = v3(0, 0, 0), Rk = v3(0, 0, 0), cK = 0, wK = 0, sf = 0, sk = 0, kMin = 1;
     feet.forEach(function (f, i) { Rf.addScaledVector(flat(n['a' + SIDES[i].k]), f.w); sf += f.w; });
     SIDES.forEach(function (s) {
       var k = n['k' + s.k], w = 1 - smooth(0.035, 0.06, Math.max(0, n0['k' + s.k].y));
-      Rk.addScaledVector(flat(k), w); sk += w; cK += (A.kneeR - k.y) * w; wK = Math.max(wK, w);
+      Rk.addScaledVector(flat(k), w); sk += w; cK += (A.kneeR - k.y) * w; wK = Math.max(wK, w); kMin = Math.min(kMin, w);
     });
+    wFt *= 1 - kMin * Math.min(feet[0].toes, feet[1].toes);   // both knees down on tucked toes (knee plank): the knees carry the body, not the toes
     if (sf > 1e-6) Rf.divideScalar(sf);
     if (sk > 1e-6) { Rk.divideScalar(sk); cK /= sk; }
     wK *= 1 - wFt;

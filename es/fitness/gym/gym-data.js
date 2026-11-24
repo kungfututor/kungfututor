@@ -194,15 +194,17 @@
   var PX = 262;
   function plank(k) {             // k: 0 knees down → 1 full plank
     var sh = { x: PX, y: 177 }, ank = { x: PX - 143.7, y: 203 };
-    var knee = { x: PX - 100, y: 207 };
+    // knees down: shoulder → knee is exactly trunk + thigh (one straight line), shins resting on the mat, toes tucked under
+    var knee = { x: PX - Math.sqrt(102 * 102 - 30 * 30), y: 207 };
+    var kAnk = { x: knee.x - Math.sqrt(44 * 44 - 16), y: 203 };
     var piv = k < 1 ? { x: knee.x + (ank.x - knee.x) * k, y: knee.y + (ank.y - knee.y) * k } : ank;
     var L = 58 + (k < 1 ? 44 + 44 * k : 88);
     var dx = sh.x - piv.x, dy = piv.y - sh.y, d = Math.sqrt(dx * dx + dy * dy);
     var hip = { x: sh.x - 58 / d * dx, y: sh.y + 58 / d * dy };
     var t = Math.atan2(sh.x - hip.x, -(sh.y - hip.y)) / D2R;
-    var foot = { x: ank.x + (knee.x - 41 - ank.x) * (1 - k), y: ank.y + (192 - ank.y) * (1 - k) };
+    var foot = { x: kAnk.x + (ank.x - kAnk.x) * k, y: ank.y };      // the toes stay tucked while the knees lift
     return { x: hip.x, y: hip.y, t: t, h: -t + 82, su: 0, sl: 90, fu: 2, fl: 92,
-      fN: foot, fF: { x: foot.x - 3, y: foot.y }, ftN: 37 - 97 * (1 - k), ftF: 37 - 97 * (1 - k), kbN: 1, kbF: 1 };
+      fN: foot, fF: { x: foot.x, y: foot.y }, ftN: 37, ftF: 37, kbN: 1, kbF: 1 };   // both legs move together
   }
   /* ---------- glute bridge (on the back, head to the left) ---------- */
   var BX = 110;
@@ -309,8 +311,9 @@
           J.bar = b;
           back += S.circle(b, PLATE * sc, '#E9E7E1', C.ink, 2.5, ' opacity=".92"') + S.circle(b, 4 * sc, C.ink);
         }
-        if (s.id === 'plank') hud += S.text(18, 30, KT.pick('綠線＝頭到腳跟一直線', 'GREEN LINE = HEAD TO HEELS IN ONE LINE'), { size: 11, fill: C.jade, family: "'JetBrains Mono','Noto Sans TC',monospace" });
-        if (s.id === 'plank' || s.id === 'pushup') fr += S.line(J.head, beginner && s.id === 'pushup' ? J.kN : J.aN, C.jade, 1.6, ' stroke-dasharray="5 4" opacity=".8"');
+        var kneesDown = s.id === 'plank' && J.kN.y > c.gy - 12 * sc;   // knees on the mat: the line runs head to knees
+        if (s.id === 'plank') hud += S.text(18, 30, kneesDown ? KT.pick('綠線＝頭到膝蓋一直線', 'GREEN LINE = HEAD TO KNEES IN ONE LINE') : KT.pick('綠線＝頭到腳跟一直線', 'GREEN LINE = HEAD TO HEELS IN ONE LINE'), { size: 11, fill: C.jade, family: "'JetBrains Mono','Noto Sans TC',monospace" });
+        if (s.id === 'plank' || s.id === 'pushup') fr += S.line(J.head, (beginner && s.id === 'pushup') || kneesDown ? J.kN : J.aN, C.jade, 1.6, ' stroke-dasharray="5 4" opacity=".8"');
         if (barbell && s.id !== 'bench') hud += S.text(18, 30, KT.pick('虛線＝腳掌中間（槓鈴保持在上方）', 'DASHED LINE = MID-FOOT (KEEP THE BAR OVER IT)'), { size: 11, fill: '#7C8191', family: "'JetBrains Mono','Noto Sans TC',monospace" });
         return { back: back, front: fr, hud: hud };
       }
