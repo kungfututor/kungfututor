@@ -18,7 +18,7 @@ var FLOOR = 211;         // lesson floor line
 var CATS = [
   { k: 'kungfu', n: P('功夫', 'Kung Fu') }, { k: 'strike', n: P('打擊', 'Striking') },
   { k: 'grapple', n: P('摔與地面', 'Grappling') }, { k: 'defence', n: P('自我防衛', 'Self-Defence') },
-  { k: 'fit', n: P('健身', 'Fitness') }
+  { k: 'fit', n: P('健身', 'Fitness') }, { k: 'golf', n: P('高爾夫', 'Golf') }
 ];
 var LIB = {
   STANCES: [P('功夫步型', 'Kung fu stances'), '../../kungfu/stances/'], STRIKES: [P('功夫拳腳', 'Kung fu strikes'), '../../kungfu/strikes/'],
@@ -28,7 +28,8 @@ var LIB = {
   BJJ: [P('巴西柔術', 'BJJ'), '../../combat/bjj/'], WRESTLING: [P('摔跤', 'Wrestling'), '../../combat/wrestling/'],
   SELFDEF: [P('防身術', 'Self-defence'), '../../self-defence/basics/'], KRAV: [P('以色列格鬥術', 'Krav Maga'), '../../self-defence/krav-maga/'],
   GYM: [P('健身房', 'Gym'), '../../fitness/gym/'], WINGCHUN: [P('詠春', 'Wing Chun'), '../../kungfu/wing-chun/'],
-  SAMBO: [P('桑搏', 'Sambo'), '../../combat/sambo/'], FMA: [P('菲律賓武術', 'Filipino Martial Arts'), '../../combat/fma/']
+  SAMBO: [P('桑搏', 'Sambo'), '../../combat/sambo/'], FMA: [P('菲律賓武術', 'Filipino Martial Arts'), '../../combat/fma/'],
+  GOLF: [P('高爾夫', 'Golf'), '../../sports/golf/']
 };
 // Which side a move shows first. The 2D lessons draw the near (right) limbs in front; these say what is correct:
 // the striking arts teach right-handers to stand left foot forward (orthodox), and each Tai Chi posture has its
@@ -73,10 +74,16 @@ var MOVES = [
   mv('fit', 'GYM', 'squat', { bar: 'back' }), mv('fit', 'GYM', 'deadlift', { bar: 'hands' }), mv('fit', 'GYM', 'press', { bar: 'hands' }),
   mv('fit', 'GYM', 'row', { bar: 'hands' }), mv('fit', 'GYM', 'lunge'),
   // (hands and toes on the floor the whole time: nothing steps, so the planted-feet planner is left out)
-  mv('fit', 'GYM', 'pushup', { gait: false }), mv('fit', 'GYM', 'plank', { gait: false }), mv('fit', 'GYM', 'bridge')
+  mv('fit', 'GYM', 'pushup', { gait: false }), mv('fit', 'GYM', 'plank', { gait: false }), mv('fit', 'GYM', 'bridge'),
+  // golf: the golfer model, a club and a ball; drawn face-on, with the forward bend taken from the lesson's side-view setup
+  mv('golf', 'GOLF', 'setup', { mode: 'front', golf: 1 }), mv('golf', 'GOLF', 'takeaway', { mode: 'front', golf: 1 }), mv('golf', 'GOLF', 'top', { mode: 'front', golf: 1 }),
+  mv('golf', 'GOLF', 'downswing', { mode: 'front', golf: 1 }), mv('golf', 'GOLF', 'impact', { mode: 'front', golf: 1 }), mv('golf', 'GOLF', 'finish', { mode: 'front', golf: 1 }),
+  mv('golf', 'GOLF', 'full', { mode: 'front', golf: 1 }), mv('golf', 'GOLF', 'driver', { mode: 'front', golf: 1 }), mv('golf', 'GOLF', 'chip', { mode: 'front', golf: 1 }),
+  mv('golf', 'GOLF', 'putt', { mode: 'front', golf: 1 })
 ].filter(function (m) { return window[m.lib] && LIB[m.lib]; }).map(function (m) {
   if (m.side === undefined) m.side = m.lib === 'TAICHI' ? TC_SIDE[m.key] : SIDE[m.lib];
   if (m.lib === 'TAICHI' && TC_STEPS[m.key]) { m.gaitOnly = TC_STEPS[m.key]; m.slides = true; }
+  if (m.golf) { m.model = 'golfer'; m.pivots = true; }   // (the back foot turns on its toes in the finish)
   m.s = window[m.lib].LIST.filter(function (s) { return typeof m.key === 'number' ? s.n === m.key : s.id === m.key; })[0];
   m.slug = m.lib.toLowerCase() + '-' + m.key;
   return m;
@@ -92,7 +99,8 @@ function hiddenSvg() {
 }
 var sideP = new KTFigure.Player(hiddenSvg(), { autoplay: false });
 var frontP = new KTFigure.Player(hiddenSvg(), { autoplay: false });
-var cur = null, clip = null, x0 = 0, OPT = { groundY: FLOOR + 3, scale: 1, cx: 0 };
+var cur = null, clip = null, x0 = 0, OPT = { groundY: FLOOR + 3, scale: 1, cx: 0 }, GOLFREF = null;
+var KTFigure_BASE = { x: 200, lift: 0, t: 0, h: 0, su: 8, sl: 14, fu: -8, fl: -2, tu: 3, tl: 0, bu: -3, bl: 0 };
 
 function build(m, view) {
   var L = window[m.lib], lang = KT.getLang();
@@ -111,6 +119,14 @@ function loadMove(m) {
   if (mode !== 'front') { clip = build(m, 'side'); sideP.load(clip); }
   if (mode !== 'side') { var fc = build(m, 'front'); frontP.load(fc); if (mode === 'front') { clip = fc; } }
   x0 = mode === 'front' ? 0 : solveAt(sideP, 0, true).J.hip.x;
+  GOLFREF = null;
+  if (m.golf) {                                             // the address posture seen from the side and from the front
+    var setup = window.GOLF.LIST.filter(function (s) { return s.id === 'setup'; })[0];
+    var sc = window.GOLF.makeClip(setup, 'side', 1, KT.getLang()), fc = window.GOLF.makeClip(setup, 'front', 1, KT.getLang());
+    var addrF = fc.frames[fc.frames.length - 1].p, addrS = sc.frames[sc.frames.length - 1].p;
+    GOLFREF = { side: KTFigure.solve(Object.assign({}, KTFigure_BASE, addrS), OPT), front: KTFigure.solve(Object.assign({}, KTFigure_BASE, addrF), OPT) };
+  }
+  useModel(m.model);
   planGait();
 }
 
@@ -201,6 +217,12 @@ var barbell = new THREE.Group(); scene.add(barbell); barbell.visible = false;
 // a rattan stick held in the right hand (Filipino martial arts): 64 lesson units above the grip, 10 below (the butt shows under the fist)
 var stickGeo = new THREE.CylinderGeometry(0.012, 0.013, 74 * K, 12); stickGeo.translate(0, (64 - 10) / 2 * K, 0);
 var stick = new THREE.Mesh(stickGeo, std('#8B5A2B', 0.7)); stick.castShadow = true; stick.visible = false; scene.add(stick);
+// a golf club (shaft along +Y from the grip, head at the far end) and a ball
+var club = new THREE.Group(); club.visible = false; scene.add(club);
+var clubShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.0075, 0.0055, 1, 10), std('#B8BCC4', 0.35)); clubShaft.castShadow = true; club.add(clubShaft);
+var clubGrip = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.011, 0.26, 10), std('#222222', 0.8)); club.add(clubGrip);
+var clubHead = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.045, 0.025), std('#8E939B', 0.3)); clubHead.castShadow = true; club.add(clubHead);
+var golfBall = new THREE.Mesh(new THREE.SphereGeometry(0.0214, 16, 12), std('#FFFFFF', 0.5)); golfBall.castShadow = true; golfBall.visible = false; scene.add(golfBall);
 var barRod = mesh(new THREE.CylinderGeometry(0.014, 0.014, 1.6, 12), M.steel, barbell); barRod.rotation.x = Math.PI / 2;
 [0.56, -0.56].forEach(function (z) {
   var pl = mesh(new THREE.CylinderGeometry(0.225, 0.225, 0.05, 32), M.plate, barbell); pl.rotation.x = Math.PI / 2; pl.position.z = z;
@@ -246,6 +268,14 @@ function pose3d(t) {
   // should show (cur.side: 'l' = whole body mirrored, 'legs' / 'arms' = only those) and the Mirror button swaps it.
   // Mirroring = the right limb takes the left limb's place on the other side of the body.
   var sd = sidesNow();
+  // golf: the turn of the shoulders and hips. A face-on drawing shows it as narrower shoulders / hips (sw 16 and hw 9 when square);
+  // the body turns away from the side the hands are on (back on the backswing, towards the target on the follow-through)
+  var gTurn = 0, hTurn = 0;
+  if (cur.golf && Jf) {
+    var gside = (Jf.hN.x + Jf.hF.x) / 2 - Jf.hip.x >= 0 ? 1 : -1;
+    gTurn = Math.acos(Math.min(1, (typeof P0.sw === 'number' ? P0.sw : 16) / 16)) * gside;
+    hTurn = Math.acos(Math.min(1, (typeof P0.hw === 'number' ? P0.hw : 9) / 9)) * gside;
+  }
   function V(name, pt) {
     var src = name, flip = false;
     if (!pt && ((sd.legs && /^(hip|k|a|t)[NF]$/.test(name)) || (sd.arms && /^(sh|e|h)[NF]$/.test(name)))) {
@@ -277,13 +307,26 @@ function pose3d(t) {
       z *= src.charAt(0) === 'k' ? (1 + fzk) / 2 : fzk;
     }
     // front-view lessons: an arm drawn shorter than its real length points towards the viewer, so in 3D it reaches forward by the missing length
-    if (mode === 'front' && !pt && /^[eh][NF]$/.test(src)) {
+    if (mode === 'front' && !pt && !cur.golf && /^[eh][NF]$/.test(src)) {
       var q = src.charAt(1), s0 = Js['sh' + q], e0 = Js['e' + q], h0 = Js['h' + q];
       x = Math.sqrt(Math.max(0, 900 - (e0.x - s0.x) * (e0.x - s0.x) - (e0.y - s0.y) * (e0.y - s0.y))) * K;
       if (src.charAt(0) === 'h') x += Math.sqrt(Math.max(0, 784 - (h0.x - e0.x) * (h0.x - e0.x) - (h0.y - e0.y) * (h0.y - e0.y))) * K;
     }
+    // golf: the swing is drawn face-on; the forward bend of the address posture comes from the lesson's side-view setup.
+    // Every joint keeps the forward position and height difference it has at address; the hands come back towards the body
+    // as they rise above the shoulders (at the top of the swing they are up beside the head, not out in front).
+    if (cur.golf && GOLFREF && !pt) {
+      var GS = GOLFREF.side, GF = GOLFREF.front, arm = /^[eh][NF]$/.test(src), ref = arm ? 'sh' + src.charAt(1) : src;
+      var rs = GS[ref] || GS[ref.replace(/[NF]$/, '')] || GS.hip, rf = GF[ref] || GF.hip;
+      x = (rs.x - GS.hip.x) * K;
+      if (!/^[at][NF]$/.test(src)) y += (rf.y - rs.y) * K;
+      if (arm) {
+        var hd = (GS['h' + src.charAt(1)].x - GS['sh' + src.charAt(1)].x) * K, rise = Jf['sh' + src.charAt(1)].y - Jf['h' + src.charAt(1)].y;
+        x += hd * (src.charAt(0) === 'e' ? 0.55 : 1) * (1 - 0.75 * smooth(-45, 15, rise));
+      }
+    }
     // …and the same for a thigh drawn shorter (lT): the knee bends towards the viewer, i.e. forward — not sideways
-    if (mode === 'front' && !pt && (src === 'kN' || src === 'kF')) {
+    if (mode === 'front' && !pt && !cur.golf && (src === 'kN' || src === 'kF')) {
       var lT = typeof P0.lT === 'number' ? Math.min(1, P0.lT) : 1;
       x = 44 * Math.sqrt(1 - lT * lT) * K;
       if (lT > 0.999) {
@@ -312,6 +355,12 @@ function pose3d(t) {
     // `ez`: how far apart the elbows are (1 = each in front of its own shoulder, 0 = on the centre line — an uppercut elbow)
     if (!Jf && !pt && (src === 'eN' || src === 'eF') && typeof P0.ez === 'number') z *= P0.ez;
     if (flip) z = -z;
+    // (the shoulders and arms turn about the base of the neck, the hips about their centre; the head stays over the ball)
+    var up = !pt && cur.golf && /^(shN|shF|eN|eF|hN|hF)$/.test(name), tq = up ? gTurn : !pt && cur.golf && /^hip[NF]$/.test(name) ? hTurn : 0;
+    if (tq) {
+      var px = up ? (GOLFREF.side.sh.x - GOLFREF.side.hip.x) * K : 0, pz = up ? (Jf.sh.x - Jf.hip.x) * K * (flip ? -1 : 1) : 0;
+      var cq = Math.cos(tq), sq = Math.sin(tq), x1 = px + (x - px) * cq - (z - pz) * sq; z = pz + (x - px) * sq + (z - pz) * cq; x = x1;
+    }
     // `lz`: the upper body leans sideways by that many degrees (+ = towards the lesson's near side: slipping a punch, bobbing
     // and weaving) — a side-view drawing cannot show it. Everything above the hips turns about the hips as one piece.
     if (!pt && typeof P0.lz === 'number' && P0.lz && /^(sh|head|shN|shF|eN|eF|hN|hF)$/.test(name)) {
@@ -321,7 +370,7 @@ function pose3d(t) {
     return new THREE.Vector3(hx + x * cos + z * sin, y, -x * sin + z * cos);
   }
   var at = (S ? sideP : frontP).poseAt(t);
-  return { J: Js, V: V, theta: theta, pose: S ? S.pose : F.pose, seg: at.seg, k: at.k };
+  return { J: Js, V: V, theta: theta, pose: S ? S.pose : F.pose, seg: at.seg, k: at.k, gTurn: gTurn };
 }
 
 /* ---------- feet that stay where they are planted ----------
@@ -594,8 +643,9 @@ function lessonJoints(t) {
  *    ends reach the floor with the lesson's straight line kept.
  * N (near, +z) is the body's right side, F its left.
  */
-var MODEL_URL = '/assets/models/instructor/kt-instructor.glb';
-var avatar = null;
+// two models: the instructor for every lesson, and the golfer (made for KungfuTutor with Meshy, private licence) for golf
+var MODELS = { instructor: '/assets/models/instructor/kt-instructor.glb', golfer: '/assets/models/golfer/kt-golfer.glb' };
+var avatar = null, AVS = {}, avKey = null, avLoading = {};
 var AV = { v1: new THREE.Vector3(), v2: new THREE.Vector3(), q1: new THREE.Quaternion(), q2: new THREE.Quaternion(), q3: new THREE.Quaternion() };
 // three.js drops the colon from "mixamorig:Hips", so match on the part after the prefix
 function boneKey(name) { return name.replace(/^mixamorig[:_]?/i, ''); }
@@ -1274,15 +1324,34 @@ function poseAvatar(n, theta, move, pins) {
   info.kneeDrop = kneeDrop; info.rest = rest; info.g = g; info.wb = wb; info.C = C; info.n = n;
   return info;
 }
-(function loadAvatar() {
-  new GLTFLoader().load(MODEL_URL, function (g) {
+function loadAvatar(key, done) {
+  if (AVS[key]) { if (done) done(); return; }
+  if (avLoading[key]) { if (done) avLoading[key].push(done); return; }
+  avLoading[key] = done ? [done] : [];
+  new GLTFLoader().load(MODELS[key], function (g) {
     var a = setupAvatar(g.scene);
     if (!a) return;
-    avatar = a; body.visible = false;
-    barbell.scale.setScalar(1.155); PLATE_R = 0.225 * 1.155;   // the barbell at the model's size
-    if (clip) { planGait(); draw(); }                         // (the step plan needs the model to know where its feet land)
-    if (/[?&]check\b/.test(location.search)) import('./lab3d-check.js').then(function (m) { m.run(CHECK_API); });
-  }, undefined, function () { /* keep the simple figure */ });
+    AVS[key] = a; a.rig.visible = false;
+    if (key === 'instructor') { barbell.scale.setScalar(1.155); PLATE_R = 0.225 * 1.155; }   // the barbell at the instructor's size
+    if (avKey === key) useModel(key, true);
+    avLoading[key].forEach(function (f) { f(); }); avLoading[key] = null;
+  }, undefined, function (e) { console.error('3D model could not be loaded:', key, e && (e.stack || e.message || e)); });
+}
+// show the model a move uses (loading it the first time); the simple figure stands in while it loads
+function useModel(key, force) {
+  key = key || 'instructor';
+  if (avKey === key && !force) return;
+  avKey = key;
+  Object.keys(AVS).forEach(function (k) { AVS[k].rig.visible = k === key; });
+  avatar = AVS[key] || null; body.visible = !avatar;
+  if (!avatar) { loadAvatar(key); return; }
+  if (clip && force) { planGait(); draw(); }               // (the step plan needs the model to know where its feet land)
+}
+(function startModels() {
+  // the self-check needs every model in memory before it starts
+  if (/[?&]check\b/.test(location.search)) {
+    loadAvatar('instructor', function () { loadAvatar('golfer', function () { useModel(cur && cur.model, true); import('./lab3d-check.js').then(function (m) { m.run(CHECK_API); }); }); });
+  } else loadAvatar(cur && cur.model === 'golfer' ? 'golfer' : 'instructor');
 })();
 
 function drawBody(time) {
@@ -1290,7 +1359,7 @@ function drawBody(time) {
   faceQ.setFromAxisAngle(UPV, r.theta);
   if (avatar) {
     drawBar(r, J, V, poseAvatar(n, r.theta, cur, q.pins));
-    drawStick(r);
+    drawStick(r); drawClub(r);
     return r.seg;
   }
   place(parts.thighN, n.hipN, n.kN); place(parts.shinN, n.kN, n.aN); place(parts.shoeN, n.aN, n.tN);
@@ -1341,6 +1410,25 @@ function drawBar(r, J, V, info) {
 }
 
 // the stick follows the right fist; its angle comes from the lesson (sk: 0 = pointing down, 90 = forward, 180 = up)
+// the club: from the grip (between the two hands) along the lesson's club angle, leaning forward to the ball as it points down
+function drawClub(r) {
+  club.visible = golfBall.visible = !!(cur && cur.golf && avatar);
+  if (!club.visible) return;
+  var B = avatar.B, gr = SIDES.map(function (s) { var w = wpos(B[s.X + 'Hand']); return w.add(wpos(B[s.X + 'HandMiddle1']).sub(w).multiplyScalar(0.62)); });
+  var g = gr[0].clone().add(gr[1]).multiplyScalar(0.5), a = (r.pose.ca || 0) * Math.PI / 180, L = Math.max(0.3, (r.pose.cl || 80) * K * 1.12);
+  var GS = GOLFREF && GOLFREF.side, fwd = GS ? Math.max(0, (GS.hN.y < 0 ? 0 : 1)) : 1;
+  var dir = new THREE.Vector3(0.55 * Math.max(0, Math.cos(a)) * fwd, -Math.cos(a), Math.sin(a)).normalize();
+  if (r.gTurn) { var cg = Math.cos(r.gTurn), sg = Math.sin(r.gTurn), dx1 = dir.x * cg - dir.z * sg; dir.z = dir.x * sg + dir.z * cg; dir.x = dx1; }
+  // never into the floor: the head rests on it
+  if (g.y + dir.y * L < 0.03) { var need = (0.03 - g.y) / L; dir.y = need; var hz = Math.hypot(dir.x, dir.z) || 1, k2 = Math.sqrt(Math.max(0, 1 - need * need)) / hz; dir.x *= k2; dir.z *= k2; }
+  club.position.copy(g); club.quaternion.setFromUnitVectors(UPV, dir);
+  clubShaft.scale.set(1, L, 1); clubShaft.position.set(0, L / 2, 0); clubGrip.position.set(0, 0.06, 0);
+  clubHead.position.set(0.025, L, 0);
+  var addr = cur && GOLFREF, bx = 0.62, bz = 0;
+  if (addr) { var GSd = GOLFREF.side, GFd = GOLFREF.front; bx = (GSd.hip.x + 97 - GSd.hip.x) * K * 0.72; bz = 0.02; }
+  golfBall.position.set(bx, 0.0214, bz);
+  golfBall.visible = golfBall.visible && !(r.pose.bt > 0.05 && r.pose.bv > 0.5) && !(r.pose.bt > 0.5);
+}
 function drawStick(r) {
   stick.visible = !!(cur.stick && avatar && (r.pose.sv === undefined || r.pose.sv > 0.5));
   if (!stick.visible) return;
@@ -1484,7 +1572,7 @@ var CHECK_API = {
     faceQ.setFromAxisAngle(UPV, r.theta);
     var info = poseAvatar(n, r.theta, cur, q.pins);
     drawBar(r, r.J, r.V, info);
-    drawStick(r);
+    drawStick(r); drawClub(r);
     return { info: info, n: n, theta: r.theta };
   }
 };

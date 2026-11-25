@@ -144,6 +144,7 @@ export function run(api) {
   function one(idx) {
     if (idx >= list.length) return done();
     var o = list[idx], total = api.load(o.i), frames = api.frames();
+    A = api.avatar();                                       // (golf lessons use the golfer model)
     var R = { slug: o.m.slug, name: api.name(o.m), flags: {}, max: {}, min: {}, pops: 0 };
     var prev = null, off = { n: 0, max: 0, dir: '', t: 0 };
     // a planted foot must stay where it was planted: follow the ball of each foot for as long as it is down
