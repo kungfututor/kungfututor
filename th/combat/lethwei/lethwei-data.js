@@ -12,7 +12,8 @@
 
   var X0 = 140;
   var LEGS = { x: X0, t: 4, h: 6, fN: { x: 20, y: 85 }, fF: { x: -22, y: 85 }, ftN: 90, ftF: 70, kbN: 1, kbF: 1, lift: 0 };
-  var GUARD = { su: 65, sl: 188, fu: 55, fl: 192, laN: 1 };
+  // bare fists: the guard sits higher and closer to the head than a gloved one, forearms upright as shields
+  var GUARD = { su: 75, sl: 205, fu: 65, fl: 208, laN: 1, ez: 1 };   // ez: how far apart the elbows are in the 3D view
   var BASE = m(KP.base, { hit: 0, oa1: 62, oa2: 186, ob1: 52, ob2: 190, ola: 14, olb: 4, ol: 16 });
   function P() { return m.apply(null, [BASE, LEGS, GUARD].concat([].slice.call(arguments))); }
   function grip(ox, ot, t) {      // both hands on the back of the opponent's neck (targets relative to the hip)
@@ -35,8 +36,8 @@
     ] },
     hook: { hit: 'hN', trail: 'hN', frames: [
       { d: 700, p: P({ ox: 212 }), c: cap('近距離站架', 'Stance at close range') },
-      { d: 160, p: P({ t: 0, su: 55, sl: 150, ox: 212 }), c: cap('重心稍移到前腳', 'Shift a little weight onto the lead foot') },
-      { d: 300, p: P({ t: 8, su: 88, sl: 90, laN: 0.35, ftN: 55, ox: 212, ot: -6, oh: -14, hit: 1 }), e: 'out', c: cap('轉身帶動，拳頭橫向勾入下巴側面', 'Turn the body and hook the fist across into the side of the jaw') },
+      { d: 160, p: P({ x: X0 + 3, t: 6, ox: 212 }), c: cap('重心稍移到前腳', 'Shift a little weight onto the lead foot') },
+      { d: 300, p: P({ t: 8, su: 88, sl: 90, laN: 0.35, hz: 0.55, ftN: 55, ox: 212, ot: -6, oh: -14, hit: 1 }), e: 'out', c: cap('轉身帶動，拳頭橫向勾入下巴側面', 'Turn the body and hook the fist across into the side of the jaw') },
       { d: 500, p: P({ ox: 214 }), c: cap('收回護頭', 'Back to the guard') }
     ] },
     headbutt: { hit: 'head', trail: 'head', frames: [
@@ -48,13 +49,13 @@
     elbow: { hit: 'eF', trail: 'eF', frames: [
       { d: 700, p: P({ ox: 190 }), c: cap('近距離站架', 'Close-range stance') },
       { d: 200, p: P({ t: 10, fN: { x: 20, y: 78 }, fF: { x: -22, y: 78 }, fu: 20, fl: 150, ox: 190 }), c: cap('膝蓋微蹲、後手手肘放低', 'Dip the knees and drop the rear elbow') },
-      { d: 260, p: P({ t: 14, fu: 120, fl: 275, fF: { x: -18, y: 84 }, ftF: 40, ox: 190, ot: -8, oh: -24, hit: 1 }), e: 'out', c: cap('蹬地，手肘由下往上頂向下巴', 'Drive up and spear the elbow upward under the chin') },
+      { d: 260, p: P({ t: 14, fu: 120, fl: 275, ez: 0.3, fF: { x: -18, y: 84 }, ftF: 40, ox: 190, ot: -8, oh: -24, hit: 1 }), e: 'out', c: cap('蹬地，手肘由下往上頂向下巴', 'Drive up and spear the elbow upward under the chin') },
       { d: 600, p: P({ ox: 194 }), c: cap('回到護頭', 'Back to the guard') }
     ] },
     flyknee: { hit: 'kF', trail: 'kF', frames: [
       { d: 700, p: P({ ox: 222 }), c: cap('站架，對方低頭或往前', 'Stance; the opponent dips or comes forward') },
-      { d: 220, p: P({ x: X0 + 10, fN: { x: 26, y: 84 }, fF: { x: -30, y: 82 }, ftF: 30, t: 0, ox: 222, ot: 10 }), c: cap('前腳踏出，準備起跳', 'Step in with the lead foot to take off') },
-      { d: 260, p: P({ x: X0 + 22, lift: 34, fN: { x: -8, y: 62 }, fF: { x: 32, y: 26 }, ftF: 10, ftN: 40, t: -10, su: 75, sl: 150, fu: 70, fl: 160, ox: 222, ot: 4, oh: -20, hit: 1 }), e: 'out', c: cap('起跳，後膝往前上方頂，雙手往前', 'Jump and drive the rear knee up and forward, hands reaching out') },
+      { d: 220, p: P({ x: X0 + 10, fN: { x: 26, y: 84 }, fF: { x: -30, y: 76 }, ftF: 30, t: 0, ox: 222, ot: 10 }), c: cap('前腳踏出，準備起跳', 'Step in with the lead foot to take off') },
+      { d: 260, p: P({ x: X0 + 22, lift: 34, fN: { x: -8, y: 62 }, fF: { x: 32, y: 26 }, ftF: 10, ftN: 40, t: -10, su: 82, sl: 98, fu: 78, fl: 102, ox: 222, ot: 4, oh: -20, hit: 1 }), e: 'out', c: cap('起跳，後膝往前上方頂，雙手往前', 'Jump and drive the rear knee up and forward, hands reaching out') },
       { d: 320, p: P({ x: X0 + 20, fN: { x: 20, y: 85 }, fF: { x: -22, y: 85 }, ox: 236 }), c: cap('落地站穩，立刻護頭', 'Land balanced and get the hands up') },
       { d: 500, p: P({ ox: 236 }) }
     ] },
@@ -66,11 +67,13 @@
       { d: 600, p: P({ ox: 228 }), c: cap('回到站架', 'Back to stance') }
     ] },
     push: { hit: 'aN', trail: 'aN', frames: [
-      { d: 700, p: P({ ox: 236 }), c: cap('站架，對方逼近', 'Stance; the opponent steps in') },
+      { d: 480, p: P({ ox: 236 }), c: cap('站架，對方逼近', 'Stance; the opponent steps in') },
+      { d: 220, p: P({ x: X0 - 12, fN: { x: 32, y: 82 }, fF: { x: -10, y: 82 }, ox: 236 }) },   // weight settles on the back leg before the lead foot lifts
       { d: 220, p: P({ t: -6, fN: { x: 32, y: 38 }, ftN: 125, ox: 236 }), c: cap('前腳提膝', 'Lift the lead knee') },
       { d: 260, p: P({ t: -14, fN: { x: 82, y: 22 }, ftN: 178, ox: 240, ot: -10, hit: 1 }), e: 'out', c: cap('推髖，用腳掌把對方推開', 'Push the hips and drive the sole into them') },
       { d: 260, p: P({ t: -6, fN: { x: 32, y: 38 }, ftN: 125, ox: 262, ot: -6 }), c: cap('收腿', 'Re-chamber') },
-      { d: 600, p: P({ ox: 262 }), c: cap('回到站架', 'Back to stance') }
+      { d: 160, p: P({ x: X0 - 12, fN: { x: 32, y: 82 }, fF: { x: -10, y: 82 }, ox: 262 }) },
+      { d: 460, p: P({ ox: 262 }), c: cap('回到站架', 'Back to stance') }
     ] },
     catch: { hit: 'hN', trail: null, frames: [
       { d: 700, p: P({ ox: 226 }), c: cap('站架', 'Stance') },
@@ -82,11 +85,15 @@
     cover: { hit: null, trail: null, frames: [
       { d: 700, p: P({ ox: 214 }), c: cap('站架', 'Stance') },
       { d: 180, p: P({ ox: 214, oa1: 40, oa2: 120, ot: 2 }), c: cap('對方揮出勾拳', 'They swing a hook') },
-      { d: 240, p: P({ fu: 100, fl: 192, h: 16, t: 8, ox: 214, oa1: 88, oa2: 100, ot: 8 }), e: 'out', c: cap('手臂貼頭側，前臂擋住，下巴收、身體微前傾', 'Arm tight to the side of the head, forearm takes it, chin down, lean in a little') },
+      { d: 240, p: P({ su: 125, sl: 255, h: 16, t: 8, ox: 214, oa1: 88, oa2: 100, ot: 8 }), e: 'out', c: cap('手臂貼頭側，前臂擋住，下巴收、身體微前傾', 'Arm tight to the side of the head, forearm takes it, chin down, lean in a little') },
       { d: 280, p: P({ t: 16, fu: 92, fl: 90, fF: { x: -18, y: 84 }, ftF: 40, ox: 214, ot: -6 }), c: cap('擋完立刻用後手反擊', 'Counter straight away with the rear hand') },
       { d: 600, p: P({ ox: 216 }), c: cap('回到護頭', 'Back to the guard') }
     ] }
   };
+
+  // one-legged moments (kicks, knees, shin blocks): the hips move over the standing foot so the figure never tips over;
+  // the standing foot stays put and the partner keeps the distance the lesson drew (see KTFigure.balanceClip)
+  ['kick', 'push'].forEach(function (k) { w.KTFigure.balanceClip(CLIPS[k].frames, { base: { x: X0 } }); });
 
   function makeClip(s, view, level, lang) {
     var src = CLIPS[s.id], pace = level < 1 ? 1.8 : 1;

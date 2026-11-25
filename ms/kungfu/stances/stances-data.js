@@ -11,12 +11,12 @@
 
   /* ---------- shared pose parts ---------- */
   var ARMS_SIDE_STAND = { su: 4, sl: 6, fu: -4, fl: -2 };
-  var ARMS_SIDE_FIST = { su: -22, sl: 80, fu: -26, fl: 78 };           // fists chambered at the waist
+  var ARMS_SIDE_FIST = { su: -48, sl: 62, fu: -50, fl: 60 };           // fists chambered at the sides of the waist: elbows drawn back, fists beside the body
   var ARMS_FRONT_STAND = { su: 6, sl: 3, fu: -6, fl: -3 };
-  var ARMS_FRONT_FIST = { su: 28, sl: -55, fu: -28, fl: 55 };          // fists at the waist, seen from the front
+  var ARMS_FRONT_FIST = { su: 18, sl: -5, fu: -18, fl: 5 };            // fists at the sides of the waist, seen from the front
   var FRONT = { hw: 9, sw: 16, kbF: -1, kbN: 1 };
 
-  var STAND_SIDE = m(ARMS_SIDE_STAND, { t: 0, h: 0, lT: 1, fN: { x: 2, y: 87 }, fF: { x: -2, y: 87 }, ftN: 90, ftF: 90 });
+  var STAND_SIDE = m(ARMS_SIDE_STAND, { t: 0, h: 0, lT: 1, fN: { x: 2, y: 87 }, fF: { x: -2, y: 87 }, ftN: 90, ftF: 90, fzN: 1, fzF: 1 });
   var STAND_FRONT = m(FRONT, ARMS_FRONT_STAND, { t: 0, h: 0, lT: 1, fN: { x: 9, y: 87 }, fF: { x: -9, y: 87 }, ftN: 90, ftF: -90 });
 
   var POSES = {
@@ -34,7 +34,9 @@
       front: m(FRONT, ARMS_FRONT_FIST, { t: 4, fN: { x: 14, y: 34 }, fF: { x: -90, y: 34 }, ftN: 90, ftF: -90 })
     },
     cross: {
-      side: m(ARMS_SIDE_FIST, { t: 5, fN: { x: 34, y: 46 }, ftN: 90, fF: { x: -14, y: 38 }, ftF: 30 })
+      // (fzN / fzF: where each foot sits sideways for the 3D view — the front foot on the centre line, the back foot across behind
+      //  it on the other side, so the back knee tucks in behind the outside of the front calf)
+      side: m(ARMS_SIDE_FIST, { t: 5, fN: { x: 34, y: 46 }, ftN: 90, fF: { x: -14, y: 38 }, ftF: 30, fzN: 0.4, fzF: -1.25 })
     }
   };
 

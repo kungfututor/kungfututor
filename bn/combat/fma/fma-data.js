@@ -14,15 +14,16 @@
   var X0 = 140, STICK = 64;
   var LEGS = { x: X0, t: 6, h: 4, fN: { x: 24, y: 83 }, fF: { x: -24, y: 83 }, ftN: 90, ftF: 70, kbN: 1, kbF: 1, lift: 0 };
   // weapon hand forward with the stick up; live (empty) hand by the chest
-  var GUARD = { su: 50, sl: 125, sk: 150, sv: 1, fu: 40, fl: 160 };
+  // (hzN: where the weapon hand is sideways in the 3D view: 1 = its own side, below 0 = across the body)
+  var GUARD = { su: 50, sl: 125, sk: 150, skz: 0, sv: 1, fu: 40, fl: 160, hzN: 1 };
   // partner holds a stick too: osk = its stick angle, odrop 0..1 = knocked to the floor
   var BASE = m(KP.base, { hit: 0, ox: 236, oa1: 50, oa2: 125, ob1: 40, ob2: 160, osk: 150, odrop: 0, ol: 18, ola: 14 });
   function P() { return m.apply(null, [BASE, LEGS, GUARD].concat([].slice.call(arguments))); }
 
-  var CHAMBER_F = { su: 150, sl: 215, sk: -125 };          // stick cocked over the weapon-side shoulder
+  var CHAMBER_F = { su: 110, sl: 243, sk: -125 };          // stick cocked over the weapon-side shoulder: hand by the ear, elbow forward
   var HIT_F = { su: 98, sl: 96, sk: 104, t: 12 };          // contact high, stick level with the target
-  var FOLLOW_F = { su: 30, sl: 8, sk: -15, t: 14 };         // follow-through low, past the hip
-  var CHAMBER_B = { su: 135, sl: 255, sk: -150, laN: 0.7 }; // stick by the opposite shoulder
+  var FOLLOW_F = { su: 30, sl: 8, sk: -70, skz: 45, t: 14, hzN: -2.2 };   // follow-through low, across the body past the opposite hip
+  var CHAMBER_B = { su: 90, sl: 210, sk: -165, skz: 55, laN: 0.7, hzN: -1.3 };   // hand in front of the opposite shoulder, clear of the face // stick by the opposite shoulder
   var HIT_B = { su: 100, sl: 88, sk: 78, t: 10, laN: 1 };
   var FOLLOW_B = { su: 55, sl: 35, sk: 25, t: 10, laN: 1 };
   var ROOF = { su: 162, sl: 172, sk: -55 };                // hand high, stick sloping down behind: strikes slide off
@@ -50,7 +51,7 @@
     thrust: { hit: 'st', trail: 'st', frames: [
       { d: 600, p: P({ ox: 246 }), c: cap('戒備姿勢', 'Ready stance') },
       { d: 220, p: P({ su: -15, sl: 75, sk: 90, ox: 246 }), c: cap('棍子收到腰側，棍尖朝前', 'Draw the stick back to the hip, tip pointing forward') },
-      { d: 180, p: P({ x: X0 + 14, su: 88, sl: 90, sk: 90, t: 16, fN: { x: 30, y: 83 }, fF: { x: -26, y: 82 }, ftF: 40, ox: 246, ot: 10, hit: 1 }), e: 'out', c: cap('前腳上步，手臂伸直，棍尖直線刺向腹部', 'Step in and drive the tip straight into the stomach, arm extending') },
+      { d: 180, p: P({ x: X0 + 14, su: 66, sl: 76, sk: 90, t: 16, fN: { x: 30, y: 83 }, fF: { x: -26, y: 82 }, ftF: 40, ox: 246, ot: 10, hit: 1 }), e: 'out', c: cap('前腳上步，手臂伸直，棍尖直線刺向腹部', 'Step in and drive the tip straight into the stomach, arm extending') },
       { d: 600, p: P({ ox: 248 }), c: cap('收回戒備', 'Back to the ready stance') }
     ] },
     eight: { hit: null, trail: 'st', frames: [

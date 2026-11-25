@@ -11,7 +11,8 @@
 
   var X0 = 140;
   var LEGS = { x: X0, t: 4, h: 10, fN: { x: 22, y: 82 }, fF: { x: -24, y: 82 }, ftN: 90, ftF: 65, kbN: 1, kbF: 1 };
-  var GUARD = { su: 40, sl: 165, fu: 25, fl: 170, laN: 1, laF: 1 };
+  // (hz: how far apart the hands are in the 3D view, lz: sideways lean of the upper body in degrees - a side drawing shows neither)
+  var GUARD = { su: 40, sl: 165, fu: 25, fl: 170, laN: 1, laF: 1, hz: 1, lz: 0 };
   // opponent in a boxing guard too
   var BASE = m(KP.base, { hit: 0, oa1: 40, oa2: 165, ob1: 25, ob2: 170, ola: 16, olb: 4, ol: 18, oh: 6 });
   function P() { return m.apply(null, [BASE, LEGS, GUARD].concat([].slice.call(arguments))); }
@@ -41,14 +42,14 @@
     ] },
     hook: { hit: 'hN', trail: 'hN', frames: [
       { d: 700, p: P({ ox: 212 }), c: cap('站架，近距離', 'Stance, at close range') },
-      { d: 160, p: P({ t: 0, su: 55, sl: 150, ox: 212 }), c: cap('重心稍移到前腳', 'Shift a little weight onto the lead foot') },
-      { d: 300, p: P({ t: 8, su: 88, sl: 90, laN: 0.35, ftN: 55, ox: 212, ot: -6, oh: -14, hit: 1 }), e: 'out', c: cap('前腳轉、髖轉，手肘抬到與拳同高，拳頭橫向勾入', 'Pivot the lead foot and turn the hips; elbow up level with the fist, which swings across') },
+      { d: 160, p: P({ x: X0 + 3, t: 6, ox: 212 }), c: cap('重心稍移到前腳', 'Shift a little weight onto the lead foot') },
+      { d: 300, p: P({ t: 8, su: 88, sl: 90, laN: 0.35, hz: 0.35, ftN: 55, ox: 212, ot: -6, oh: -14, hit: 1 }), e: 'out', c: cap('前腳轉、髖轉，手肘抬到與拳同高，拳頭橫向勾入', 'Pivot the lead foot and turn the hips; elbow up level with the fist, which swings across') },
       { d: 500, p: P({ ox: 214 }), c: cap('收回護頭', 'Back to the guard') }
     ] },
     upper: { hit: 'hF', trail: 'hF', frames: [
       { d: 700, p: P({ ox: 212 }), c: cap('站架，近距離', 'Stance, at close range') },
       { d: 220, p: P({ t: 10, fN: { x: 22, y: 74 }, fF: { x: -24, y: 74 }, fu: 20, fl: 120, ox: 206 }), c: cap('膝蓋微蹲、後手稍微放低', 'Dip the knees and drop the rear hand slightly') },
-      { d: 300, p: P({ t: 12, fu: 62, fl: 168, fF: { x: -20, y: 81 }, ftF: 35, ox: 206, ot: -7, oh: -22, hit: 1 }), e: 'out', c: cap('腿蹬地、轉髖，拳頭由下往上打向下巴', 'Drive up through the legs, turn the hips and bring the fist up under the chin') },
+      { d: 300, p: P({ t: 12, fu: 62, fl: 168, hz: 0.25, fF: { x: -20, y: 81 }, ftF: 35, ox: 206, ot: -7, oh: -22, hit: 1 }), e: 'out', c: cap('腿蹬地、轉髖，拳頭由下往上打向下巴', 'Drive up through the legs, turn the hips and bring the fist up under the chin') },
       { d: 500, p: P({ ox: 214 }), c: cap('收回護頭', 'Back to the guard') }
     ] },
     onetwo: { hit: 'hNF', trail: 'hF', frames: [
@@ -61,21 +62,21 @@
     slip: { hit: null, trail: null, frames: [
       { d: 700, p: P({ ox: 222 }), c: cap('站架，看對方的肩膀', 'Stance; watch their shoulders') },
       { d: 160, p: P({ ox: 222, oa1: 60, oa2: 120 }), c: cap('對方出前手拳', 'They throw a jab') },
-      { d: 260, p: P({ t: 20, h: 8, x: X0 + 4, fN: { x: 22, y: 74 }, fF: { x: -24, y: 74 }, ox: 222, oa1: 90, oa2: 90, ot: 8 }), e: 'out', c: cap('膝蓋微彎、身體往前側移，讓拳頭從肩膀上方擦過', 'Bend the knees and shift forward and to the side so the punch slides over your shoulder') },
-      { d: 300, p: P({ t: 20, h: 8, x: X0 + 4, fN: { x: 22, y: 74 }, fF: { x: -24, y: 74 }, ox: 222, oa1: 70, oa2: 110 }), c: cap('眼睛一直看著對方', 'Keep your eyes on them') },
+      { d: 260, p: P({ t: 16, h: 8, lz: -16, x: X0 + 4, fN: { x: 22, y: 74 }, fF: { x: -24, y: 74 }, ox: 222, oa1: 90, oa2: 90, ot: 8 }), e: 'out', c: cap('膝蓋微彎、身體往前側移，讓拳頭從肩膀上方擦過', 'Bend the knees and shift forward and to the side so the punch slides over your shoulder') },
+      { d: 300, p: P({ t: 16, h: 8, lz: -16, x: X0 + 4, fN: { x: 22, y: 74 }, fF: { x: -24, y: 74 }, ox: 222, oa1: 70, oa2: 110 }), c: cap('眼睛一直看著對方', 'Keep your eyes on them') },
       { d: 600, p: P({ ox: 222 }), c: cap('回到站架，準備反擊', 'Back to stance, ready to counter') }
     ] },
     weave: { hit: null, trail: null, frames: [
       { d: 700, p: P({ ox: 214 }), c: cap('站架', 'Stance') },
       { d: 180, p: P({ ox: 214, oa1: 40, oa2: 120, ot: 2 }), c: cap('對方揮出勾拳', 'They swing a hook') },
-      { d: 340, p: P({ t: 26, h: 10, fN: { x: 22, y: 62 }, fF: { x: -24, y: 62 }, ox: 214, oa1: 88, oa2: 100, ot: 8 }), e: 'out', c: cap('彎膝蓋往下蹲，頭從拳頭下方穿過（不是彎腰）', 'Bend the knees and drop under the punch — legs, not the waist') },
-      { d: 340, p: P({ t: 14, h: 8, fN: { x: 22, y: 70 }, fF: { x: -24, y: 70 }, ox: 214, oa1: 60, oa2: 130 }), c: cap('以 U 字路線移到另一側站起', 'Move in a U shape and come up on the other side') },
+      { d: 340, p: P({ t: 14, h: 6, lz: 12, fN: { x: 22, y: 58 }, fF: { x: -24, y: 58 }, ox: 214, oa1: 88, oa2: 100, ot: 8 }), e: 'out', c: cap('彎膝蓋往下蹲，頭從拳頭下方穿過（不是彎腰）', 'Bend the knees and drop under the punch — legs, not the waist') },
+      { d: 340, p: P({ t: 10, h: 6, lz: -14, fN: { x: 22, y: 70 }, fF: { x: -24, y: 70 }, ox: 214, oa1: 60, oa2: 130 }), c: cap('以 U 字路線移到另一側站起', 'Move in a U shape and come up on the other side') },
       { d: 600, p: P({ ox: 214 }), c: cap('回到站架，雙手一直護頭', 'Back to stance; the hands stay up throughout') }
     ] },
     parry: { hit: 'hF', trail: 'hF', frames: [
       { d: 700, p: P({ ox: 218 }), c: cap('站架', 'Stance') },
       { d: 150, p: P({ ox: 218, oa1: 60, oa2: 120 }), c: cap('對方出前手拳', 'They throw a jab') },
-      { d: 230, p: P({ fu: 62, fl: 118, ox: 218, oa1: 84, oa2: 78, hit: 1 }), e: 'out', c: cap('後手短促地往前一拍，把拳頭撥偏', 'A short tap forward with the rear glove knocks the jab off line') },
+      { d: 230, p: P({ fu: 38, fl: 150, hz: 0.45, ox: 218, oa1: 84, oa2: 78, hit: 1 }), e: 'out', c: cap('後手短促地往前一拍，把拳頭撥偏', 'A short tap forward with the rear glove knocks the jab off line') },
       { d: 300, p: P({ ox: 218, oa1: 60, oa2: 120 }), c: cap('手立刻回到下巴', 'The glove snaps straight back to the chin') },
       { d: 600, p: P({ ox: 220 }), c: cap('拍擋後馬上反擊', 'Counter straight after the parry') }
     ] },

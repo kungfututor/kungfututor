@@ -26,7 +26,7 @@
   var STAND_OVER = { t: 14, su: 38, sl: 52, fu: 32, fl: 46 };       // you stay standing, still holding the sleeve
 
   // whole-body poses with the hip placed absolutely (floor at y ~211)
-  function ab() { return m.apply(null, [BASE, { ftN: 90, ftF: 70, kbN: 1, kbF: 1, lift: 0, h: 0, laN: 1 }].concat([].slice.call(arguments))); }
+  function ab() { return m.apply(null, [BASE, { ftN: 90, ftF: 70, kbN: 1, kbF: 1, lift: 0, h: 0, laN: 1, laF: 1, luN: 1, luF: 1 }].concat([].slice.call(arguments))); }
 
   var CLIPS = {
     stance: { trail: 'hN', frames: [
@@ -41,7 +41,7 @@
       { d: 800, p: ab({ ox: 660, x: 150, y: 126, t: 4, fN: { x: 168, y: 211 }, fF: { x: 130, y: 211 }, su: 70, sl: 80, fu: 64, fl: 76 }), c: cap('站立，雙手向前，下巴微收', 'Stand with the arms forward and the chin slightly tucked') },
       { d: 600, p: ab({ ox: 660, x: 140, y: 172, t: 30, h: 18, fN: { x: 168, y: 211 }, fF: { x: 142, y: 211 }, su: 92, sl: 92, fu: 88, fl: 88 }), c: cap('深蹲，下巴貼胸，眼睛看腰帶結', 'Squat low, chin to chest, eyes on your belt knot') },
       { d: 400, p: ab({ ox: 660, x: 124, y: 204, t: -35, h: 26, fN: { x: 170, y: 198 }, fF: { x: 162, y: 202 }, su: 95, sl: 95, fu: 92, fl: 92 }), e: 'out', c: cap('臀部坐在腳跟後方，圓背往後滾', 'Sit the hips down just behind your heels and roll back with a round back') },
-      { d: 900, p: ab({ ox: 660, x: 128, y: 204, t: -66, h: 30, fN: { x: 176, y: 166 }, fF: { x: 168, y: 172 }, su: 50, sl: 62, fu: 46, fl: 58, hit: 1 }), c: cap('雙臂在身體兩側約 45° 拍墊，頭不碰地', 'Slap the mat with both arms at about 45° from your body; the head never touches the mat') },
+      { d: 900, p: ab({ ox: 660, x: 128, y: 204, t: -83, h: 42, fN: { x: 176, y: 166 }, fF: { x: 168, y: 172 }, su: 74, sl: 74, fu: 72, fl: 72, luN: 0.74, laN: 0.74, luF: 0.74, laF: 0.74, hit: 1 }), c: cap('雙臂在身體兩側約 45° 拍墊，頭不碰地', 'Slap the mat with both arms at about 45° from your body; the head never touches the mat') },
       { d: 700, p: ab({ ox: 660, x: 124, y: 204, t: -22, h: 14, fN: { x: 176, y: 211 }, fF: { x: 168, y: 211 }, su: 60, sl: 80, fu: 56, fl: 76 }), c: cap('坐起來，準備站起', 'Sit up, ready to stand') }
     ] },
     deashi: { hit: 'tN', trail: 'tN', frames: [

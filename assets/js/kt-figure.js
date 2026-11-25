@@ -24,6 +24,7 @@
  *   face        1 = faces +x (default), -1 = turned round (mirrored about the hip);
  *               tweening between them squeezes the figure, which reads as a turn
  *   any other numeric key is interpolated and handed to props() as ctx.pose
+ * KTFigure.balance(pose) / balanceClip(frames): move the hips over the standing foot (see below).
  */
 (function (w) {
   'use strict';
@@ -90,6 +91,23 @@
     }
     var aN = arm(shN, p.su, p.sl, p.hN, p.laN, p.luN), aF = arm(shF, p.fu, p.fl, p.hF, p.laF, p.luF);
     var lN = leg(hipN, p.tu, p.tl, p.fN, p.ftN, p.kbN), lF = leg(hipF, p.bu, p.bl, p.fF, p.ftF, p.kbF);
+    // A foot standing on its toes (heel raised) has those toes ON the floor, never under it. Poses written with the raised-heel
+    // ankle at the flat foot's height pushed the toes below the floor line, and placing the figure on its lowest point then
+    // lifted the flat foot off the ground instead. So when the other foot is flat on the floor and this one's toes dip below
+    // it, this ankle is raised until the toes are level with the flat foot. The correction fades out as the flat foot leaves the
+    // floor (a kick, a step): then this foot simply stands on its toes. (Feet placed by angles, and absolute poses, are left as drawn.)
+    if (!abs) {
+      [[lN, lF, p.fN, hipN, p.ftN, p.kbN], [lF, lN, p.fF, hipF, p.ftF, p.kbF]].forEach(function (q) {
+        var me = q[0], ot = q[1], tg = q[2], drop = me.t.y - me.a.y;
+        if (!tg || drop <= 0 || ot.t.y > ot.a.y + 1.5) return;
+        var otFloor = Math.max(ot.a.y, ot.t.y), dip = Math.min(drop, me.t.y - otFloor);
+        var up = (me.a.y - otFloor - 2.5) / 6.5; up = up < 0 ? 0 : up > 1 ? 1 : up;          // how far the flat foot has left the floor
+        var over = dip * (1 - up * up * (3 - 2 * up));
+        if (over <= 0.05) return;
+        var r = leg(q[3], 0, 0, { x: tg.x, y: tg.y - over }, q[4], q[5]);
+        me.k = r.k; me.a = r.a; me.t = r.t;
+      });
+    }
     var J = { hip: hip, sh: sh, head: head, shN: shN, shF: shF, hipN: hipN, hipF: hipF,
       eN: aN.e, hN: aN.h, eF: aF.e, hF: aF.h,
       kN: lN.k, aN: lN.a, tN: lN.t, kF: lF.k, aF: lF.a, tF: lF.t };
@@ -104,6 +122,89 @@
     }
     if (s !== 1) for (n in J) J[n] = { x: cx + (J[n].x - cx) * s, y: gy + (J[n].y - gy) * s };
     return J;
+  }
+
+  /* ---- balance: keep the body's weight over the feet it stands on ----
+   * balance(pose) returns the same pose with the hips moved along x until the centre of the body's weight sits
+   * over the standing foot (or feet). Those feet stay exactly where they were; the trunk, the arms and a leg in
+   * the air move with the hips. Poses that are not simply standing come back unchanged: in the air (lift),
+   * placed by x and y, half-way through a turn, or with a hand, an elbow, a knee, the hips or the shoulders
+   * near the floor.
+   * balanceClip(frames) does it for every frame of a clip and then moves the partner (ox) by one amount in ALL
+   * frames — the shift of the frame where the strike lands (hit), else the largest — so the partner stands still
+   * and the contact the lesson drew still meets. With { partner: 'follow' } the partner moves frame by frame with
+   * your hips instead (for a clinch, where you hold them the whole time).
+   * Body-mass shares follow the usual anthropometric tables (trunk 50%, head 8%, each leg 16%, each arm 5%). */
+  var MASS = [['hip', 'sh', 0.497, 0.5], ['head', 'head', 0.081, 0],
+    ['shN', 'eN', 0.028, 0.44], ['eN', 'hN', 0.016, 0.43], ['hN', 'hN', 0.006, 0],
+    ['shF', 'eF', 0.028, 0.44], ['eF', 'hF', 0.016, 0.43], ['hF', 'hF', 0.006, 0],
+    ['hipN', 'kN', 0.1, 0.43], ['kN', 'aN', 0.0465, 0.43], ['aN', 'tN', 0.0145, 0.5],
+    ['hipF', 'kF', 0.1, 0.43], ['kF', 'aF', 0.0465, 0.43], ['aF', 'tF', 0.0145, 0.5]];
+  function comX(J) { var c = 0; MASS.forEach(function (g) { c += g[2] * (J[g[0]].x + (J[g[1]].x - J[g[0]].x) * g[3]); }); return c; }
+  // where the standing feet carry weight: [from, to] along x, or null when the body is not simply standing
+  function support(J) {
+    var floor = -1e9, n, lo = 1e9, hi = -1e9, feet = [];
+    for (n in J) if (n !== 'head') floor = Math.max(floor, J[n].y);
+    if (['hip', 'sh', 'kN', 'kF', 'hN', 'hF', 'eN', 'eF'].some(function (q) { return J[q].y > floor - 6; })) return null;
+    ['N', 'F'].forEach(function (sd) {
+      var a = J['a' + sd], t = J['t' + sd];
+      if (Math.max(a.y, t.y) < floor - 4) return;                          // this foot is in the air
+      var d = t.x >= a.x ? 1 : -1, flat = Math.abs(a.y - t.y) < 3.5, along = Math.abs(t.x - a.x) > 3;
+      var x1 = flat ? a.x - 5 * d : t.x - 4 * d;                           // the heel, or the ball of a foot standing on its toes
+      var x2 = (along ? t.x : a.x + 6 * d) + 8 * d;                        // a little past the drawn toe (real toes are longer)
+      lo = Math.min(lo, x1, x2); hi = Math.max(hi, x1, x2); feet.push(sd);
+    });
+    return feet.length ? { lo: lo, hi: hi, feet: feet } : null;
+  }
+  function balance(p0, opt) {
+    opt = opt || {};
+    var p = {}, k, i, J, sup, moved = 0;
+    for (k in BASE) p[k] = BASE[k];
+    for (k in (opt.base || {})) p[k] = opt.base[k];
+    for (k in p0) p[k] = p0[k];
+    if (typeof p.y === 'number' || (p.lift || 0) > 2) return p0;
+    if (typeof p.face === 'number' && Math.abs(Math.abs(p.face) - 1) > 0.01) return p0;
+    var face = p.face < 0 ? -1 : 1, set = {};
+    for (i = 0; i < 6; i++) {
+      J = solve(p, { groundY: 0, scale: 1, cx: 0 });
+      sup = support(J);
+      if (!sup) return p0;
+      var m = Math.min(6, (sup.hi - sup.lo) * 0.3), c = comX(J), dx = Math.max(sup.lo + m, Math.min(sup.hi - m, c)) - c;
+      if (Math.abs(dx) < 0.4) break;
+      dx /= 0.9;                                                            // the standing leg stays behind, so the weight moves a little less than the hips
+      sup.feet.forEach(function (sd) {
+        var key = 'f' + sd, tg = p[key];
+        if (!tg) {                                                          // a standing leg given by angles: pin its foot where it is
+          var hp = J['hip' + sd], a = J['a' + sd], t = J['t' + sd], kn = J['k' + sd];
+          tg = { x: (a.x - J.hip.x) * face, y: a.y - J.hip.y };
+          var a0 = Math.atan2((a.x - hp.x) * face, a.y - hp.y), ua = Math.atan2((kn.x - hp.x) * face, kn.y - hp.y), df = ua - a0;
+          while (df > Math.PI) df -= 2 * Math.PI; while (df < -Math.PI) df += 2 * Math.PI;
+          p['kb' + sd] = df >= 0 ? 1 : -1; set['kb' + sd] = 1;
+          if (typeof p['ft' + sd] !== 'number') { p['ft' + sd] = Math.atan2((t.x - a.x) * face, t.y - a.y) / D2R; set['ft' + sd] = 1; }
+        }
+        p[key] = { x: tg.x - dx * face, y: tg.y }; set[key] = 1;
+      });
+      p.x += dx; moved += dx;
+    }
+    if (Math.abs(moved) < 0.4) return p0;
+    var out = {};
+    for (k in p0) out[k] = p0[k];
+    out.x = p.x;
+    for (k in set) out[k] = p[k];
+    if (opt.partner !== false && typeof out.ox === 'number') out.ox += moved;
+    return out;
+  }
+  function balanceClip(frames, opt) {
+    var o = { partner: false, base: opt && opt.base }, ref = 0, best = -1;
+    var dxs = frames.map(function (f) { var q = balance(f.p, o), base = (o.base && typeof f.p.x !== 'number') ? o.base.x : f.p.x, d = q === f.p ? 0 : q.x - (typeof base === 'number' ? base : BASE.x); f.p = q; return d; });
+    dxs.forEach(function (d, i) { var sc = Math.abs(d) + (frames[i].p.hit > 0.5 ? 1000 : 0); if (d && sc > best) { best = sc; ref = d; } });
+    // (opt.partner 'follow': a partner you are holding — a clinch — moves with your hips frame by frame instead)
+    var follow = opt && opt.partner === 'follow';
+    if (ref) frames.forEach(function (f, i) {
+      if (typeof f.p.ox !== 'number') return;
+      var q = {}, k; for (k in f.p) q[k] = f.p[k]; q.ox += follow ? dxs[i] : ref; f.p = q;
+    });
+    return { shifts: dxs, partner: follow ? 'follow' : ref };
   }
 
   var EASE = {
@@ -297,5 +398,5 @@
     }
   };
 
-  w.KTFigure = { Player: Player, S: S, DIM: DIM, COL: COL, VB: VB, solve: solve };
+  w.KTFigure = { Player: Player, S: S, DIM: DIM, COL: COL, VB: VB, solve: solve, balance: balance, balanceClip: balanceClip, comX: comX, support: support };
 })(window);

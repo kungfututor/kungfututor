@@ -48,7 +48,7 @@
 
     hammer: { hitJ: 'hN', trail: 'hN', frames: [
       { d: 650, p: P(FENCE, { ox: 236, oa1: 70, oa2: 82 }), c: cap('對方伸手抓過來', 'They reach out to grab you') },
-      { d: 300, p: P(FENCE, { su: 150, sl: 215, t: 0, ox: 236, oa1: 72, oa2: 84 }), c: cap('前手握拳，舉到肩上', 'Make a fist with the lead hand and raise it above the shoulder') },
+      { d: 300, p: P(FENCE, { su: 110, sl: 243, t: 0, ox: 236, oa1: 72, oa2: 84 }), c: cap('前手握拳，舉到肩上', 'Make a fist with the lead hand and raise it above the shoulder') },   // fist by the ear, elbow forward — a short wind-up
       { d: 300, p: P(FENCE, { su: 72, sl: 62, t: 10, ox: 236, oa1: 50, oa2: 40, ot: 6, hit: 1 }), e: 'out', c: cap('用拳底（小指那側）往下砸向伸來的手臂或臉', 'Bring the bottom of the fist (little-finger side) down onto the reaching arm or face') },
       { d: 380, p: P(FENCE, { ox: 240, oa1: 20, oa2: 25 }), c: cap('收回戒備', 'Back to the fence') },
       { d: 800, p: P(FENCE, { x: X0 - 30, ox: 240 }), c: cap('後退、離開', 'Step back and leave') }
@@ -56,7 +56,7 @@
 
     elbow: { hitJ: 'eN', trail: 'eN', grab: 'sh', frames: [
       { d: 750, p: P(FENCE, { su: 20, sl: 120, ox: 192, oa1: 70, oa2: 85, g: 1 }), c: cap('對方太近，抓住你的衣領', 'They are too close and grab your collar') },
-      { d: 260, p: P(FENCE, { su: -25, sl: 70, t: 0, ox: 192, oa1: 70, oa2: 85, g: 1 }), c: cap('手肘向後收，準備轉腰', 'Draw the elbow back and load the hips') },
+      { d: 260, p: P(FENCE, { su: 5, sl: 160, t: 0, ox: 192, oa1: 70, oa2: 85, g: 1 }), c: cap('手肘向後收，準備轉腰', 'Draw the elbow back and load the hips') },   // elbow back by the ribs, hand staying up by the chest
       { d: 260, p: P(FENCE, { su: 96, sl: -70, t: 18, ftF: 60, ox: 192, oa1: 70, oa2: 85, g: 1, ot: -7, oh: -18, hit: 1 }), e: 'out', c: cap('轉腰，手肘水平向前打向下巴', 'Turn the hips and swing the elbow forward, level, into the jaw') },
       { d: 380, p: P(FENCE, { su: 88, sl: 92, fu: 82, fl: 95, t: 10, ox: 238, ot: -6, g: 0 }), c: cap('雙掌推開對方', 'Shove them away with both palms') },
       { d: 800, p: P(FENCE, { x: X0 - 30, ox: 240 }), c: cap('後退、離開', 'Step back and leave') }
@@ -67,7 +67,8 @@
       { d: 260, p: P(FENCE, { fF: { x: 24, y: 42 }, ftF: 120, t: -4, ox: 245, oa1: 40, oa2: 55 }), c: cap('後腿提膝', 'Lift the back knee') },
       { d: 220, p: P(FENCE, { fF: { x: 68, y: 66 }, ftF: 165, t: -10, ox: 245, oa1: 30, oa2: 40, ot: 8, hit: 1 }), e: 'out', c: cap('腳跟踹向對方膝蓋或小腿脛骨', 'Thrust the heel into their knee or shin') },
       { d: 260, p: P(FENCE, { fF: { x: 24, y: 42 }, ftF: 120, t: -4, ox: 250, ot: 4 }), c: cap('收腿，保持平衡', 'Pull the leg back, stay balanced') },
-      { d: 800, p: P(FENCE, { x: X0 - 30, ox: 250 }), c: cap('落地後退、離開', 'Plant the foot, step back, leave') }
+      { d: 380, p: P(FENCE, { ox: 250 }) },                                          // the foot comes down in the stance first…
+      { d: 800, p: P(FENCE, { x: X0 - 30, ox: 250 }), c: cap('落地後退、離開', 'Plant the foot, step back, leave') }   // …then both feet step back
     ] },
 
     wrist: { hitJ: null, trail: 'hN', grab: 'hN', frames: [
@@ -80,12 +81,16 @@
 
     cover: { hitJ: null, trail: 'hN', frames: [
       { d: 600, p: P(FENCE, { ox: 236, oa1: -40, oa2: -10, ot: -4 }), c: cap('對方揮拳打向頭部', 'They swing a punch at your head') },
-      { d: 220, p: P(FENCE, { su: 122, sl: 196, fu: 114, fl: 188, t: 14, h: 14, ox: 232, oa1: 78, oa2: 96, ot: 8 }), e: 'out', c: cap('雙臂抬起護住頭兩側，收下巴、身體微向前', 'Raise both forearms to frame the head, chin tucked, body leaning in slightly') },
-      { d: 550, p: P(FENCE, { su: 122, sl: 196, fu: 114, fl: 188, t: 14, h: 14, ox: 232, oa1: 70, oa2: 80, ot: 4 }) },
+      { d: 220, p: P(FENCE, { su: 125, sl: 255, fu: 119, fl: 250, ez: 0.45, t: 14, h: 14, ox: 232, oa1: 78, oa2: 96, ot: 8 }), e: 'out', c: cap('雙臂抬起護住頭兩側，收下巴、身體微向前', 'Raise both forearms to frame the head, chin tucked, body leaning in slightly') },
+      { d: 550, p: P(FENCE, { su: 125, sl: 255, fu: 119, fl: 250, ez: 0.45, t: 14, h: 14, ox: 232, oa1: 70, oa2: 80, ot: 4 }) },   // hands at the sides of the head, elbows forward
       { d: 380, p: P(FENCE, { su: 88, sl: 92, fu: 82, fl: 95, t: 10, ox: 262, ot: -6 }), c: cap('雙掌推開，製造空間', 'Shove with both palms to make space') },
       { d: 800, p: P(FENCE, { x: X0 - 30, ox: 262 }), c: cap('後退、離開、求助', 'Step back, leave, get help') }
     ] }
   };
+
+  // one-legged moments (kicks): the hips move over the standing foot so the figure never tips over;
+  // the standing foot stays put and the partner keeps the distance the lesson drew (see KTFigure.balanceClip)
+  ['kick'].forEach(function (k) { w.KTFigure.balanceClip(CLIPS[k].frames, { base: { x: X0 } }); });
 
   /* ---------- props: the other person, contact flash, distance bar ---------- */
   var OCOL = '#AEB3BE', OCOL_F = '#CDD0D7';

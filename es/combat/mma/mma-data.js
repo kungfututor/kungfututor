@@ -12,26 +12,36 @@
   var ang = function (a, b) { return Math.atan2(b.x - a.x, b.y - a.y) / D2R; };
 
   var X0 = 140;
-  var LEGS = { x: X0, t: 8, h: 6, fN: { x: 24, y: 80 }, fF: { x: -26, y: 80 }, ftN: 90, ftF: 70, kbN: 1, kbF: 1, lift: 0 };
-  var GUARD = { su: 45, sl: 162, fu: 30, fl: 167, laN: 1 };
+  // wider and lower than the boxing stance (feet 46 apart, hips 82 up), hands a little lower and further forward
+  var LEGS = { x: X0, t: 10, h: 6, fN: { x: 27, y: 76 }, fF: { x: -29, y: 76 }, ftN: 90, ftF: 70, kbN: 1, kbF: 1, lift: 0 };
+  var GUARD = { su: 52, sl: 140, fu: 38, fl: 146, laN: 1, hz: 1, lz: 0 };
   var BASE = m(KP.base, { hit: 0, oa1: 45, oa2: 162, ob1: 30, ob2: 167, ola: 18, olb: 4, ol: 20, oh: 4 });
   function P() { return m.apply(null, [BASE, LEGS, GUARD].concat([].slice.call(arguments))); }
   // the opponent lying on their back, head away from you, hands up to cover
   var DOWN = { ot: -88, oh: 0, ola: 88, olb: 92, ol: -88, oa1: 170, oa2: 175, ob1: 165, ob2: 172 };
 
-  // technical stand-up, in absolute positions (hip x/y, feet on the floor at y 210)
+  // Technical stand-up, in absolute positions (a flat foot rests at y 211, a hand at y 209).
+  // The posted hand really is on the floor (hF = the spot it presses on). The hips lift high on that straight arm and the
+  // opposite foot — high enough for the free leg to fold underneath with its knee clear of the mat — and its foot is
+  // planted BEHIND, on the toes, before the hand leaves. Both feet then stay exactly where they are while the body comes
+  // up between them, so the stance at the end is simply the two planted feet.
   function standup(k) {
-    var G = 210, post = { x: X0 - 52, y: 208 };
+    var G = 211, post = { x: X0 - 45, y: 209 }, near = { x: X0 + 40, y: G }, toe = { x: X0 - 0.6, y: 213.5 };
+    function hips(sh, t) { return { x: sh.x - 58 * Math.sin(t * D2R), y: sh.y + 58 * Math.cos(t * D2R) }; }      // hips hanging from a shoulder
+    function onToes(ft) { return { x: toe.x - 10 * Math.sin(ft * D2R), y: toe.y - 10 * Math.cos(ft * D2R) }; }   // back ankle, toes staying on one spot
+    var over = { x: post.x + 2, y: post.y - 57.96 };                                                             // the shoulder straight above the posted hand
     var poses = [
-      { hip: { x: X0, y: 204 }, t: -22, fN: { x: X0 + 40, y: G }, fF: { x: X0 + 84, y: 206 }, ftF: 90, posted: 1 },
-      { hip: { x: X0 + 6, y: 172 }, t: -8, fN: { x: X0 + 40, y: G }, fF: { x: X0 - 26, y: 204 }, ftF: 40, posted: 1 },
-      { hip: { x: X0 - 8, y: 160 }, t: 22, fN: { x: X0 + 40, y: G }, fF: { x: X0 - 46, y: G }, ftF: 70, posted: 0 },
-      { hip: { x: X0 - 4, y: 128 }, t: 8, fN: { x: X0 + 22, y: G }, fF: { x: X0 - 28, y: G }, ftF: 70, posted: 0 }
+      { hip: { x: X0, y: 205 }, t: -28, h: 10, fF: { x: X0 + 84, y: 209 }, ftF: 140, posted: 1 },   // sitting, heel of the straight leg on the mat
+      { hip: hips(over, -74), t: -74, h: 36, fF: { x: X0 + 10, y: 197 }, ftF: 20, posted: 1 },      // hips up on hand + foot, the leg folding under
+      { hip: hips(over, -80), t: -80, h: 40, fF: onToes(15), ftF: 15, posted: 1 },                  // foot planted behind on the ball, heel up, hand still down
+      { hip: { x: X0 + 16, y: 152 }, t: 10, h: 0, fF: onToes(25), ftF: 25, posted: 0 },             // hand off: a deep split squat between the two feet
+      { hip: { x: X0 + 16, y: 129 }, t: 8, h: 6, fF: onToes(70), ftF: 70, posted: 0 }               // stance
     ];
     var p = poses[k], sh = { x: p.hip.x + 58 * Math.sin(p.t * D2R), y: p.hip.y - 58 * Math.cos(p.t * D2R) };
-    var arm = p.posted ? { fu: ang(sh, post), fl: ang(sh, post) } : { fu: 30, fl: 167 };
-    return m({ x: p.hip.x, y: p.hip.y, t: p.t, h: p.t < 0 ? 10 : 0, fN: p.fN, fF: p.fF, ftN: 90, ftF: p.ftF, kbN: 1, kbF: 1,
-      su: 45, sl: 162 }, arm);
+    // the far hand: on its spot while posted, otherwise up by the chin (the same place the guard angles 30 / 167 give)
+    var hand = p.posted ? post : { x: sh.x + 21.3, y: sh.y - 1.3 };
+    return { x: p.hip.x, y: p.hip.y, t: p.t, h: p.h, fN: near, fF: p.fF, ftN: 90, ftF: p.ftF, kbN: 1, kbF: 1,
+      su: 45, sl: 162, fu: 30, fl: 167, hF: hand };
   }
 
   var CLIPS = {
@@ -44,14 +54,14 @@
       { d: 600, p: P({ ox: 220 }), c: cap('站架', 'Stance') },
       { d: 240, p: P({ x: X0 + 5, t: 10, su: 90, sl: 90, ox: 220, ot: -5, hit: 1 }), e: 'out', c: cap('前手直拳', 'Jab') },
       { d: 120, p: P({ ox: 220 }) },
-      { d: 280, p: P({ t: 20, fu: 92, fl: 90, fF: { x: -22, y: 80 }, ftF: 35, ox: 220, ot: -9, oh: -10, hit: 1 }), e: 'out', c: cap('後手直拳，轉腳轉髖', 'Cross — pivot the back foot and turn the hips') },
+      { d: 280, p: P({ t: 20, fu: 92, fl: 90, fF: { x: -25, y: 76 }, ftF: 35, ox: 220, ot: -9, oh: -10, hit: 1 }), e: 'out', c: cap('後手直拳，轉腳轉髖', 'Cross — pivot the back foot and turn the hips') },
       { d: 600, p: P({ ox: 224 }), c: cap('雙手回防，準備移動', 'Hands back up, ready to move') }
     ] },
     overhand: { hit: 'hF', trail: 'hF', frames: [
       { d: 700, p: P({ ox: 220 }), c: cap('站架', 'Stance') },
-      { d: 200, p: P({ t: 14, h: -6, fu: 70, fl: 150, ox: 220 }), c: cap('頭往前側移出中線', 'Dip the head forward and off the centre line') },
-      { d: 180, p: P({ t: 18, h: -6, fu: 135, fl: 120, fF: { x: -22, y: 80 }, ftF: 40, ox: 220 }), c: cap('後手由上方畫弧打出', 'The rear hand loops up and over') },
-      { d: 220, p: P({ t: 26, h: -6, fu: 100, fl: 62, fF: { x: -22, y: 80 }, ftF: 35, ox: 220, ot: -6, oh: 14, hit: 1 }), e: 'out', c: cap('從上方越過對方的手，打在頭側', 'Come down over their guard onto the side of the head') },
+      { d: 200, p: P({ t: 14, h: -6, lz: 10, fu: 70, fl: 150, ox: 220 }), c: cap('頭往前側移出中線', 'Dip the head forward and off the centre line') },
+      { d: 180, p: P({ t: 18, h: -6, lz: 12, fu: 100, fl: 221, fF: { x: -25, y: 76 }, ftF: 40, ox: 220 }), c: cap('後手由上方畫弧打出', 'The rear hand loops up and over') },
+      { d: 220, p: P({ t: 26, h: -6, lz: 8, fu: 125, fl: 80, fF: { x: -25, y: 76 }, ftF: 35, ox: 220, ot: -6, oh: 14, hit: 1 }), e: 'out', c: cap('從上方越過對方的手，打在頭側', 'Come down over their guard onto the side of the head') },
       { d: 600, p: P({ ox: 222 }), c: cap('回到站架', 'Back to stance') }
     ] },
     lowkick: { hit: 'shinF', trail: 'aF', frames: [
@@ -84,10 +94,19 @@
     standup: { hit: null, trail: 'hip', frames: [
       { d: 800, p: m(BASE, standup(0), { ox: 330 }), c: cap('坐在地上：一手撐地在後，同側腳伸直，另一腳踩地，前手護臉', 'Sitting: one hand posted behind, that leg straight, the other foot planted, front hand guarding the face') },
       { d: 600, p: m(BASE, standup(1), { ox: 330 }), c: cap('撐手與踩地的腳一起推，把臀部抬離地面', 'Push off the posted hand and planted foot to lift the hips') },
-      { d: 500, p: m(BASE, standup(2), { ox: 330 }), c: cap('伸直的腳從身體下方往後收，踩在後方', 'Swing the straight leg back under you and plant it behind') },
-      { d: 900, p: m(BASE, standup(3), { ox: 330 }), c: cap('站起成站架，與對方保持距離', 'Stand up into your stance at a safe distance') }
+      { d: 550, p: m(BASE, standup(2), { ox: 330 }), c: cap('伸直的腳從身體下方往後收，踩在後方', 'Swing the straight leg back under you and plant it behind') },
+      { d: 600, p: m(BASE, standup(3), { ox: 330 }) },
+      { d: 900, p: m(BASE, standup(4), { ox: 330 }), c: cap('站起成站架，與對方保持距離', 'Stand up into your stance at a safe distance') },
+      // …and back down the same way, so the loop never drops on to the floor without the hand
+      { d: 500, p: m(BASE, standup(4), { ox: 330 }) },
+      { d: 500, p: m(BASE, standup(3), { ox: 330 }) },
+      { d: 600, p: m(BASE, standup(2), { ox: 330 }) }
     ] }
   };
+
+  // one-legged moments (kicks, knees, shin blocks): the hips move over the standing foot so the figure never tips over;
+  // the standing foot stays put and the partner keeps the distance the lesson drew (see KTFigure.balanceClip)
+  ['lowkick'].forEach(function (k) { w.KTFigure.balanceClip(CLIPS[k].frames, { base: { x: X0 } }); });
 
   function makeClip(s, view, level, lang) {
     var src = CLIPS[s.id], pace = level < 1 ? 1.8 : 1;

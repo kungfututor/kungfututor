@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>3Dムーブメントラボ — 指導者を回して、スローで見る | KungfuTutor</title>
-<meta name="description" content="360°回転でき、4分の1の速度に減速し、コマ送りで確認できる3Dの武術・フィットネス指導者。カンフーの構えや太極拳からムエタイ、ボクシング、組み技、護身術、ジムでのリフトまで、50の動きを収録。">
+<meta name="description" content="360°回転、4分の1速度でのスロー再生、コマ送りができる3Dの武術・フィットネス指導者。カンフーの構え、ウィンチュンと太極拳の24の型から、ボクシング、ムエタイ、レスウェー、棒術、護身術、ジムでのウエイトリフティングまで108の動作を収録。">
 <meta property="og:title" content="KungfuTutor 3Dムーブメントラボ — あらゆる角度から見る">
 <!-- kt:alternates -->
 <link rel="alternate" hreflang="en" href="https://kungfututor.com/lab/3d/">
@@ -126,6 +126,7 @@
           <button class="main" type="button" id="lab-play" aria-pressed="true">❚❚ Pause</button>
           <button class="soft" type="button" id="lab-next" data-zh="下一步 ▸" data-en="Next step ▸"></button>
           <button class="soft" type="button" id="lab-reset" data-zh="重來" data-en="Reset"></button>
+          <button class="soft" type="button" id="lab-mirror" aria-pressed="false" data-zh="左右互換" data-en="Swap left / right"></button>
           <div class="grp" role="group" aria-label="Speed">
             <button type="button" data-speed="0.25" aria-pressed="false">0.25×</button><button type="button" data-speed="0.5" aria-pressed="false">0.5×</button><button type="button" data-speed="1" aria-pressed="true">1×</button>
           </div>
@@ -185,6 +186,9 @@
 <script src="../../combat/wrestling/wrestling-data.js"></script>
 <script src="../../self-defence/basics/sd-data.js"></script>
 <script src="../../self-defence/krav-maga/krav-data.js"></script>
+<script src="../../kungfu/wing-chun/wingchun-data.js"></script>
+<script src="../../combat/sambo/sambo-data.js"></script>
+<script src="../../combat/fma/fma-data.js"></script>
 <script type="module" src="lab3d.js"></script>
 </body>
 </html>

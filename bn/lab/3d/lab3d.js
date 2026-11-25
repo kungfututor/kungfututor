@@ -27,27 +27,56 @@ var LIB = {
   MMA: [P('綜合格鬥', 'MMA'), '../../combat/mma/'], JUDO: [P('柔道', 'Judo'), '../../combat/judo/'],
   BJJ: [P('巴西柔術', 'BJJ'), '../../combat/bjj/'], WRESTLING: [P('摔跤', 'Wrestling'), '../../combat/wrestling/'],
   SELFDEF: [P('防身術', 'Self-defence'), '../../self-defence/basics/'], KRAV: [P('以色列格鬥術', 'Krav Maga'), '../../self-defence/krav-maga/'],
-  GYM: [P('健身房', 'Gym'), '../../fitness/gym/']
+  GYM: [P('健身房', 'Gym'), '../../fitness/gym/'], WINGCHUN: [P('詠春', 'Wing Chun'), '../../kungfu/wing-chun/'],
+  SAMBO: [P('桑搏', 'Sambo'), '../../combat/sambo/'], FMA: [P('菲律賓武術', 'Filipino Martial Arts'), '../../combat/fma/']
 };
+// Which side a move shows first. The 2D lessons draw the near (right) limbs in front; these say what is correct:
+// the striking arts teach right-handers to stand left foot forward (orthodox), and each Tai Chi posture has its
+// own side in the 24-form ('legs' = only the legs are mirrored, where the form uses the opposite hand and foot).
+var SIDE = { BOXING: 'l', MUAYTHAI: 'l', LETHWEI: 'l', MMA: 'l', KRAV: 'l', SELFDEF: 'l' };
+// Postures 16 and 17 (drop stance, then up on one leg): the lesson places the legs exactly — the stretched foot slides out along the
+// floor, as it does in the form, and the hips travel on to it — so steps are planned only for the walk back to the start (these stretches).
+var TC_STEPS = { 16: [4, 5, 6], 17: [3, 4, 5] };
+var TC_SIDE = { 2: 'l', 3: 'legs', 4: 'legs', 5: 'l', 7: 'l', 9: 'l', 11: 'l', 12: 'legs', 15: 'l', 16: 'l', 19: 'legs', 20: 'legs', 21: 'legs', 22: 'l' };
 function mv(cat, lib, key, extra) { var o = { cat: cat, lib: lib, key: key }; for (var k in extra || {}) o[k] = extra[k]; return o; }
 var MOVES = [
-  mv('kungfu', 'STANCES', 'horse', { mode: 'both' }), mv('kungfu', 'STANCES', 'bow'), mv('kungfu', 'STANCES', 'drop', { mode: 'front' }),
-  mv('kungfu', 'STANCES', 'empty'), mv('kungfu', 'STRIKES', 'punch'), mv('kungfu', 'STRIKES', 'palm'),
-  mv('kungfu', 'STRIKES', 'snap'), mv('kungfu', 'STRIKES', 'side'), mv('kungfu', 'STRIKES', 'stretch'),
-  mv('kungfu', 'TAICHI', 1), mv('kungfu', 'TAICHI', 3), mv('kungfu', 'TAICHI', 4), mv('kungfu', 'TAICHI', 9), mv('kungfu', 'TAICHI', 13),
-  mv('strike', 'LETHWEI', 'flyknee'), mv('strike', 'LETHWEI', 'elbow'),
-  mv('strike', 'MUAYTHAI', 'kick'), mv('strike', 'MUAYTHAI', 'teep'), mv('strike', 'MUAYTHAI', 'knee'),
-  mv('strike', 'MUAYTHAI', 'elbow'), mv('strike', 'MUAYTHAI', 'check'),
-  mv('strike', 'BOXING', 'jab'), mv('strike', 'BOXING', 'onetwo'), mv('strike', 'BOXING', 'hook'), mv('strike', 'BOXING', 'upper'),
-  mv('strike', 'BOXING', 'slip'), mv('strike', 'BOXING', 'weave'), mv('strike', 'MMA', 'overhand'),
-  mv('grapple', 'MMA', 'double'), mv('grapple', 'MMA', 'sprawl'), mv('grapple', 'MMA', 'standup'),
-  mv('grapple', 'WRESTLING', 'stance'), mv('grapple', 'JUDO', 'breakfall'), mv('grapple', 'BJJ', 'shrimp'),
-  mv('defence', 'SELFDEF', 'fence'), mv('defence', 'SELFDEF', 'palm'), mv('defence', 'SELFDEF', 'hammer'),
+  mv('kungfu', 'STANCES', 'horse', { mode: 'both', toes: 0.25 }), mv('kungfu', 'STANCES', 'bow'), mv('kungfu', 'STANCES', 'drop', { mode: 'front' }),
+  mv('kungfu', 'STANCES', 'empty'), mv('kungfu', 'STANCES', 'cross'), mv('kungfu', 'STRIKES', 'punch'), mv('kungfu', 'STRIKES', 'palm'),
+  // (the side kick is drawn side-on to its target, i.e. seen from the kicker's front: it needs a front-view drawing before it
+  //  can be shown in 3D — as a side-view lesson it came out as a front kick)
+  mv('kungfu', 'STRIKES', 'snap'), mv('kungfu', 'STRIKES', 'heel'), mv('kungfu', 'STRIKES', 'stretch'),
+  mv('kungfu', 'WINGCHUN', 'stance', { mode: 'both', gait: false, pivots: true }), mv('kungfu', 'WINGCHUN', 'punch'), mv('kungfu', 'WINGCHUN', 'chain'), mv('kungfu', 'WINGCHUN', 'tan'),
+  mv('kungfu', 'WINGCHUN', 'bong', { mode: 'front' }), mv('kungfu', 'WINGCHUN', 'fuk'), mv('kungfu', 'WINGCHUN', 'pak', { mode: 'front' }), mv('kungfu', 'WINGCHUN', 'kick'),
+  mv('kungfu', 'TAICHI', 1), mv('kungfu', 'TAICHI', 2), mv('kungfu', 'TAICHI', 3), mv('kungfu', 'TAICHI', 4), mv('kungfu', 'TAICHI', 5), mv('kungfu', 'TAICHI', 6), mv('kungfu', 'TAICHI', 7), mv('kungfu', 'TAICHI', 8), mv('kungfu', 'TAICHI', 9), mv('kungfu', 'TAICHI', 10, { mode: 'front' }), mv('kungfu', 'TAICHI', 11), mv('kungfu', 'TAICHI', 12),
+  mv('kungfu', 'TAICHI', 13), mv('kungfu', 'TAICHI', 14), mv('kungfu', 'TAICHI', 15), mv('kungfu', 'TAICHI', 16), mv('kungfu', 'TAICHI', 17), mv('kungfu', 'TAICHI', 18), mv('kungfu', 'TAICHI', 19), mv('kungfu', 'TAICHI', 20), mv('kungfu', 'TAICHI', 21), mv('kungfu', 'TAICHI', 22), mv('kungfu', 'TAICHI', 23), mv('kungfu', 'TAICHI', 24),
+  mv('strike', 'BOXING', 'stance'), mv('strike', 'BOXING', 'jab'), mv('strike', 'BOXING', 'cross'), mv('strike', 'BOXING', 'onetwo'),
+  mv('strike', 'BOXING', 'hook'), mv('strike', 'BOXING', 'upper'), mv('strike', 'BOXING', 'slip'), mv('strike', 'BOXING', 'weave'),
+  mv('strike', 'BOXING', 'parry'), mv('strike', 'BOXING', 'footwork'),
+  mv('strike', 'MUAYTHAI', 'stance'), mv('strike', 'MUAYTHAI', 'jab'), mv('strike', 'MUAYTHAI', 'cross'), mv('strike', 'MUAYTHAI', 'teep'),
+  mv('strike', 'MUAYTHAI', 'kick'), mv('strike', 'MUAYTHAI', 'lowkick'), mv('strike', 'MUAYTHAI', 'elbow'), mv('strike', 'MUAYTHAI', 'knee'),
+  mv('strike', 'MUAYTHAI', 'check'),
+  mv('strike', 'LETHWEI', 'stance'), mv('strike', 'LETHWEI', 'straight'), mv('strike', 'LETHWEI', 'hook'), mv('strike', 'LETHWEI', 'headbutt'),
+  mv('strike', 'LETHWEI', 'elbow'), mv('strike', 'LETHWEI', 'flyknee'), mv('strike', 'LETHWEI', 'kick'), mv('strike', 'LETHWEI', 'push'),
+  mv('strike', 'LETHWEI', 'cover'),
+  mv('strike', 'MMA', 'stance'), mv('strike', 'MMA', 'onetwo'), mv('strike', 'MMA', 'overhand'), mv('strike', 'MMA', 'lowkick'),
+  mv('strike', 'FMA', 'stance', { stick: 1 }), mv('strike', 'FMA', 'forehand', { stick: 1 }), mv('strike', 'FMA', 'backhand', { stick: 1 }),
+  mv('strike', 'FMA', 'thrust', { stick: 1 }), mv('strike', 'FMA', 'eight', { stick: 1 }), mv('strike', 'FMA', 'roof', { stick: 1 }),
+  mv('strike', 'FMA', 'disarm', { stick: 1 }), mv('strike', 'FMA', 'empty'),
+  // (double-leg takedown and sprawl lean on an opponent, and the technical stand-up props the body on a hand behind the hips:
+  //  they come back with the two-person / ground moves, which need their own floor-support handling)
+  mv('grapple', 'WRESTLING', 'stance'),
+  mv('grapple', 'JUDO', 'breakfall'), mv('grapple', 'SAMBO', 'breakfall'), mv('grapple', 'BJJ', 'shrimp'),
+  mv('defence', 'SELFDEF', 'fence'), mv('defence', 'SELFDEF', 'distance'), mv('defence', 'SELFDEF', 'palm'), mv('defence', 'SELFDEF', 'hammer'),
   mv('defence', 'SELFDEF', 'elbow'), mv('defence', 'SELFDEF', 'kick'), mv('defence', 'SELFDEF', 'cover'),
-  mv('defence', 'KRAV', 'burst'), mv('defence', 'KRAV', 'kick'),
+  mv('defence', 'KRAV', 'stance'), mv('defence', 'KRAV', 'burst'), mv('defence', 'KRAV', 'inside'), mv('defence', 'KRAV', 'outside'),
+  mv('defence', 'KRAV', 'kick'), mv('defence', 'KRAV', 'escape'),
   mv('fit', 'GYM', 'squat', { bar: 'back' }), mv('fit', 'GYM', 'deadlift', { bar: 'hands' }), mv('fit', 'GYM', 'press', { bar: 'hands' }),
-  mv('fit', 'GYM', 'row', { bar: 'hands' }), mv('fit', 'GYM', 'lunge'), mv('fit', 'GYM', 'pushup'), mv('fit', 'GYM', 'plank'), mv('fit', 'GYM', 'bridge')
+  mv('fit', 'GYM', 'row', { bar: 'hands' }), mv('fit', 'GYM', 'lunge'),
+  // (hands and toes on the floor the whole time: nothing steps, so the planted-feet planner is left out)
+  mv('fit', 'GYM', 'pushup', { gait: false }), mv('fit', 'GYM', 'plank', { gait: false }), mv('fit', 'GYM', 'bridge')
 ].filter(function (m) { return window[m.lib] && LIB[m.lib]; }).map(function (m) {
+  if (m.side === undefined) m.side = m.lib === 'TAICHI' ? TC_SIDE[m.key] : SIDE[m.lib];
+  if (m.lib === 'TAICHI' && TC_STEPS[m.key]) { m.gaitOnly = TC_STEPS[m.key]; m.slides = true; }
   m.s = window[m.lib].LIST.filter(function (s) { return typeof m.key === 'number' ? s.n === m.key : s.id === m.key; })[0];
   m.slug = m.lib.toLowerCase() + '-' + m.key;
   return m;
@@ -82,6 +111,7 @@ function loadMove(m) {
   if (mode !== 'front') { clip = build(m, 'side'); sideP.load(clip); }
   if (mode !== 'side') { var fc = build(m, 'front'); frontP.load(fc); if (mode === 'front') { clip = fc; } }
   x0 = mode === 'front' ? 0 : solveAt(sideP, 0, true).J.hip.x;
+  planGait();
 }
 
 /* ---------- three.js scene ---------- */
@@ -168,6 +198,9 @@ var nose = new THREE.Mesh(new THREE.SphereGeometry(0.018, 10, 8), M.skin); nose.
 [0.092, -0.092].forEach(function (z) { var e = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 6), M.skin); e.position.set(-0.005, 0, z); head.add(e); });
 // barbell (gym lifts): bar along the body's width, 20 kg-style plates
 var barbell = new THREE.Group(); scene.add(barbell); barbell.visible = false;
+// a rattan stick held in the right hand (Filipino martial arts): 64 lesson units above the grip, 10 below (the butt shows under the fist)
+var stickGeo = new THREE.CylinderGeometry(0.012, 0.013, 74 * K, 12); stickGeo.translate(0, (64 - 10) / 2 * K, 0);
+var stick = new THREE.Mesh(stickGeo, std('#8B5A2B', 0.7)); stick.castShadow = true; stick.visible = false; scene.add(stick);
 var barRod = mesh(new THREE.CylinderGeometry(0.014, 0.014, 1.6, 12), M.steel, barbell); barRod.rotation.x = Math.PI / 2;
 [0.56, -0.56].forEach(function (z) {
   var pl = mesh(new THREE.CylinderGeometry(0.225, 0.225, 0.05, 32), M.plate, barbell); pl.rotation.x = Math.PI / 2; pl.position.z = z;
@@ -190,6 +223,11 @@ function lean(from, to) {           // rotation about Z that points +Y along fro
 // depth (z) used when only a side view exists
 var DEPTH = { hip: 0, sh: 0, head: 0, hipN: 0.1, hipF: -0.1, kN: 0.1, kF: -0.1, aN: 0.1, aF: -0.1, tN: 0.1, tF: -0.1, shN: 0.19, shF: -0.19, eN: 0.2, eF: -0.2, hN: 0.12, hF: -0.12 };
 
+// which limbs are shown mirrored right now: the move's own side, swapped again by the Mirror button
+function sidesNow() {
+  var sde = cur ? cur.side : null, f = !!(state && state.flip), legs = sde === 'l' || sde === 'legs', arms = sde === 'l' || sde === 'arms';
+  return { legs: legs !== f, arms: arms !== f };
+}
 function pose3d(t) {
   var mode = cur.mode || 'side';
   var S = mode !== 'front' ? solveAt(sideP, t, true) : null;
@@ -204,17 +242,342 @@ function pose3d(t) {
     lu = typeof lu === 'number' ? Math.min(1, lu) : 1;
     return Math.max(wide + 0.04, 0.19 + 30 * K * Math.sqrt(1 - lu * lu));
   }
+  // Left and right: a side-view lesson cannot say which leg is the left one, so each move carries the side it
+  // should show (cur.side: 'l' = whole body mirrored, 'legs' / 'arms' = only those) and the Mirror button swaps it.
+  // Mirroring = the right limb takes the left limb's place on the other side of the body.
+  var sd = sidesNow();
   function V(name, pt) {
-    var j = pt || Js[name];
+    var src = name, flip = false;
+    if (!pt && ((sd.legs && /^(hip|k|a|t)[NF]$/.test(name)) || (sd.arms && /^(sh|e|h)[NF]$/.test(name)))) {
+      src = name.slice(0, -1) + (name.slice(-1) === 'N' ? 'F' : 'N'); flip = true;
+    }
+    var j = pt || Js[src];
     var x = mode === 'front' ? 0 : (j.x - x0) * K - hx, y = (FLOOR - j.y) * K;
-    var z = Jf && !pt ? (Jf[name].x - Jf.hip.x) * K : (DEPTH[name] || 0);
-    if (wide && (name === 'hN' || name === 'hF')) z = name === 'hN' ? wide : -wide;
+    var z = Jf && !pt ? (Jf[src].x - Jf.hip.x) * K : (DEPTH[src] || 0);
+    if (!Jf && !pt && (src === 'hN' || src === 'hF')) {
+      // A side-view lesson cannot show how far apart the hands are; the pose key `hz` says it: 1 = each hand on its own
+      // side (the default), 0 = both on the centre line, below 0 = crossed over.
+      // (hzN / hzF place one hand on its own: single whip's hook hand out behind, a stick hand crossing the body)
+      var hz = P0['hz' + src.charAt(1)];
+      if (typeof hz !== 'number') hz = typeof P0.hz === 'number' ? P0.hz : 1;
+      z *= hz;
+      // A hand hanging beside the body sits outside the hip, not inside it (the hips are wider than the hands' usual spacing).
+      var tp = Js.sh, bt = Js.hip;
+      if (bt.y - tp.y > 20) {                                 // (upright enough to have a "beside")
+        var yy = Math.max(tp.y, Math.min(bt.y, j.y)), bodyX = tp.x + (bt.x - tp.x) * (yy - tp.y) / (bt.y - tp.y);
+        var beside = (1 - smooth(6, 15, Math.abs(j.x - bodyX))) * smooth(tp.y + 10, tp.y + 26, j.y) * smooth(0.5, 0.9, Math.abs(hz));
+        z += ((src === 'hN' ? 0.25 : -0.25) * (hz < 0 ? -1 : 1) - z) * beside;      // (a hand crossed over hangs beside the other hip)
+      }
+    }
+    // …nor how far apart the feet are: `fz` says it (1 = each foot under its own hip, the default; about 1.8 = shoulder-width;
+    // 0.5 = feet together). A single foot can be placed with fzN / fzF — below 0 it crosses the centre line (cross stance).
+    if (!Jf && !pt && /^[akt][NF]$/.test(src)) {
+      var fzk = P0['fz' + src.charAt(1)];
+      if (typeof fzk !== 'number') fzk = typeof P0.fz === 'number' ? P0.fz : 1;
+      z *= src.charAt(0) === 'k' ? (1 + fzk) / 2 : fzk;
+    }
+    // front-view lessons: an arm drawn shorter than its real length points towards the viewer, so in 3D it reaches forward by the missing length
+    if (mode === 'front' && !pt && /^[eh][NF]$/.test(src)) {
+      var q = src.charAt(1), s0 = Js['sh' + q], e0 = Js['e' + q], h0 = Js['h' + q];
+      x = Math.sqrt(Math.max(0, 900 - (e0.x - s0.x) * (e0.x - s0.x) - (e0.y - s0.y) * (e0.y - s0.y))) * K;
+      if (src.charAt(0) === 'h') x += Math.sqrt(Math.max(0, 784 - (h0.x - e0.x) * (h0.x - e0.x) - (h0.y - e0.y) * (h0.y - e0.y))) * K;
+    }
+    // …and the same for a thigh drawn shorter (lT): the knee bends towards the viewer, i.e. forward — not sideways
+    if (mode === 'front' && !pt && (src === 'kN' || src === 'kF')) {
+      var lT = typeof P0.lT === 'number' ? Math.min(1, P0.lT) : 1;
+      x = 44 * Math.sqrt(1 - lT * lT) * K;
+      if (lT > 0.999) {
+        // A front drawing with full-length thighs can only show a bent knee poking out sideways — a knee cannot bend that way.
+        // The same bend is turned to the front: straight ahead for a shallow bend, more and more out over the (turned-out)
+        // toes the deeper it is — the rule the toes themselves follow in planFoot.
+        var qk = src.charAt(1), hp2 = Js['hip' + qk], an2 = Js['a' + qk], ldx = an2.x - hp2.x, ldy = an2.y - hp2.y, ll = Math.hypot(ldx, ldy) || 1;
+        var along = ((j.x - hp2.x) * ldx + (j.y - hp2.y) * ldy) / ll, px = hp2.x + ldx / ll * along, py = hp2.y + ldy / ll * along;
+        var offx = j.x - px, offy = j.y - py, off = Math.hypot(offx, offy);
+        var cb = ((j.x - hp2.x) * (an2.x - j.x) + (j.y - hp2.y) * (an2.y - j.y)) / ((Math.hypot(j.x - hp2.x, j.y - hp2.y) * Math.hypot(an2.x - j.x, an2.y - j.y)) || 1);
+        var outw = 0.75 * smooth(20 * DEG, 70 * DEG, Math.acos(Math.max(-1, Math.min(1, cb))));
+        x = Math.sqrt(1 - outw * outw) * off * K;
+        y = (FLOOR - (py + offy * outw)) * K;
+        z = ((px + offx * outw) - Jf.hip.x) * K;
+      }
+    }
+    if (wide && (src === 'hN' || src === 'hF')) z = src === 'hN' ? wide : -wide;
     // push-up hands (lesson gives luN/luF): planted on the floor at shoulder width, straight under the shoulders
-    else if (!Jf && (name === 'hN' || name === 'hF') && typeof P0.luN === 'number' && y < 0.04) z = name === 'hN' ? 0.2 : -0.2;
-    if ((wide || (!Jf && typeof P0[name === 'eN' ? 'luN' : 'luF'] === 'number')) && (name === 'eN' || name === 'eF')) z = name === 'eN' ? elbowZ(name) : -elbowZ(name);
+    else if (!Jf && (src === 'hN' || src === 'hF') && typeof P0.luN === 'number' && y < 0.04) {
+      // …or further out when the forearm is drawn shortened too (arms slapping the mat at 45° in a breakfall)
+      var la = P0[src === 'hN' ? 'laN' : 'laF']; la = typeof la === 'number' ? Math.min(1, la) : 1;
+      z = la < 0.999 ? elbowZ(src === 'hN' ? 'eN' : 'eF') + 28 * K * Math.sqrt(1 - la * la) : 0.2;
+      if (src === 'hF') z = -z;
+    }
+    if ((wide || (!Jf && typeof P0[src === 'eN' ? 'luN' : 'luF'] === 'number')) && (src === 'eN' || src === 'eF')) z = src === 'eN' ? elbowZ(src) : -elbowZ(src);
+    // `ez`: how far apart the elbows are (1 = each in front of its own shoulder, 0 = on the centre line — an uppercut elbow)
+    if (!Jf && !pt && (src === 'eN' || src === 'eF') && typeof P0.ez === 'number') z *= P0.ez;
+    if (flip) z = -z;
+    // `lz`: the upper body leans sideways by that many degrees (+ = towards the lesson's near side: slipping a punch, bobbing
+    // and weaving) — a side-view drawing cannot show it. Everything above the hips turns about the hips as one piece.
+    if (!pt && typeof P0.lz === 'number' && P0.lz && /^(sh|head|shN|shF|eN|eF|hN|hF)$/.test(name)) {
+      var la0 = P0.lz * DEG * (sd.arms ? -1 : 1), hy0 = (FLOOR - Js.hip.y) * K, dy0 = y - hy0, cl = Math.cos(la0), sl0 = Math.sin(la0);
+      y = hy0 + dy0 * cl - z * sl0; z = dy0 * sl0 + z * cl;
+    }
     return new THREE.Vector3(hx + x * cos + z * sin, y, -x * sin + z * cos);
   }
-  return { J: Js, V: V, theta: theta, pose: S ? S.pose : F.pose, seg: (S ? sideP : frontP).poseAt(t).seg };
+  var at = (S ? sideP : frontP).poseAt(t);
+  return { J: Js, V: V, theta: theta, pose: S ? S.pose : F.pose, seg: at.seg, k: at.k };
+}
+
+/* ---------- feet that stay where they are planted ----------
+ * The 2D lessons place the feet relative to the hips ("treadmill" style): stepping into a bow stance is drawn as the
+ * back foot sliding away while the hips stay put. In 3D that would be a foot sliding across the floor. So for every
+ * stretch between two key frames one foot is chosen as the anchor — a foot the lesson itself keeps still, otherwise
+ * the one carrying more of the weight when the stretch begins — and the whole body is moved so that this foot stays
+ * on its spot. The other foot then really steps: it lifts, travels and lands a little before the weight arrives.
+ * Both feet AND the hips travelling together (a retreat drawn as a glide) become two steps, or a hop when it is
+ * fast; a very small glide is simply left out. The stretch that returns to the first frame picks the anchor that
+ * brings the body back to where it started, so the loop does not creep across the floor.
+ */
+var GAIT = null;
+var JOINTS = ['hip', 'sh', 'head', 'hipN', 'hipF', 'kN', 'kF', 'aN', 'aF', 'tN', 'tF', 'shN', 'shF', 'eN', 'eF', 'hN', 'hF'];
+function rawJoints(t) { var r = pose3d(t), n = {}; JOINTS.forEach(function (k) { n[k] = r.V(k); }); return { r: r, n: n }; }
+// where a foot meets the floor (under the ankle, or under the toes when the heel is up) and how firmly it is down (0…1)
+function footSpot(n, k) {
+  var a = n['a' + k], t = n['t' + k], toe = 1 - smooth(0.005, 0.03, t.y - a.y);     // toes up → the heel is what touches
+  return { x: a.x + (t.x - a.x) * toe, z: a.z + (t.z - a.z) * toe, g: 1 - smooth(0.035, 0.08, Math.max(0, Math.min(a.y, t.y))) };
+}
+function planGait() {
+  GAIT = null;
+  if (!cur || cur.gait === false) return;
+  var pl = cur.mode === 'front' ? frontP : sideP, fr = pl.frames, nF = fr.length, key = [], acc = 0, i;
+  for (i = 0; i < nF; i++) {
+    var q = rawJoints(acc), n = q.n;
+    key.push({ N: footSpot(n, 'N'), F: footSpot(n, 'F'), hip: { x: n.hip.x, z: n.hip.z }, fw: { x: Math.cos(q.r.theta), z: -Math.sin(q.r.theta) } });
+    acc += fr[i].d;
+  }
+  function sub(a, b) { return { x: a.x - b.x, z: a.z - b.z }; }
+  function len(v) { return Math.hypot(v.x, v.z); }
+  var STEP = 0.10;                                           // feet that move less than this against each other do not step: they stay planted
+  var C = [{ x: 0, z: 0 }], segs = [];
+  for (i = 0; i < nF; i++) {
+    var A = key[i], B = key[(i + 1) % nF], wrap = i === nF - 1, C0 = C[i];
+    var gN = Math.min(A.N.g, B.N.g) > 0.8, gF = Math.min(A.F.g, B.F.g) > 0.8;        // firmly down at both ends of the stretch
+    var dN = sub(B.N, A.N), dF = sub(B.F, A.F), dH = sub(B.hip, A.hip), mN = len(dN), mF = len(dF);
+    var S = { anchor: null, N: 'lesson', F: 'lesson', drift: null, late: false }, both = gN && gF;
+    var plain = cur.gaitOnly && cur.gaitOnly.indexOf(i) < 0;   // this stretch is left exactly as the lesson draws it
+    if (plain) { both = gN = gF = false; S.plain = true; }
+    var homeIf = function (d) { return len({ x: C0.x - d.x, z: C0.z - d.z }); };    // how far from the start the body would be with this foot as anchor
+    if (both) {
+      var big = Math.max(mN, mF), rel = len(sub(dN, dF)), less = mN <= mF ? 'N' : 'F';
+      var glide = dN.x * dF.x + dN.z * dF.z > 0 && rel < 0.35 * big && len(sub(dH, { x: (dN.x + dF.x) / 2, z: (dN.z + dF.z) / 2 })) < 0.35 * big;
+      // how much of the weight each foot carries as the stretch begins: where the hips sit between the feet
+      var ax = A.N.x - A.F.x, az = A.N.z - A.F.z, L2 = ax * ax + az * az;
+      var raw = L2 > 1e-6 ? ((A.hip.x - A.F.x) * ax + (A.hip.z - A.F.z) * az) / L2 : 0.5, shareN = Math.max(0, Math.min(1, raw));
+      var known = L2 > 1e-6 && raw > -0.3 && raw < 1.3;       // hips far outside the feet (sitting behind them): the share says nothing
+      var apart = L2 > 0.09;                                  // feet side by side (closer than 30 cm): the weight can go to either in an instant, so it does not decide who steps
+      if (glide && big >= 0.08 && !(homeIf(dN) < len(C0) - 0.03)) {
+        // feet and hips travel together (a retreat drawn as a glide): two steps, or a hop when it is fast
+        // (not when it undoes travel that was left out earlier — leaving this out too brings the body home)
+        if (fr[i].d < 350 && big > 0.25) S.N = S.F = 'hop';
+        else { var lead = (A.N.x - A.F.x) * dN.x + (A.N.z - A.F.z) * dN.z >= 0 ? 'N' : 'F'; S[lead] = 'first'; S[lead === 'N' ? 'F' : 'N'] = 'second'; }
+      } else if (rel <= STEP) S.anchor = less;                // the feet keep their places: the one the lesson moves least is the reference
+      else if (less === 'N' ? mN < 0.02 && len(dH) > 0.02 : mF < 0.02 && len(dH) > 0.02) S.anchor = less;   // the lesson itself moves the hips against a foot it keeps still
+      else if (!known) S.anchor = less;
+      else if (len(dH) > 0.08 && Math.min(mN, mF) < 0.12 && Math.min(mN, mF) < 0.4 * Math.max(mN, mF)) {
+        // the lesson carries the hips past a foot it keeps (nearly) where it is — walking through: that foot stays and the
+        // other steps; if the weight is still on the stepping foot it shifts across first and the foot steps late
+        S.anchor = less;
+        if (apart && (less === 'N' ? shareN < 0.3 : shareN > 0.7)) S.late = true;
+      }
+      else if (apart && (shareN > 0.7 || shareN < 0.3)) {     // one foot steps: not the one carrying the weight…
+        S.anchor = shareN > 0.7 ? 'N' : 'F';
+        // …except on the way back to the first frame, if only the other choice brings the body home: then the weight
+        // shifts first and the foot steps late
+        var heavy = S.anchor === 'N' ? dN : dF, light = S.anchor === 'N' ? dF : dN;
+        if (wrap && homeIf(heavy) > 0.03 && homeIf(light) <= 0.03) { S.anchor = S.anchor === 'N' ? 'F' : 'N'; S.late = true; }
+      } else {
+        // weight fairly even: come back towards the starting spot if the body has travelled, otherwise step forward
+        var hN = homeIf(dN), hF = homeIf(dF);
+        if (len(C0) > 0.03 && Math.abs(hN - hF) > 0.03) S.anchor = hN < hF ? 'N' : 'F';
+        else if (Math.min(mN, mF) < 0.4 * Math.max(mN, mF)) S.anchor = less;   // the lesson moves one foot far more than the other ("step one foot back"): that one steps
+        else if (apart && shareN > 0.56) S.anchor = 'N';
+        else if (apart && shareN < 0.44) S.anchor = 'F';
+        else {                                                // the foot that ends up behind stays
+          var pN = B.N.x * B.fw.x + B.N.z * B.fw.z, pF = B.F.x * B.fw.x + B.F.z * B.fw.z;
+          S.anchor = Math.abs(pN - pF) > 0.03 ? (pN < pF ? 'N' : 'F') : less;
+        }
+      }
+      if (S.anchor && rel > STEP) S[S.anchor === 'N' ? 'F' : 'N'] = S.late ? 'late' : 'step';   // the other foot really steps
+    } else if (gN) S.anchor = 'N';
+    else if (gF) S.anchor = 'F';
+    // a foot that is in the air at the start and firmly down at the end, next to an anchored foot: it lands ahead of the weight
+    // …and a foot that is firmly down at the start and in the air at the end stays down until the weight has moved off it
+    ['N', 'F'].forEach(function (f) {
+      if (!S.anchor || S.anchor === f) return;
+      if (A[f].g <= 0.8 && B[f].g > 0.8) S[f] = 'land';
+      else if (A[f].g > 0.8 && B[f].g <= 0.8) S[f] = 'lift';
+    });
+    var dA = S.anchor === 'N' ? dN : S.anchor === 'F' ? dF : { x: 0, z: 0 };
+    var C1 = { x: C0.x - dA.x, z: C0.z - dA.z };
+    if (wrap) { if (len(C1) > 0.005) S.drift = { x: -C1.x, z: -C1.z }; C1 = { x: 0, z: 0 }; }
+    segs.push(S); C.push(C1);
+  }
+  var Ts = [], t0 = 0;
+  for (i = 0; i < nF; i++) { Ts.push(t0); t0 += fr[i].d; }
+  GAIT = { key: key, seg: segs, C: C, pin: null, T: Ts, fr: fr };
+  // A step normally lands at 70% of its stretch, before the weight arrives. A long reaching step (a drop stance) cannot:
+  // the hips are still too high for the leg to reach that far. Find the earliest moment from 70% on when it can.
+  var REACH = 0.82, tAcc = 0;
+  for (i = 0; i < nF; i++) {
+    var Sg = segs[i];
+    ['N', 'F'].forEach(function (f) {
+      if (Sg[f] !== 'step' && Sg[f] !== 'land') return;
+      var Bk = key[(i + 1) % nF], wx = Bk[f].x + C[i + 1].x, wz = Bk[f].z + C[i + 1].z, land = 1, ok = true;
+      for (var sI = 10; sI >= 1; sI--) {                      // walk back from the end of the stretch
+        var qs = rawJoints(tAcc + fr[i].d * sI / 10 - 0.5), ks = qs.r.k, sp = footSpot(qs.n, Sg.anchor);
+        var hx2 = qs.n['hip' + f].x + C[i].x - (sp.x - key[i][Sg.anchor].x), hz2 = qs.n['hip' + f].z + C[i].z - (sp.z - key[i][Sg.anchor].z);
+        var can = Math.hypot(hx2 - wx, hz2 - wz, Math.max(0, qs.n.hip.y)) < REACH;   // (the model's ankle sits about as high above the floor as its hips are raised over the lesson's)
+        if (!can) ok = false;
+        if (ok && ks >= 0.7) land = ks;
+      }
+      Sg['land' + f] = Math.max(0.7, land);
+    });
+    tAcc += fr[i].d;
+  }
+  if (!avatar) return;
+  // Which feet stay down through each stretch? (the anchor, or a foot that hardly moves; a small leftover drift of the
+  // body on the way back to the first frame is taken up by the legs, the feet stay)
+  var held = [], T;
+  for (i = 0; i < nF; i++) {
+    var A2 = key[i], B2 = key[(i + 1) % nF], S2 = segs[i], h = {};
+    ['N', 'F'].forEach(function (f) {
+      var down = Math.min(A2[f].g, B2[f].g) > 0.8, moved = len(sub({ x: B2[f].x + C[i + 1].x, z: B2[f].z + C[i + 1].z }, { x: A2[f].x + C[i].x, z: A2[f].z + C[i].z }));
+      h[f] = !S2.plain && down && S2[f] === 'lesson' && (!S2.drift || len(S2.drift) <= STEP) && (S2.anchor === f || moved <= STEP);
+    });
+    held.push(h);
+  }
+  // every stretch of the loop during which a foot stays down forms a run; runs[f][j] = index of the run's first key frame
+  var runs = { N: [], F: [] };
+  ['N', 'F'].forEach(function (f) {
+    var start = -1;
+    for (i = 0; i < nF; i++) { runs[f].push(-1); if (start < 0 && !held[i][f]) start = i; }
+    if (start < 0) { for (i = 0; i < nF; i++) runs[f][i] = 0; return; }                  // down the whole time
+    var run = -1;
+    for (var c2 = 1; c2 <= nF; c2++) { var j = (start + c2) % nF; if (held[j][f]) { if (run < 0) run = j; runs[f][j] = run; } else run = -1; }
+  });
+  function poseKeys(pinAt) {                                // pose the model at every key frame and read both feet
+    var out = [];
+    T = 0;
+    for (i = 0; i < nF; i++) {
+      var qq = lessonJoints(T), inf = poseAvatar(qq.n, qq.r.theta, cur, pinAt ? pinAt(i) : null);
+      var bN = wpos(avatar.B.RightToeBase), bF = wpos(avatar.B.LeftToeBase), aN2 = wpos(avatar.B.RightFoot), aF2 = wpos(avatar.B.LeftFoot);
+      out.push({ N: { x: bN.x, z: bN.z, ax: aN2.x, az: aN2.z, turn: inf.feet.N.turn }, F: { x: bF.x, z: bF.z, ax: aF2.x, az: aF2.z, turn: inf.feet.F.turn } });
+      T += fr[i].d;
+    }
+    return out;
+  }
+  // 1) the turn-out a planted foot needs: the most it needs at any key frame of its run (both ends of every stretch)
+  var free = poseKeys(null), turn = [];
+  for (i = 0; i < nF; i++) turn.push({ N: null, F: null });
+  ['N', 'F'].forEach(function (f) {
+    var most = {};
+    for (i = 0; i < nF; i++) { var r0 = runs[f][i]; if (r0 < 0) continue; most[r0] = Math.max(most[r0] || 0, free[i][f].turn, free[(i + 1) % nF][f].turn); }
+    for (i = 0; i < nF; i++) if (runs[f][i] >= 0) turn[i][f] = most[runs[f][i]];
+  });
+  // 2) where the ball of the foot lands with that turn-out, at every key frame (a foot keeps the turn-out of the run it is
+  //    in, or of the run it has just finished): a run is pinned to where its first key frame put it
+  var landed = poseKeys(function (j) { var o = { N: null, F: null }; ['N', 'F'].forEach(function (f) { var k2 = runs[f][j] >= 0 ? j : (runs[f][(j + nF - 1) % nF] >= 0 ? (j + nF - 1) % nF : -1); if (k2 >= 0) o[f] = { turn: turn[k2][f] }; }); return o; });
+  var pin = [];
+  for (i = 0; i < nF; i++) {
+    var o2 = { N: null, F: null };
+    ['N', 'F'].forEach(function (f) { var r0 = runs[f][i]; if (r0 >= 0) o2[f] = { x: landed[r0][f].x, z: landed[r0][f].z, ax: landed[r0][f].ax, az: landed[r0][f].az, turn: turn[i][f] }; });
+    pin.push(o2);
+  }
+  // how the pin acts in each stretch: 'hold' (stays down), 'switch' (a step: lifts off from the old spot, lands on the new one),
+  // 'prev' (leaving the floor from its spot), 'next' (coming down on its next spot)
+  var pm = [];
+  for (i = 0; i < nF; i++) {
+    var A3 = key[i], B3 = key[(i + 1) % nF], o3 = {};
+    ['N', 'F'].forEach(function (f) {
+      var d0 = A3[f].g > 0.8, d1 = B3[f].g > 0.8;            // firmly down at the start / at the end
+      o3[f] = segs[i].plain ? 'none' : held[i][f] ? 'hold' : segs[i][f] === 'land' ? 'next' : segs[i][f] === 'lift' ? 'prev' : segs[i][f] !== 'lesson' ? 'switch' : d0 && !d1 ? 'prev' : !d0 && d1 ? 'next' : 'none';
+    });
+    pm.push(o3);
+  }
+  GAIT.pin = pin; GAIT.pm = pm; GAIT.ball = landed;
+}
+// the lesson's joints at time t, moved so that planted feet stay planted and stepping feet step
+function lessonJoints(t) {
+  var q = rawJoints(t), n = q.n, r = q.r, G = GAIT;
+  if (!G) return q;
+  var nF = G.key.length, j = Math.min(nF - 1, r.seg), k = r.k, S = G.seg[j], A = G.key[j], B = G.key[(j + 1) % nF], C0 = G.C[j], C1 = G.C[j + 1];
+  var cx = C0.x, cz = C0.z;
+  if (S.anchor) { var sp = footSpot(n, S.anchor); cx -= sp.x - A[S.anchor].x; cz -= sp.z - A[S.anchor].z; }
+  if (S.drift) { cx += S.drift.x * k; cz += S.drift.z * k; }
+  Object.keys(n).forEach(function (m) { n[m].x += cx; n[m].z += cz; });
+  // While a foot is still coming down from the air (stepping down out of a raised knee) the hips hold back — they have
+  // covered only half of what the lesson has by then — and catch up once it has landed. The anchor foot never moves.
+  if (S.anchor && S[S.anchor === 'N' ? 'F' : 'N'] === 'land') {
+    var Lf = S['land' + (S.anchor === 'N' ? 'F' : 'N')] || 0.7, hk = k * (0.5 + 0.5 * smooth(Lf - 0.25, 1, k));
+    var hx = (B.hip.x + C1.x - A.hip.x - C0.x) * (hk - k), hz = (B.hip.z + C1.z - A.hip.z - C0.z) * (hk - k);
+    Object.keys(n).forEach(function (m) {
+      var mine = m === 'a' + S.anchor || m === 't' + S.anchor ? 0 : m === 'k' + S.anchor ? 0.5 : 1;   // the anchor foot stays; its knee follows half-way
+      n[m].x += hx * mine; n[m].z += hz * mine;
+    });
+  }
+  var prog = { N: k, F: k }, go = { N: k, F: k }, stepping = 0;
+  ['N', 'F'].forEach(function (f) {
+    if (S[f] !== 'land' && S[f] !== 'lift') return;
+    // A foot on its way down is where the lesson would have it a little later, so it is down before the weight arrives.
+    // A foot about to leave the floor is where the lesson had it a little earlier, so it stays down while the weight moves off it.
+    var kq = S[f] === 'land' ? Math.min(1, k / (S['land' + f] || 0.7)) : Math.max(0, (k - 0.3) / 0.7), lo = 0, hi = 1;
+    for (var bi = 0; bi < 14; bi++) { var md = (lo + hi) / 2; if (G.fr[j].e(md) < kq) lo = md; else hi = md; }
+    var q2 = rawJoints(G.T[j] + G.fr[j].d * Math.min(0.9999, (lo + hi) / 2)), c2x = C0.x, c2z = C0.z;
+    if (S.anchor) { var sp2 = footSpot(q2.n, S.anchor); c2x -= sp2.x - A[S.anchor].x; c2z -= sp2.z - A[S.anchor].z; }
+    ['a', 't', 'k'].forEach(function (p2) { var v = q2.n[p2 + f]; n[p2 + f].set(v.x + c2x, v.y, v.z + c2z); });
+    prog[f] = kq;
+  });
+  ['N', 'F'].forEach(function (f) {
+    var mode = S[f];
+    if (mode === 'lesson' || mode === 'land' || mode === 'lift') return;
+    var u = mode === 'step' ? k / (S['land' + f] || 0.7) : mode === 'late' ? (k - 0.3) / 0.7 : mode === 'first' ? k / 0.5 : mode === 'second' ? (k - 0.5) / 0.5 : k;
+    u = Math.max(0, Math.min(1, u)); prog[f] = u; stepping++;
+    go[f] = mode === 'hop' ? u : smooth(0.18, 0.82, u);                              // across the floor only while the foot is in the air
+  });
+  // two steps in a row (a retreat): the hips stay between the feet instead of running ahead of the foot still on the floor
+  if (stepping === 2 && S.N !== 'hop') {
+    var bx = (B.hip.x - A.hip.x) * ((go.N + go.F) / 2 - k), bz = (B.hip.z - A.hip.z) * ((go.N + go.F) / 2 - k);
+    Object.keys(n).forEach(function (m) { n[m].x += bx; n[m].z += bz; });
+  }
+  ['N', 'F'].forEach(function (f) {
+    var mode = S[f];
+    if (mode === 'lesson' || mode === 'land' || mode === 'lift') return;
+    var u = prog[f];
+    var w0x = A[f].x + C0.x, w0z = A[f].z + C0.z, w1x = B[f].x + C1.x, w1z = B[f].z + C1.z, now = footSpot(n, f);
+    var dx = w0x + (w1x - w0x) * go[f] - now.x, dz = w0z + (w1z - w0z) * go[f] - now.z;
+    var H = mode === 'hop' ? 0.11 : Math.max(0.055, Math.min(0.1, 0.3 * Math.hypot(w1x - w0x, w1z - w0z))), h = H * Math.sin(Math.PI * u);
+    ['a', 't'].forEach(function (p2) { var v = n[p2 + f]; v.x += dx; v.z += dz; v.y += h; });
+    var kn = n['k' + f]; kn.x += dx * 0.5; kn.z += dz * 0.5; kn.y += h * 0.5;
+  });
+  q.shift = { x: cx, z: cz };
+  // Pins: a foot that stays down keeps its spot. A foot that is leaving the floor or stepping lifts off FROM the spot
+  // it was pinned to and sets down ON the spot it will be pinned to next (the pin only acts while the foot is still
+  // touching the floor, so it fades out by itself as the foot rises).
+  q.pins = null;
+  if (G.pin) {
+    q.pins = { N: null, F: null };
+    ['N', 'F'].forEach(function (f) {
+      var m = G.pm[j][f], before = G.pin[(j + nF - 1) % nF][f] || G.ball[j][f], after = G.pin[(j + 1) % nF][f] || G.ball[(j + 1) % nF][f], here = null;
+      var u = prog[f];
+      function faded(src, w) { return src ? { x: src.x, z: src.z, ax: src.ax, az: src.az, turn: src.turn, w: w } : null; }
+      if (m === 'hold') here = G.pin[j][f];
+      else if (m === 'prev') { here = faded(before, 1 - smooth(0, 0.5, u)) || {}; here.free = smooth(0.02, 0.2, u); }       // leaving the floor: lets go of its spot as it rises
+      else if (m === 'next') { here = faded(after, smooth(0.5, 1, u)) || {}; here.free = 1 - smooth(0.7, 0.93, u); here.down = smooth(0.4, 0.9, u); }       // coming down: settles on to its next spot
+      else if (m === 'switch') {                                                   // a step: both, and free of the floor in between
+        here = (u < 0.5 ? faded(before, 1 - smooth(0, 0.45, u)) : faded(after, smooth(0.55, 1, u))) || {};
+        here.free = smooth(0.04, 0.22, Math.sin(Math.PI * u));
+        here.down = smooth(0.45, 0.85, u);                                           // on its way down: the hips come down in time for the leg to reach
+      }
+      q.pins[f] = here || null;
+    });
+  }
+  return q;
 }
 
 /* ---------- the skinned instructor model (made for KungfuTutor with Meshy, private licence) ----------
@@ -365,6 +728,8 @@ function setupAvatar(root) {
   rig.scale.setScalar((88 * K) / leg); rig.updateMatrixWorld(true);
   var right = wpos(B.RightUpLeg).sub(wpos(B.LeftUpLeg)); right.y = 0; right.normalize();
   var fwd = new THREE.Vector3().crossVectors(UPV, right).normalize();
+  // how far forward of upright the model's neck sits when its face is level (its own rest pose)
+  var nk0 = wpos(B.Head).sub(wpos(B.Neck)), neckLean = Math.atan2(nk0.dot(fwd), nk0.y);
   var rest = {}, RQ = {};
   Object.keys(B).forEach(function (n) { rest[n] = B[n].quaternion.clone(); RQ[n] = wquat(B[n]); });
   var fist = fistTurns(B), open = { Right: [], Left: [] };
@@ -414,7 +779,7 @@ function setupAvatar(root) {
     D[X].heelSet = hs; D[X].ballSet = bs;
   });
   scene.add(rig);
-  return { rig: rig, B: B, rest: rest, RQ: RQ, D: D, fist: fist, open: open, fwd: fwd, right: right, mesh: body3d,
+  return { rig: rig, B: B, rest: rest, RQ: RQ, D: D, fist: fist, open: open, fwd: fwd, right: right, mesh: body3d, neckLean: neckLean,
     skin: skinSampler(body3d, 3), full: full, kneeR: kneeR * 1.25,
     armScale: (D.Right.upper + D.Right.fore) / ((KTFigure.DIM.upper + KTFigure.DIM.fore) * K), ankleH: D.Right.ankleH };
 }
@@ -432,7 +797,7 @@ var RIGID = ['hip', 'sh', 'head'];
 /* n: lesson joints in metres (floor at y = 0), theta: facing, move: the move being shown.
  * The lesson's own joint angles are kept wherever they can be; contact with the floor is then made exact.
  * Returns what was done, for the barbell and the self-check. */
-function poseAvatar(n, theta, move) {
+function poseAvatar(n, theta, move, pins) {
   var A = avatar, B = A.B, D = A.D, info = { feet: {}, hands: {}, pitch: 0 };
   var frontView = move && move.mode && move.mode !== 'side', bar = move && move.bar;
   var face = new THREE.Quaternion().setFromUnitVectors(A.fwd, v3(1, 0, 0).applyAxisAngle(UPV, theta));
@@ -454,7 +819,12 @@ function poseAvatar(n, theta, move) {
     hr.normalize();
     setWQ(B.Hips, frameRot(UPV, RT, up, hr).multiply(W0('Hips')));
     aimBone(B.Spine, B.Neck, n.sh.clone().sub(n.hip));
-    aimBone(B.Neck, B.Head, n.head.clone().sub(n.sh));
+    // The lesson draws the neck as a straight continuation of the spine. A real neck leans forward of that line while the
+    // face stays level (this model: about 23°), so aiming the neck bone straight up the lesson's line tipped the face up by
+    // that much. The lean is put back for an upright body; lying down, the head keeps the lesson's line (it rests on the floor).
+    var nd = n.head.clone().sub(n.sh), tilt = A.neckLean * smooth(0.30, 0.70, up.y);
+    if (tilt > 1e-4 && nd.lengthSq() > 1e-8) nd.applyAxisAngle(hr, -tilt);
+    aimBone(B.Neck, B.Head, nd);
     var mid = wpos(B.RightUpLeg).add(wpos(B.LeftUpLeg)).multiplyScalar(0.5);
     A.rig.position.copy(n.hip).sub(mid); A.rig.updateMatrixWorld(true);
     return { up: up, hr: hr, pLeft: hr.clone().negate(), pFwd: new THREE.Vector3().crossVectors(up, hr).normalize(),
@@ -481,7 +851,8 @@ function poseAvatar(n, theta, move) {
     f.bendDir = perp(kn.clone().sub(hp), f.rel.clone().normalize());
     var h = flat(t.clone().sub(a)), braw;                    // braw: + = toes lower than the ankle (heel lifted)
     if (frontView) {                                         // front-view stances: toes follow a bent knee, point forward on a straight leg
-      var th = kn.clone().sub(hp), thh = flat(th), kf = 0.75 * smooth(20 * DEG, 70 * DEG, th.angleTo(a.clone().sub(kn))) * smooth(0.05, 0.15, thh.length());
+      // (a move may say how far: the horse stance keeps its feet parallel — move.toes)
+      var th = kn.clone().sub(hp), thh = flat(th), kf = (move && typeof move.toes === 'number' ? move.toes : 0.75) * smooth(20 * DEG, 70 * DEG, th.angleTo(a.clone().sub(kn))) * smooth(0.05, 0.15, thh.length());
       f.head0 = FW.clone().multiplyScalar(1 - kf).addScaledVector(thh.normalize(), kf).normalize();
       braw = Math.atan2(a.y - t.y, Math.max(h.length(), 1e-4));
     } else {                                                 // side view: the foot points along the facing; past 90° the toes point back
@@ -532,8 +903,17 @@ function poseAvatar(n, theta, move) {
     // never higher than a planted leg can reach at full stretch (give or take the few millimetres lessons vary by)
     feet.forEach(function (f) {
       var d = D[f.X], reach = d.thigh + d.shin - 0.001, hl = Math.hypot(f.rel.x, f.rel.z);
+      // (a foot pinned to its spot may be further from the hips than the lesson drew: the hips then come down to it)
+      var pn = pins && pins[f.k], hlPin = hl;
+      if (pn && typeof pn.x === 'number') {
+        var fq = tw(d.fromBall).applyQuaternion(f.rot), hs = C.Hs[f.X];
+        hlPin = Math.hypot(pn.x + fq.x - hs.x, pn.z + fq.z - hs.z);
+        hl += (hlPin - hl) * (pn.w === undefined ? 1 : pn.w);
+      }
       var top = f.Ay + (d.ballH + Math.hypot(d.fromBall.y, d.ballFwd) - f.Ay) * f.toes;        // a foot on its toes can still raise its heel
-      lift -= Math.max(0, lift - (top + Math.sqrt(Math.max(0, reach * reach - hl * hl)) - C.Hs[f.X].y + 0.006)) * smooth(0.6, 1, f.w);
+      lift -= Math.max(0, lift - (top + Math.sqrt(Math.max(0, reach * reach - hl * hl)) - C.Hs[f.X].y + (hlPin !== hl || (pn && typeof pn.x === 'number') ? 0.001 : 0.006))) * smooth(0.6, 1, f.w);   // (a pinned foot is exactly where it is: no allowance)
+      // a foot on its way down: the hips are already low enough for the leg to reach its landing spot when it gets there
+      if (pn && pn.down) lift -= Math.max(0, lift - (top + Math.sqrt(Math.max(0, reach * reach - hlPin * hlPin)) - C.Hs[f.X].y + 0.006)) * pn.down;
     });
     return lift;
   }
@@ -567,12 +947,20 @@ function poseAvatar(n, theta, move) {
     var d = D[f.X], S = wpos(B[f.X + 'UpLeg']), reach = d.thigh + d.shin - 0.001;
     var Tfree = S.clone().add(f.rel), dl = f.rel.length(), hl = Math.hypot(f.rel.x, f.rel.z), keep = smooth(0.955, 0.99, f.ext) * smooth(0.2, 0.4, hl / Math.max(dl, 1e-4));
     var r, td, sd, hinge, h0, shinUp, p = 0, flex0 = 0;
-    if (f.toes > 0) {                                        // on the ball of the foot: raise or lower the heel so the leg keeps the lesson's shape
+    if (f.toes > 0) {
+      // On the ball of the foot the heel keeps the angle the lesson draws, so it moves as smoothly as the lesson does.
+      // Only when the leg could not reach the foot that way does the heel go to the height that makes the leg fit
+      // (working the heel angle out from the leg length alone is far too twitchy: 5 cm of ankle height = 45° of heel).
       var fb = tw(d.fromBall), R = Math.hypot(fb.y, fb.dot(FW)), th0 = Math.atan2(fb.y, -fb.dot(FW));
-      var q = Math.asin(Math.max(-1, Math.min(1, (Tfree.y + kneeDrop - d.ballH) / R)));   // (a body sunk deeper for a low knee keeps the foot as it was)
-      var bs = (f.beta0 + th0 > Math.PI / 2 ? Math.PI - q : q) - th0;
-      f.beta = f.beta0 + (Math.max(3 * DEG, Math.min(88 * DEG, bs)) - f.beta0) * f.toes; footShape(f);
+      var q = Math.asin(Math.max(-1, Math.min(1, (Tfree.y + kneeDrop - d.ballH) / R)));
+      var bs = Math.max(3 * DEG, Math.min(88 * DEG, (f.beta0 + th0 > Math.PI / 2 ? Math.PI - q : q) - th0));
+      var ayL = d.ballH + R * Math.sin(f.beta0 + th0), need = smooth(reach + 0.004, reach + 0.04, Math.hypot(hl, S.y - ayL));   // (a leg that is simply straight is not out of reach)
+      // (hands on the floor as well — push-up, plank: the body's line is fixed by hands and toes, so there the heel always fits the leg)
+      need = Math.max(need, Math.max(hands[0].w, hands[1].w));
+      f.beta = f.beta0 + (bs - f.beta0) * need * f.toes; footShape(f);
     }
+    var pin = pins && pins[f.k], fixedTurn = pin && typeof pin.turn === 'number' && !frontView;   // (in a front-view stance the toes already follow the knee)
+    if (fixedTurn && f.turn !== pin.turn) { f.turn = pin.turn; footShape(f); }   // turned out once, when it was planted
     for (var pass = 0; pass < 7; pass++) {
       // planted: the ankle stays over the spot the lesson's leg reaches, at the height the foot needs
       var ay = f.Ay + f.adj, hd = hl, dy = S.y - ay;
@@ -584,6 +972,16 @@ function poseAvatar(n, theta, move) {
       var Tp = v3(S.x + (hl > 1e-4 ? f.rel.x * hd / hl : 0), ay, S.z + (hl > 1e-4 ? f.rel.z * hd / hl : 0));
       f.slide = Math.abs(hd - hl) * f.w;
       var T = Tfree.clone().lerp(Tp, f.w);
+      // A foot that is staying where it was planted has the ball of the foot pinned to that spot, so raising or lowering
+      // the heel pivots on the ball (the ankle travels over it) instead of swinging the toes across the floor.
+      // pin.w fades it: a foot lifting off leaves its spot gradually, a foot coming down settles on to its next one.
+      if (pin && typeof pin.x === 'number') {
+        var fbp = tw(d.fromBall).applyQuaternion(f.rot), pw = pin.w === undefined ? 1 : pin.w;
+        // (front-view stances turn the toes out as the knees open: there the heel stays and the toes swing, so the ankle is pinned)
+        var px = frontView && typeof pin.ax === 'number' ? pin.ax : pin.x + fbp.x, pz = frontView && typeof pin.az === 'number' ? pin.az : pin.z + fbp.z;
+        T.x += (px - T.x) * pw; T.z += (pz - T.z) * pw;
+        if (pw > 0.999) f.slide = 0;
+      }
       f.wo = Math.max(f.w, 1 - smooth(0, 0.06, T.y - ay));   // how much the foot is "on the floor" for its angle (1 at contact height)
       if (T.y < ay) T.y = ay;                                // a foot cannot go under the floor, planted or not
       r = ik2(S, T, d.thigh, d.shin, f.bendDir, C.pFwd, 152 * DEG);
@@ -604,7 +1002,7 @@ function poseAvatar(n, theta, move) {
       p = -Math.asin(Math.max(-1, Math.min(1, f.sole.dot(shinUp))));
       if (f.w > 0.5 && pass === 0) {                         // a flat foot under a far-leaning shin turns out, as a bow stance's back foot does
         flex0 = -p;
-        if (flex0 > 26 * DEG && Math.abs(f.beta) < 3 * DEG) { f.turn = Math.min(50 * DEG, (flex0 - 26 * DEG) * 2.6); footShape(f); continue; }
+        if (!fixedTurn && flex0 > 26 * DEG && Math.abs(f.beta) < 3 * DEG) { f.turn = Math.min(50 * DEG, (flex0 - 26 * DEG) * 2.6); footShape(f); continue; }
       }
       if ((f.w > 0.5 || f.wo > 0.5) && pass < 6) {           // still past the ankle's range: lift the heel (or lower it)
         var far = f.beta > 3 * DEG ? 70 * DEG : 40 * DEG;     // a foot on its toes points further than a flat or heel-resting one
@@ -657,8 +1055,9 @@ function poseAvatar(n, theta, move) {
       }
     }
     var fdn = n['h' + H.k].clone().sub(n['e' + H.k]).normalize().y;
-    var hf = d.wristH + Math.min(0, H.adj) * H.w + (0.03 + 0.1 * Math.max(0, -fdn)) * (1 - H.w);   // a hand cannot go under the floor (a planted palm seen hovering may come down to it) (a fist hanging below the wrist needs more room than a flat palm)
+    var hf = d.wristH + Math.max(0, H.adj) + Math.min(0, H.adj) * H.w + (0.03 + 0.1 * Math.max(0, -fdn)) * (1 - H.w);   // a hand cannot go under the floor (a planted palm seen hovering may come down to it) (a fist hanging below the wrist needs more room than a flat palm)
     if (T.y < hf) T.y = hf;
+    if (H.up) T.y += H.up;                                    // lifted clear of the floor by the final hand check
     var r = ik2(S, T, d.upper, d.fore, bend, UPV.clone().negate(), 148 * DEG);
     var ud = r.M.clone().sub(S), fd = r.E.clone().sub(r.M);
     var restUp = tw(d.upperDir), restH = tw(d.armHinge);
@@ -686,7 +1085,12 @@ function poseAvatar(n, theta, move) {
   var barShift = 0;                                        // a barbell on the floor moved forward over the model's mid-foot
   var kneeDrop = 0;                                        // how much deeper than the lesson the body went for a low knee
   var barPush = 0;                                         // how far the bar was moved forward to clear the model's legs
-  var C = core(n), feet = SIDES.map(function (s) { return planFoot(s, n); }), hands = SIDES.map(function (s) { return planHand(s, n, C); });
+  var C = core(n), hands = SIDES.map(function (s) { return planHand(s, n, C); });
+  var feet = SIDES.map(function (s) {
+    var f = planFoot(s, n), pn = pins && pins[s.k];
+    if (pn && pn.free) { f.w *= 1 - pn.free; f.touch *= 1 - pn.free; }             // mid-step
+    return f;
+  });
   var wF = feet.map(function (f) { return f.w; }), wH = hands.map(function (H) { return H.w; }), maxFoot = Math.max(wF[0], wF[1]);
   var lying = Math.max(feet[0].touch - wF[0], feet[1].touch - wF[1]);   // a foot on the floor that is not a standing foot (toes pointing back)
   function replan() {
@@ -703,6 +1107,20 @@ function poseAvatar(n, theta, move) {
   var gBody = 1e9;
   Object.keys(n0).forEach(function (k) { if (k !== 'head' && !/^[at][NF]$/.test(k)) gBody = Math.min(gBody, n0[k].y); });
   rest = Math.max(rest * grounded, Math.max(lying, 1 - smooth(0.05, 0.08, Math.max(0, gBody))) * (1 - maxFoot));
+  // standing on one leg: the body's weight moves sideways over that foot, as a person's hips do; the foot itself stays put.
+  // (each foot starts under its own hip joint, so without this the weight would hang 11 cm to the side of a single standing foot)
+  if (rest < 0.5 && Math.max(wH[0], wH[1]) < 0.5) {
+    var sway = v3(0, 0, 0);
+    SIDES.forEach(function (s, i) {
+      var o = SIDES[1 - i], up = smooth(0.03, 0.16, Math.max(0, Math.min(n0['a' + o.k].y, n0['t' + o.k].y)));   // how far the other foot is off the floor
+      sway.addScaledVector(i === 0 ? RT : LF, 0.08 * wF[i] * (1 - wF[1 - i]) * up * (1 - rest * 2));
+    });
+    if (sway.lengthSq() > 1e-8) {
+      var st = wF[0] >= wF[1] ? SIDES[0].k : SIDES[1].k, n4 = {};
+      Object.keys(n).forEach(function (k) { n4[k] = (k === 'a' + st || k === 't' + st) ? n[k] : n[k].clone().add(sway); });
+      n = n4; info.sway = sway.length(); replan();
+    }
+  }
   for (var pi = 0; pi < 2; pi++) {
     var pt = pitchOf(n, feet, hands, torsoRest);
     if (!pt || Math.abs(pt.phi) < 0.002) break;
@@ -782,7 +1200,7 @@ function poseAvatar(n, theta, move) {
     // lowest point of the body, leaving out limbs that end in a planted foot or hand (those are handled below)
     var lows = A.skin.lows(), low = lows[0], pen = 0;
     feet.forEach(function (f) { if (f.wo < 0.5) low = Math.min(low, lows[f.region], lows[f.region + 8]); else pen = Math.min(pen, lows[f.region + 8]); });
-    hands.forEach(function (H) { pen = Math.min(pen, lows[H.region + 4], H.w < 0.5 ? Math.min(lows[H.region], lows[H.region + 2]) : 0); });   // arms never carry the resting body
+    hands.forEach(function (H) { pen = Math.min(pen, lows[H.region + 4]); });   // arms never carry the resting body (a sunk hand is lifted on its own, below)
     // sunk into the floor → lift; a knee or elbow of a planted limb sunk → lift a little; meant to rest on the floor → lower until it touches
     // (the gap to leave is fixed on the first round, so the result varies smoothly with how firmly the lesson rests the body)
     if (it === 0) gapLeft = low > 0 ? low * (1 - rest * (1 - smooth(0.45, 0.6, low))) : 0;   // a body far above the floor is not resting on it
@@ -811,17 +1229,26 @@ function poseAvatar(n, theta, move) {
       feet.forEach(function (f) {
         if (f.wo < 0.5) return;
         var e = lows[f.region] * step;
-        if (e < -0.002) { f.adj -= e; again = true; } else if (e > 0.003 && (it === 0 || f.w > 0.98)) { f.adj -= e * smooth(0.8, 0.98, f.w); again = f.w > 0.8; }
+        if (e < -0.002) { f.adj -= e; again = true; } else if (e > 0.003 && (it === 0 || f.w > 0.98)) { f.adj -= e * smooth(0.8, 0.98, f.w); again = again || f.w > 0.8; }   // (never cancel the other foot's correction)
       });
       hands.forEach(function (H) {
-        if (H.w < 0.5) return;
         var e = Math.min(lows[H.region], lows[H.region + 2]), ea = Math.min(e, lows[H.region + 4]);   // the forearm lying on the floor counts too
-        if (ea < -0.002) { H.adj -= ea * step / Math.max(0.5, H.w); again = true; } else if (e > 0.003 && H.fore < 0.5 && (it === 0 || H.w > 0.98)) { H.adj -= e * step * smooth(0.8, 0.98, H.w); again = H.w > 0.8; }
+        if (H.w < 0.5) { if (e < -0.002) { H.adj -= e * step; again = true; } return; }   // a hand on its way down (or just passing) can never go under the floor either
+        if (ea < -0.002) { H.adj -= ea * step / Math.max(0.5, H.w); again = true; } else if (e > 0.003 && H.fore < 0.5 && (it === 0 || H.w > 0.98)) { H.adj -= e * step * smooth(0.8, 0.98, H.w); again = again || H.w > 0.8; }
       });
     }
     if (Math.abs(dl) < 0.0015 && !again) break;
     if (Math.abs(dl) >= 0.0015) lift += dl;
     if (low < 0) liftMin = Math.max(liftMin, lift);
+  }
+  // last word on hands: whatever happened above, no hand finishes under the floor (only that arm moves, never the body)
+  for (var hk = 0; hk < 3; hk++) {
+    var lw = A.skin.lows(), fixedHand = false;
+    hands.forEach(function (H) {
+      var e = Math.min(lw[H.region], lw[H.region + 2]);
+      if (e < -0.002) { H.up = (H.up || 0) - e * 1.05; solveArm(H, n, C, wb); fixedHand = true; }
+    });
+    if (!fixedHand) break;
   }
   // a barbell in the hands can touch the legs but not pass through them: find the front of the legs (and belly)
   // at the bar's height and move the hands forward until the bar sits just in front of it
@@ -853,19 +1280,17 @@ function poseAvatar(n, theta, move) {
     if (!a) return;
     avatar = a; body.visible = false;
     barbell.scale.setScalar(1.155); PLATE_R = 0.225 * 1.155;   // the barbell at the model's size
-    if (clip) draw();
+    if (clip) { planGait(); draw(); }                         // (the step plan needs the model to know where its feet land)
     if (/[?&]check\b/.test(location.search)) import('./lab3d-check.js').then(function (m) { m.run(CHECK_API); });
   }, undefined, function () { /* keep the simple figure */ });
 })();
 
-var JOINTS = ['hip', 'sh', 'head', 'hipN', 'hipF', 'kN', 'kF', 'aN', 'aF', 'tN', 'tF', 'shN', 'shF', 'eN', 'eF', 'hN', 'hF'];
 function drawBody(time) {
-  var r = pose3d(time), J = r.J, V = r.V;
-  var n = {};
-  JOINTS.forEach(function (k) { n[k] = V(k); });
+  var q = lessonJoints(time), r = q.r, J = r.J, V = r.V, n = q.n;
   faceQ.setFromAxisAngle(UPV, r.theta);
   if (avatar) {
-    drawBar(r, J, V, poseAvatar(n, r.theta, cur));
+    drawBar(r, J, V, poseAvatar(n, r.theta, cur, q.pins));
+    drawStick(r);
     return r.seg;
   }
   place(parts.thighN, n.hipN, n.kN); place(parts.shinN, n.kN, n.aN); place(parts.shoeN, n.aN, n.tN);
@@ -915,6 +1340,18 @@ function drawBar(r, J, V, info) {
   barbell.quaternion.copy(faceQ);
 }
 
+// the stick follows the right fist; its angle comes from the lesson (sk: 0 = pointing down, 90 = forward, 180 = up)
+function drawStick(r) {
+  stick.visible = !!(cur.stick && avatar && (r.pose.sv === undefined || r.pose.sv > 0.5));
+  if (!stick.visible) return;
+  var B = avatar.B, X = sidesNow().arms ? 'Left' : 'Right', w = wpos(B[X + 'Hand']), a = (r.pose.sk || 0) * Math.PI / 180;
+  stick.position.copy(w.add(wpos(B[X + 'HandMiddle1']).sub(w).multiplyScalar(0.62)));
+  // skz: the stick also leans sideways by that many degrees (+ = towards the body's other side), e.g. over the opposite shoulder
+  var zt = (r.pose.skz || 0) * Math.PI / 180 * (sidesNow().arms ? 1 : -1);
+  var dir = new THREE.Vector3(Math.sin(a) * Math.cos(zt), -Math.cos(a) * Math.cos(zt), Math.sin(zt)).applyAxisAngle(UPV, r.theta);
+  stick.quaternion.setFromUnitVectors(UPV, dir.normalize());
+}
+
 /* ---------- player state + UI ---------- */
 var state = { move: 0, cat: 'kungfu', t: 0, playing: !window.matchMedia('(prefers-reduced-motion: reduce)').matches, speed: 1, total: 1, lastSeg: -1 };
 var $ = function (id) { return document.getElementById(id); };
@@ -923,6 +1360,7 @@ var list = $('lab-moves'), tabs = $('lab-cats');
 
 function setMove(i, fromHash) {
   state.move = i; var m = MOVES[i];
+  state.flip = false; if ($('lab-mirror')) $('lab-mirror').setAttribute('aria-pressed', 'false');   // every move starts on its own correct side
   loadMove(m);
   state.total = (m.mode === 'front' ? frontP : sideP).total; state.t = 0; state.lastSeg = -1;
   elName.textContent = KT.name(m.s);
@@ -971,6 +1409,10 @@ MOVES.forEach(function (m, i) {
 });
 elPlay.addEventListener('click', function () { setPlaying(!state.playing); });
 $('lab-reset').addEventListener('click', function () { state.t = 0; setPlaying(false); draw(); });
+// Mirror: show the same move on the other side of the body (left and right limbs swap)
+if ($('lab-mirror')) $('lab-mirror').addEventListener('click', function () {
+  state.flip = !state.flip; this.setAttribute('aria-pressed', state.flip ? 'true' : 'false'); planGait(); draw();
+});
 $('lab-next').addEventListener('click', function () {
   setPlaying(false);
   var acc = 0, t = state.t % state.total;
@@ -1030,17 +1472,19 @@ if (MOVES.length) {
 
 // used by lab3d-check.js (opened with ?check) — poses every move and measures floor contact and joint limits
 var CHECK_API = {
-  THREE: THREE, MOVES: MOVES, K: K, SIDES: SIDES, plateR: function () { return PLATE_R; }, scene: scene, barbell: barbell, wpos: wpos,
+  THREE: THREE, MOVES: MOVES, K: K, SIDES: SIDES, plateR: function () { return PLATE_R; }, scene: scene, barbell: barbell, wpos: wpos, stick: stick,
   avatar: function () { return avatar; },
+  gait: function () { return GAIT; },
   load: function (i) { setPlaying(false); setMove(i, true); return state.total; },
   frames: function () { return clip.frames; },
   name: function (m) { return KT.name(m.s); },
   pose: function (t) {
     state.t = t;
-    var r = pose3d(t), n = {};
-    JOINTS.forEach(function (k) { n[k] = r.V(k); });
-    var info = poseAvatar(n, r.theta, cur);
+    var q = lessonJoints(t), r = q.r, n = q.n;
+    faceQ.setFromAxisAngle(UPV, r.theta);
+    var info = poseAvatar(n, r.theta, cur, q.pins);
     drawBar(r, r.J, r.V, info);
+    drawStick(r);
     return { info: info, n: n, theta: r.theta };
   }
 };

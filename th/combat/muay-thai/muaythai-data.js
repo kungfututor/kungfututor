@@ -46,11 +46,13 @@
       { d: 500, p: P({ ox: 220 }), c: cap('收回，前手一直護臉', 'Return — the lead hand guards the face the whole time') }
     ] },
     teep: { hit: 'aN', trail: 'aN', frames: [
-      { d: 700, p: P({ ox: 236 }), c: cap('站架，對方逼近', 'Stance; the opponent steps in') },
+      { d: 480, p: P({ ox: 236 }), c: cap('站架，對方逼近', 'Stance; the opponent steps in') },
+      { d: 220, p: P({ x: X0 - 12, fN: { x: 32, y: 82 }, fF: { x: -10, y: 81 }, ox: 236 }) },   // weight settles on the back leg before the lead foot lifts
       { d: 220, p: P({ t: -6, fN: { x: 32, y: 38 }, ftN: 125, ox: 236 }), c: cap('前腳提膝', 'Lift the lead knee') },
       { d: 260, p: P({ t: -14, fN: { x: 82, y: 22 }, ftN: 178, ox: 240, ot: -10, hit: 1 }), e: 'out', c: cap('髖部前推，用前腳掌把對方推開', 'Push the hips forward and drive the ball of the foot into their stomach') },
       { d: 260, p: P({ t: -6, fN: { x: 32, y: 38 }, ftN: 125, ox: 262, ot: -6 }), c: cap('收腿回提膝', 'Re-chamber the knee') },
-      { d: 600, p: P({ ox: 262 }), c: cap('落回站架，距離拉開了', 'Back to stance with the distance restored') }
+      { d: 160, p: P({ x: X0 - 12, fN: { x: 32, y: 82 }, fF: { x: -10, y: 81 }, ox: 262 }) },
+      { d: 460, p: P({ ox: 262 }), c: cap('落回站架，距離拉開了', 'Back to stance with the distance restored') }
     ] },
     kick: { hit: 'shinF', trail: 'aF', frames: [
       { d: 700, p: P({ ox: 222 }), c: cap('站架', 'Stance') },
@@ -68,7 +70,7 @@
     ] },
     elbow: { hit: 'eN', trail: 'eN', frames: [
       { d: 700, p: P({ ox: 194 }), c: cap('近距離，對方在手臂範圍內', 'Close range — the opponent is inside punching distance') },
-      { d: 230, p: P({ su: -25, sl: 70, ox: 194 }), c: cap('前手手肘往後收、準備轉身', 'Draw the lead elbow back and load the hips') },
+      { d: 230, p: P({ su: 35, sl: 195, ox: 194 }), c: cap('前手手肘往後收、準備轉身', 'Draw the lead elbow back and load the hips') },
       { d: 250, p: P({ su: 96, sl: -70, t: 18, ftF: 50, ox: 194, ot: -7, oh: -18, hit: 1 }), e: 'out', c: cap('轉髖，手肘水平劃過對方臉側', 'Turn the hips and slice the elbow level across the side of the face') },
       { d: 600, p: P({ ox: 198 }), c: cap('回到護頭', 'Back to the guard') }
     ] },
@@ -80,7 +82,7 @@
     ] },
     knee: { hit: 'kF', trail: 'kF', frames: [
       { d: 700, p: P(clinchHands(205, 24, -4), { ox: 205, ot: 24, oh: 12, oa1: 50, oa2: 30 }), c: cap('在箍頸中控制對方的頭', 'Control the head in the clinch') },
-      { d: 200, p: P(clinchHands(205, 28, -6), { fF: { x: -30, y: 80 }, ox: 205, ot: 28, oh: 12, oa1: 50, oa2: 30 }), c: cap('後腿往後拉開、準備', 'Draw the rear leg back to load') },
+      { d: 200, p: P(clinchHands(205, 28, -6), { fF: { x: -42, y: 78 }, ftF: 40, ox: 205, ot: 28, oh: 12, oa1: 50, oa2: 30 }), c: cap('後腿往後拉開、準備', 'Draw the rear leg back to load') },
       { d: 240, p: P(clinchHands(205, 30, -12), { fF: { x: 30, y: 26 }, ftF: 10, ox: 205, ot: 30, oh: 14, oa1: 50, oa2: 30, hit: 1 }), e: 'out', c: cap('髖部往前推，膝蓋向前上方頂入腹部', 'Drive the hips forward and the knee up and in to the stomach') },
       { d: 600, p: P(clinchHands(205, 24, -4), { ox: 205, ot: 24, oh: 12, oa1: 50, oa2: 30 }), c: cap('收腿，保持箍頸', 'Return the leg, keep the clinch') }
     ] },
@@ -92,6 +94,11 @@
       { d: 600, p: P({ ox: 236 }), c: cap('落腳，準備反擊', 'Plant the foot, ready to fire back') }
     ] }
   };
+
+  // one-legged moments (kicks, knees, shin blocks): the hips move over the standing foot so the figure never tips over;
+  // the standing foot stays put and the partner keeps the distance the lesson drew (see KTFigure.balanceClip)
+  ['teep', 'kick', 'lowkick', 'check'].forEach(function (k) { w.KTFigure.balanceClip(CLIPS[k].frames, { base: { x: X0 } }); });
+  w.KTFigure.balanceClip(CLIPS.knee.frames, { base: { x: X0 }, partner: 'follow' });   // the clinch: you hold their head, so they move with you
 
   function makeClip(s, view, level, lang) {
     var src = CLIPS[s.id], pace = level < 1 ? 1.8 : 1;

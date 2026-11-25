@@ -9,11 +9,13 @@
   function cap(zh, en) { return { zh: zh, en: en }; }
 
   /* ---------- side view (facing +x) ---------- */
-  var SIDE = { t: 0, h: 0, fN: { x: 9, y: 78 }, fF: { x: 5, y: 78 }, ftN: 90, ftF: 90 };
-  var N_CHEST = { su: -20, sl: 95 }, F_CHEST = { fu: -24, fl: 92 };     // fists by the ribs
-  var N_CENTER = { su: 15, sl: 100 }, F_CENTER = { fu: 12, fl: 102 };  // fist on the centreline, elbow down
-  var N_OUT = { su: 88, sl: 88 }, F_OUT = { fu: 88, fl: 88 };          // punch extended
-  var F_WU = { fu: 30, fl: 130 };                                       // rear guard palm (wu sao)
+  // (hzN / hzF: how far each hand is from the centre line in the 3D view, ez: how far apart the elbows are - Wing Chun keeps the
+  //  elbows in and works on the centre line, which a side drawing cannot show)
+  var SIDE = { t: 0, h: 0, fN: { x: 9, y: 78 }, fF: { x: 5, y: 78 }, ftN: 90, ftF: 90, hzN: 1, hzF: 1, ez: 0.55 };
+  var N_CHEST = { su: -62, sl: 78, hzN: 1 }, F_CHEST = { fu: -64, fl: 76, hzF: 1 };     // fists drawn back to the sides of the chest, elbows behind
+  var N_CENTER = { su: 15, sl: 100, hzN: 0.1 }, F_CENTER = { fu: 12, fl: 102, hzF: 0.1 };  // fist on the centreline, elbow down
+  var N_OUT = { su: 84, sl: 94, hzN: 0.1 }, F_OUT = { fu: 84, fl: 94, hzF: 0.1 };          // punch extended on the centreline, elbow not locked
+  var F_WU = { fu: 30, fl: 130, hzF: 0.3 };                             // rear guard palm (wu sao)
 
   /* ---------- front view ---------- */
   // front view legs use angles (knees bend towards the viewer, so the thigh looks shorter: lT)
@@ -21,7 +23,8 @@
   var FR_STAND = { hw: 9, sw: 16, lT: 1, tu: 0, tl: 0, bu: 0, bl: 0, ftN: 90, ftF: -90,
     su: 6, sl: 3, fu: -6, fl: -3, laN: 1, laF: 1 };
   var FR_FISTS = { su: 4, sl: 178, laN: 0.5, fu: -4, fl: -178, laF: 0.5 };
-  var FR_WU_N = { su: 10, sl: -150, laN: 0.8, luN: 1 }, FR_WU_F = { fu: -10, fl: 150, laF: 0.8 };
+  // (front view: an arm drawn shorter reaches towards the viewer - the guard hands sit well in front of the chest, not on it)
+  var FR_WU_N = { su: 10, sl: -150, laN: 0.8, luN: 0.9 }, FR_WU_F = { fu: -10, fl: 150, laF: 0.8, luF: 0.9 };
 
   function clips(id) {
     var c;
@@ -65,40 +68,43 @@
         return { side: { trail: 'hN', strike: 'hN', palm: 'up', frames: [
           { d: 600, p: m(SIDE, N_CENTER, F_CHEST), c: cap('手置中線，肘尖向下', 'Hand on the centreline, elbow down') },
           { d: 320, p: m(SIDE, N_CENTER, F_CHEST), c: cap('掌心向上，沿中線向前攤出', 'Turn the palm up and send it forward along the centreline') },
-          { d: 900, p: m(SIDE, { su: 42, sl: 92 }, F_CHEST), c: cap('肘離身約一拳，前臂斜向中線，用手臂外側把來力向外引開', 'Elbow about a fist from the body, forearm angled to the centre — the arm guides incoming force aside') },
-          { d: 400, p: m(SIDE, { su: 42, sl: 92 }, F_CHEST), c: cap('轉腕收回', 'Circle the wrist and return') }
+          { d: 900, p: m(SIDE, { su: 22, sl: 84, hzN: 0.3 }, F_CHEST), c: cap('肘離身約一拳，前臂斜向中線，用手臂外側把來力向外引開', 'Elbow about a fist from the body, forearm angled to the centre — the arm guides incoming force aside') },
+          { d: 400, p: m(SIDE, { su: 22, sl: 84, hzN: 0.3 }, F_CHEST), c: cap('轉腕收回', 'Circle the wrist and return') }
         ] } };
       case 'bong':
         return { front: { trail: 'eN', strike: 'eN', frames: [
           { d: 600, p: m(FRONT, FR_WU_N, FR_WU_F), c: cap('雙手護中線（護手）', 'Both hands guard the centreline (wu sao)') },
           { d: 320, p: m(FRONT, FR_WU_N, FR_WU_F), c: cap('以肩為軸，手肘向外、向上轉起', 'Rotate from the shoulder: the elbow turns out and up') },
-          { d: 1000, p: m(FRONT, { su: 100, sl: -65, laN: 1, luN: 0.55 }, FR_WU_F), c: cap('肘高於腕，前臂斜向下指向中線；另一手護在中線後方', 'Elbow above the wrist, forearm slanting down to the centre; the other hand guards behind it') },
-          { d: 400, p: m(FRONT, { su: 100, sl: -65, laN: 1, luN: 0.55 }, FR_WU_F), c: cap('放鬆還原，膀手不是硬頂', 'Relax back — bong sao deflects, it never pushes hard') }
+          { d: 1000, p: m(FRONT, { su: 100, sl: -65, laN: 0.9, luN: 0.4 }, FR_WU_F), c: cap('肘高於腕，前臂斜向下指向中線；另一手護在中線後方', 'Elbow above the wrist, forearm slanting down to the centre; the other hand guards behind it') },
+          { d: 400, p: m(FRONT, { su: 100, sl: -65, laN: 0.9, luN: 0.4 }, FR_WU_F), c: cap('放鬆還原，膀手不是硬頂', 'Relax back — bong sao deflects, it never pushes hard') }
         ] } };
       case 'fuk':
         return { side: { trail: 'hN', strike: 'hN', palm: 'hook', frames: [
           { d: 600, p: m(SIDE, N_CENTER, F_CHEST), c: cap('手置中線，肘尖向下', 'Hand on the centreline, elbow down') },
           { d: 420, p: m(SIDE, N_CENTER, F_CHEST), c: cap('手掌向前伸出，掌心向下、腕關節微屈成鉤', 'Extend forward, palm down, wrist bent into a soft hook') },
-          { d: 1000, p: m(SIDE, { su: 45, sl: 90 }, F_CHEST), c: cap('肘尖向內收回中線，以手腕和前臂「伏」住對方手臂', 'Bring the elbow in to the centre; the wrist and forearm rest on and control the other arm') },
-          { d: 400, p: m(SIDE, { su: 45, sl: 90 }, F_CHEST), c: cap('保持放鬆，不壓不頂', 'Stay relaxed — don\'t press down or push') }
+          { d: 1000, p: m(SIDE, { su: 45, sl: 90, hzN: 0.1 }, F_CHEST), c: cap('肘尖向內收回中線，以手腕和前臂「伏」住對方手臂', 'Bring the elbow in to the centre; the wrist and forearm rest on and control the other arm') },
+          { d: 400, p: m(SIDE, { su: 45, sl: 90, hzN: 0.1 }, F_CHEST), c: cap('保持放鬆，不壓不頂', 'Stay relaxed — don\'t press down or push') }
         ] } };
       case 'pak':
         return { front: { trail: 'hN', strike: 'hN', frames: [
-          { d: 600, p: m(FRONT, { su: 20, sl: 175, laN: 0.7 }, FR_WU_F), c: cap('手掌在本側肩前，準備', 'Open hand in front of the same-side shoulder, ready') },
-          { d: 150, p: m(FRONT, { su: 20, sl: 175, laN: 0.7 }, FR_WU_F), e: 'out', c: cap('以掌心向中線短促拍出，不超過中線太多', 'A short, sharp slap with the palm towards the centreline — don\'t over-travel') },
-          { d: 500, p: m(FRONT, { su: -5, sl: -140, laN: 0.8 }, FR_WU_F), c: cap('拍開來拳，另一手準備同時反擊', 'Clear the incoming punch while the other hand prepares to strike') },
-          { d: 350, p: m(FRONT, { su: -5, sl: -140, laN: 0.8 }, FR_WU_F), c: cap('收回護位', 'Return to guard') }
+          { d: 600, p: m(FRONT, { su: 20, sl: 175, laN: 0.7, luN: 0.9 }, FR_WU_F), c: cap('手掌在本側肩前，準備', 'Open hand in front of the same-side shoulder, ready') },
+          { d: 150, p: m(FRONT, { su: 20, sl: 175, laN: 0.7, luN: 0.9 }, FR_WU_F), e: 'out', c: cap('以掌心向中線短促拍出，不超過中線太多', 'A short, sharp slap with the palm towards the centreline — don\'t over-travel') },
+          { d: 500, p: m(FRONT, { su: -5, sl: -140, laN: 0.8, luN: 0.8 }, FR_WU_F), c: cap('拍開來拳，另一手準備同時反擊', 'Clear the incoming punch while the other hand prepares to strike') },
+          { d: 350, p: m(FRONT, { su: -5, sl: -140, laN: 0.8, luN: 0.8 }, FR_WU_F), c: cap('收回護位', 'Return to guard') }
         ] } };
       case 'kick':
-        var st = { t: 0, h: 0, fF: { x: 3, y: 84 }, ftF: 90 };
+        var st = { t: 0, h: 0, fF: { x: 3, y: 78 }, ftF: 90, hzN: 1, hzF: 1, ez: 0.55 };   // the support knee stays bent, as in the stance
         var arms = m(N_CENTER, F_WU);
-        return { side: { trail: 'aN', strike: 'aN', frames: [
-          { d: 600, p: m(st, arms, { tu: 4, tl: 0, ftN: 90 }), c: cap('二字鉗羊馬上，雙手護中線', 'From the stance, hands guarding the centreline') },
-          { d: 220, p: m(st, arms, { tu: 72, tl: -24, ftN: 66 }), c: cap('沿中線提膝，重心移到支撐腿', 'Lift the knee along the centreline, weight onto the support leg') },
-          { d: 170, p: m(st, arms, { tu: 60, tl: 60, ftN: 150 }), e: 'out', c: cap('腳尖向上，以腳跟向前直蹬，高度約在腹部', 'Toes up, drive straight out with the heel at about stomach height') },
-          { d: 260, p: m(st, arms, { tu: 72, tl: -24, ftN: 66 }), c: cap('收回提膝，再落回馬步', 'Re-chamber, then settle back into the stance') },
-          { d: 420, p: m(st, arms, { tu: 4, tl: 0, ftN: 90 }) }
-        ] } };
+        var kf = [
+          { d: 600, p: m(st, arms, { tu: 33.5, tl: -20.3, ftN: 90 }), c: cap('二字鉗羊馬上，雙手護中線', 'From the stance, hands guarding the centreline') },
+          { d: 220, p: m(st, arms, { tu: 78, tl: -24, ftN: 82 }), c: cap('沿中線提膝，重心移到支撐腿', 'Lift the knee along the centreline, weight onto the support leg') },
+          { d: 170, p: m(st, arms, { t: -6, tu: 80, tl: 80, ftN: 170 }), e: 'out', c: cap('腳尖向上，以腳跟向前直蹬，高度約在腹部', 'Toes up, drive straight out with the heel at about stomach height') },
+          { d: 260, p: m(st, arms, { tu: 78, tl: -24, ftN: 82 }), c: cap('收回提膝，再落回馬步', 'Re-chamber, then settle back into the stance') },
+          { d: 420, p: m(st, arms, { tu: 33.5, tl: -20.3, ftN: 90 }) }
+        ];
+        // (on one leg the hips move over the standing foot - see KTFigure.balanceClip)
+        w.KTFigure.balanceClip(kf, { base: { x: 175 } });
+        return { side: { trail: 'aN', strike: 'aN', frames: kf } };
     }
   }
 

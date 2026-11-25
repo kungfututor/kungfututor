@@ -12,7 +12,7 @@
 
   var X0 = 140;
   var LEGS = { x: X0, t: 10, h: 4, fN: { x: 22, y: 82 }, fF: { x: -24, y: 82 }, ftN: 90, ftF: 70, kbN: 1, kbF: 1, lift: 0 };
-  var GUARD = { su: 55, sl: 160, fu: 40, fl: 165 };
+  var GUARD = { su: 55, sl: 160, fu: 40, fl: 165, hz: 1 };   // hz: how far apart the hands are in the 3D view
   var BASE = m(KP.base, { hit: 0, g: 0, ox: 262 });
   function P() { return m.apply(null, [BASE, LEGS, GUARD].concat([].slice.call(arguments))); }
   var PUNCH = { oa1: 90, oa2: 90, ot: 6 };          // attacker's straight punch
@@ -25,19 +25,22 @@
       { d: 500, p: P({ ox: 262, su: 60, sl: 150 }), c: cap('雙手在臉前，掌心可以張開或握拳', 'Hands up in front of the face, open or closed') },
       { d: 900, p: P({ ox: 262 }), c: cap('下巴收、重心在前腳掌，隨時可以前進或後退', 'Chin down, weight on the balls of the feet, ready to move either way') }
     ] },
+    // pressing forward: every punch comes with a short shuffle step (about 10 units), so the body really travels; the burst ends
+    // with stepping back out of range
     burst: { hit: 'hNF', trail: 'hF', frames: [
       { d: 600, p: P({ ox: 220 }), c: cap('戒備姿勢', 'Fighting stance') },
-      { d: 200, p: P({ x: X0 + 6, t: 12, su: 90, sl: 90, ox: 220, ot: -5, hit: 1 }), e: 'out', c: cap('前手直拳', 'Lead straight punch') },
-      { d: 100, p: P({ x: X0 + 6, ox: 222 }) },
-      { d: 200, p: P({ x: X0 + 10, t: 22, fu: 92, fl: 90, fF: { x: -20, y: 81 }, ftF: 35, ox: 226, ot: -9, oh: -10, hit: 1 }), e: 'out', c: cap('後手直拳，一邊往前壓', 'Rear straight punch while you keep moving forward') },
-      { d: 100, p: P({ x: X0 + 14, ox: 232 }) },
-      { d: 200, p: P({ x: X0 + 18, t: 12, su: 90, sl: 90, ox: 236, ot: -6, hit: 1 }), e: 'out', c: cap('不停頓地連續出拳，直到創造離開的機會', 'Keep firing without pausing until you have a chance to get away') },
-      { d: 600, p: P({ ox: 244 }) }
+      { d: 200, p: P({ x: X0 + 10, t: 12, su: 90, sl: 90, ox: 228, ot: -5, hit: 1 }), e: 'out', c: cap('前手直拳', 'Lead straight punch') },
+      { d: 100, p: P({ x: X0 + 10, ox: 230 }) },
+      { d: 200, p: P({ x: X0 + 22, t: 22, fu: 92, fl: 90, fF: { x: -20, y: 81 }, ftF: 35, ox: 240, ot: -9, oh: -10, hit: 1 }), e: 'out', c: cap('後手直拳，一邊往前壓', 'Rear straight punch while you keep moving forward') },
+      { d: 100, p: P({ x: X0 + 22, ox: 244 }) },
+      { d: 200, p: P({ x: X0 + 34, t: 12, su: 90, sl: 90, ox: 252, ot: -6, hit: 1 }), e: 'out', c: cap('不停頓地連續出拳，直到創造離開的機會', 'Keep firing without pausing until you have a chance to get away') },
+      { d: 450, p: P({ x: X0 + 34, ox: 256 }) },
+      { d: 600, p: P({ ox: 252 }) }
     ] },
     inside: { hit: 'hF', trail: 'hN', frames: [
       { d: 700, p: P({ ox: 222 }), c: cap('戒備姿勢', 'Fighting stance') },
       { d: 180, p: P(PUNCH, { ox: 222, oa1: 70, oa2: 110 }), c: cap('對方直拳打來', 'A straight punch comes in') },
-      { d: 220, p: P(PUNCH, { t: 16, su: 72, sl: 112, fu: 92, fl: 90, fF: { x: -20, y: 81 }, ftF: 35, ox: 222, oh: -12, hit: 1 }), e: 'out', c: cap('前手掌把拳撥開，同時後手直拳反擊', 'The lead palm redirects the punch while the rear hand punches back at the same time') },
+      { d: 220, p: P(PUNCH, { t: 16, su: 72, sl: 112, hz: 0.35, fu: 92, fl: 90, fF: { x: -20, y: 81 }, ftF: 35, ox: 222, oh: -12, hit: 1 }), e: 'out', c: cap('前手掌把拳撥開，同時後手直拳反擊', 'The lead palm redirects the punch while the rear hand punches back at the same time') },
       { d: 300, p: P({ ox: 230 }), c: cap('繼續反擊或脫離', 'Keep countering or break away') },
       { d: 500, p: P({ ox: 232 }) }
     ] },
@@ -58,8 +61,9 @@
     kick: { hit: 'tF', trail: 'aF', frames: [
       { d: 700, p: P({ ox: 232 }), c: cap('戒備姿勢，對方在一腿距離', 'Fighting stance, a leg\'s length away') },
       { d: 170, p: P({ t: 4, fF: { x: 24, y: 36 }, ftF: 60, ox: 232 }), c: cap('後腿提膝', 'Lift the rear knee') },
-      { d: 170, p: P({ t: -4, fF: { x: 66, y: 24 }, ftF: 120, ox: 232, ot: 18, oh: 10, hit: 1 }), e: 'out', c: cap('小腿向上彈出，用腳背或脛骨踢向鼠蹊部', 'Snap the lower leg up, striking the groin with the instep or shin') },
+      { d: 170, p: P({ t: -4, fF: { x: 66, y: 14 }, ftF: 120, ox: 232, ot: 18, oh: 10, hit: 1 }), e: 'out', c: cap('小腿向上彈出，用腳背或脛骨踢向鼠蹊部', 'Snap the lower leg up, striking the groin with the instep or shin') },
       { d: 220, p: P({ t: 4, fF: { x: 24, y: 36 }, ftF: 60, ox: 236, ot: 22 }), c: cap('快速收腿', 'Snap the leg back') },
+      { d: 380, p: P({ ox: 238, ot: 16 }) },                                     // the foot comes down in the stance first, then both feet step back
       { d: 600, p: P({ x: X0 - 22, ox: 238, ot: 10 }), c: cap('落地後退、離開', 'Plant, step back and leave') }
     ] },
     knee: { hit: 'kF', trail: 'kF', frames: [
@@ -76,6 +80,10 @@
       { d: 800, p: P({ x: X0 - 70, ox: 230, ot: 8 }), c: cap('往安全的地方離開，求助並報警', 'Move to safety, get help and call the police') }
     ] }
   };
+
+  // one-legged moments (kicks): the hips move over the standing foot so the figure never tips over;
+  // the standing foot stays put and the partner keeps the distance the lesson drew (see KTFigure.balanceClip)
+  ['kick'].forEach(function (k) { w.KTFigure.balanceClip(CLIPS[k].frames, { base: { x: X0 } }); });
 
   function makeClip(s, view, level) {
     var src = CLIPS[s.id], pace = level < 1 ? 1.8 : 1;

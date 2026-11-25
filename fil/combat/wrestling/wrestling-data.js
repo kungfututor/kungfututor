@@ -12,7 +12,8 @@
   function cap(zh, en) { return { zh: zh, en: en }; }
 
   var X0 = 140, RED = '#C8372D', BLUE = '#2F5DA8';
-  var LEGS = { x: X0, t: 22, h: -8, fN: { x: 26, y: 72 }, fF: { x: -30, y: 74 }, ftN: 90, ftF: 70, kbN: 1, kbF: 1, lift: 0, face: 1 };
+  // (fz: how far apart the feet are sideways in the 3D view - a wrestling stance is wider than the shoulders)
+  var LEGS = { x: X0, t: 22, h: -8, fN: { x: 26, y: 72 }, fF: { x: -30, y: 74 }, ftN: 90, ftF: 70, kbN: 1, kbF: 1, lift: 0, face: 1, fz: 2.6 };
   var HANDS = { su: 52, sl: 100, fu: 42, fl: 104, laN: 1 };      // wrestling stance: hands in front, elbows in
   var PH = { oa1: 52, oa2: 100, ob1: 42, ob2: 104 };
   var BASE = m(KP.base, PH, { hit: 0, ox: 240, ot: 20, oh: -6, ola: 26, olb: 6, ol: 26, olf: 14, olift: 0 });

@@ -38,8 +38,8 @@
     ] },
     shrimp: { hit: null, trail: 'hip', frames: [
       { d: 800, p: ab({ ox: 660, x: 210, y: 204, t: -86, fN: { x: 250, y: 211 }, fF: { x: 244, y: 211 }, kbN: 1, kbF: 1, su: 150, sl: 120, fu: 140, fl: 110 }), c: cap('仰躺，雙膝彎起，雙腳踩地，手肘貼身', 'Lie on your back, knees bent, feet flat, elbows in') },
-      { d: 500, p: ab({ ox: 660, x: 212, y: 194, t: -72, fN: { x: 250, y: 211 }, fF: { x: 244, y: 211 }, kbN: 1, kbF: 1, su: 150, sl: 120, fu: 140, fl: 110 }), c: cap('用腳推地，臀部抬起，轉到一側肩膀', 'Push off one foot, lift the hips and turn onto one shoulder') },
-      { d: 500, p: ab({ ox: 660, x: 186, y: 200, t: -58, fN: { x: 238, y: 210 }, fF: { x: 226, y: 206 }, kbN: 1, kbF: 1, su: 110, sl: 100, fu: 100, fl: 90, hit: 0 }), e: 'out', c: cap('把臀部往後推開，身體縮成側躺的蝦形', 'Drive your hips back, away from your feet, curling onto your side like a shrimp') },
+      { d: 500, p: ab({ ox: 660, x: 212, y: 190, t: -104, h: 14, fN: { x: 250, y: 211 }, fF: { x: 244, y: 211 }, kbN: 1, kbF: 1, su: 150, sl: 120, fu: 140, fl: 110 }), c: cap('用腳推地，臀部抬起，轉到一側肩膀', 'Push off one foot, lift the hips and turn onto one shoulder') },
+      { d: 500, p: ab({ ox: 660, x: 186, y: 200, t: -84, h: 16, fN: { x: 238, y: 210 }, fF: { x: 226, y: 206 }, kbN: 1, kbF: 1, su: 110, sl: 100, fu: 100, fl: 90, hit: 0 }), e: 'out', c: cap('把臀部往後推開，身體縮成側躺的蝦形', 'Drive your hips back, away from your feet, curling onto your side like a shrimp') },
       { d: 800, p: ab({ ox: 660, x: 186, y: 204, t: -86, fN: { x: 226, y: 211 }, fF: { x: 220, y: 211 }, kbN: 1, kbF: 1, su: 150, sl: 120, fu: 140, fl: 110 }), c: cap('回到仰躺，再做一次 —— 這樣就在地上製造了空間', 'Back flat and repeat — you have made space on the ground') }
     ] },
     upa: { hit: 'hip', trail: 'hip', frames: [

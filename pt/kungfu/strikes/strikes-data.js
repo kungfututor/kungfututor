@@ -9,7 +9,9 @@
   function cap(zh, en) { return { zh: zh, en: en }; }
 
   /* ---------- pose parts (side view, facing +x) ---------- */
-  var FIST_N = { su: -22, sl: 80 }, FIST_F = { fu: -26, fl: 78 };          // fists chambered at the waist
+  var FIST_N = { su: -48, sl: 62 }, FIST_F = { fu: -50, fl: 60 };          // fists chambered at the sides of the waist: elbows drawn back, fists beside the body
+  // hands on the hips, elbows out to the sides (seen from the side both parts of the arm look shorter: luN / laN)
+  var HIPS = { su: -4, sl: 4, luN: 0.75, laN: 0.78, fu: -6, fl: 2, luF: 0.75, laF: 0.78 };
   var BOW = { t: 0, h: 0, fN: { x: 42, y: 58 }, fF: { x: -66, y: 58 }, ftN: 90, ftF: 90 };
   var STAND_KICK = { t: 0, h: 0, fF: { x: -3, y: 87 }, ftF: 90, tu: 3, tl: 0, ftN: 90 };   // far leg supports, near leg kicks
 
@@ -48,7 +50,7 @@
         { d: 420, p: stand }
       ];
     } else if (kind === 'heel') {
-      var ch2 = m(stand, { t: -4, tu: 60 + 35 * h, tl: -25, ftN: 65 });
+      var ch2 = m(stand, { t: -4, tu: 70 + 35 * h, tl: -25, ftN: 90 });          // knee high, toes pulled back towards the shin
       var ex2 = m(stand, { t: -8, tu: 60 + 28 * h, tl: 60 + 28 * h, ftN: 150 + 28 * h });
       F = [
         { d: 500, p: stand, c: cap('並步站立，雙拳抱腰', 'Stand with feet together, fists at the waist') },
@@ -68,7 +70,8 @@
         { d: 420, p: stand }
       ];
     } else {  // front stretch kick — straight-leg swing
-      var up = m(stand, { h: -4, tu: 100 + 60 * h, tl: 100 + 60 * h, ftN: 190 + 60 * h });
+      stand = m(STAND_KICK, HIPS);
+      var up = m(stand, { h: -4, tu: 95 + 52 * h, tl: 95 + 52 * h, ftN: 185 + 52 * h });
       F = [
         { d: 520, p: stand, c: cap('並步站立，雙手叉腰或側平舉', 'Feet together, hands on hips or arms out to the sides') },
         { d: 280, p: m(stand, { tu: 30, tl: 30, ftN: 120 }), e: 'in' },

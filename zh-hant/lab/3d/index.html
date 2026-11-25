@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>3D動作實驗室 — 把教練轉過來，慢下來 | KungfuTutor</title>
-<meta name="description" content="一位可旋轉360°、可放慢至四分之一速度並逐格拖動的3D武術與健身教練——50個動作，涵蓋功夫馬步與太極，至泰拳、拳擊、摔抱、自衛及健身房舉重。">
+<meta name="description" content="一位3D武術與健身教練，你可以旋轉360°、以四分之一速度慢放，並逐格拖曳查看——108個動作，涵蓋功夫馬步、詠春、24式太極拳，以及拳擊、泰拳、Lethwei、棍術、自衛和健身房舉重。">
 <meta property="og:title" content="KungfuTutor 3D動作實驗室 — 看清每一個角度">
 <!-- kt:alternates -->
 <link rel="alternate" hreflang="en" href="https://kungfututor.com/lab/3d/">
@@ -126,6 +126,7 @@
           <button class="main" type="button" id="lab-play" aria-pressed="true">❚❚ Pause</button>
           <button class="soft" type="button" id="lab-next" data-zh="下一步 ▸" data-en="Next step ▸"></button>
           <button class="soft" type="button" id="lab-reset" data-zh="重來" data-en="Reset"></button>
+          <button class="soft" type="button" id="lab-mirror" aria-pressed="false" data-zh="左右互換" data-en="Swap left / right"></button>
           <div class="grp" role="group" aria-label="Speed">
             <button type="button" data-speed="0.25" aria-pressed="false">0.25×</button><button type="button" data-speed="0.5" aria-pressed="false">0.5×</button><button type="button" data-speed="1" aria-pressed="true">1×</button>
           </div>
@@ -185,6 +186,9 @@
 <script src="../../combat/wrestling/wrestling-data.js"></script>
 <script src="../../self-defence/basics/sd-data.js"></script>
 <script src="../../self-defence/krav-maga/krav-data.js"></script>
+<script src="../../kungfu/wing-chun/wingchun-data.js"></script>
+<script src="../../combat/sambo/sambo-data.js"></script>
+<script src="../../combat/fma/fma-data.js"></script>
 <script type="module" src="lab3d.js"></script>
 </body>
 </html>
