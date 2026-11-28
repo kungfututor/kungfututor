@@ -110,19 +110,31 @@ var MOVES = [
   mv('strike', 'LETHWEI', 'cover'),
   // MMA: the opponent is drawn in every lesson (strikes: a little further off than the stick figures — bodies have thickness); in the mount (ground and pound) your knees are on the mat either side of them
   mv('strike', 'MMA', 'stance', { duo: 1 }), mv('strike', 'MMA', 'onetwo', { duo: 1, odx: 30 }), mv('strike', 'MMA', 'overhand', { duo: 1, odx: 30 }), mv('strike', 'MMA', 'lowkick', { duo: 1, odx: 16 }),
-  mv('strike', 'MMA', 'double', { duo: 1, fix: ON_TOP, holds: doubleLegHolds() }), mv('strike', 'MMA', 'sprawl', { duo: 1 }),
-  mv('strike', 'MMA', 'gnp', { duo: 1, fix: { 0: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 }, 1: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 }, 2: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 }, 3: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 } } }), mv('strike', 'MMA', 'standup', { duo: 1 }),
+  mv('strike', 'MMA', 'double', { duo: 1, fix: ON_TOP, holds: doubleLegHolds() }), mv('strike', 'MMA', 'sprawl', { duo: 1, onThem: [2, 3], fix: { 1: { ox: 222 }, 2: { ox: 252 }, 3: { ox: 252 } }, holds: [   // (sprawled: chest on their upper back, their head under your chest, hands pressing head and shoulders; they are further out than the drawing, which lays your hips on their shoulders)
+    { by: 'me', hand: 'N', bone: 'Neck', at: [-0.08, 0.04, 0], on: [2, 3] }, { by: 'me', hand: 'F', bone: 'Spine2', at: [-0.1, 0.06, 0.12], on: [2, 3] }] }),
+  mv('strike', 'MMA', 'gnp', { duo: 1, fix: { 0: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 }, 1: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 }, 2: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 }, 3: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 } } , holds: [   // (mounted, their hands on your hips to push and bridge — your chest, upright, is out of their reach)
+    { by: 'partner', hand: 'N', bone: 'Hips', at: [0.06, 0.02, 0.14], on: [0, 1, 2, 3], reach: 1 }, { by: 'partner', hand: 'F', bone: 'Hips', at: [0.06, 0.02, -0.14], on: [0, 1, 2, 3], reach: 1 }] }), mv('strike', 'MMA', 'standup', { duo: 1 }),
   mv('strike', 'FMA', 'stance', { stick: 1 }), mv('strike', 'FMA', 'forehand', { stick: 1 }), mv('strike', 'FMA', 'backhand', { stick: 1 }),
   mv('strike', 'FMA', 'thrust', { stick: 1 }), mv('strike', 'FMA', 'eight', { stick: 1 }), mv('strike', 'FMA', 'roof', { stick: 1 }),
   mv('strike', 'FMA', 'disarm', { stick: 1 }), mv('strike', 'FMA', 'empty'),
   // (double-leg takedown and sprawl lean on an opponent, and the technical stand-up props the body on a hand behind the hips:
   //  they come back with the two-person / ground moves, which need their own floor-support handling)
   // wrestling: a 2D 'lying' pose leaning forward (UP, FLAT) is face down in 3D — the turns onto the back are rolls (oroll)
-  mv('grapple', 'WRESTLING', 'stance', { duo: 1 }), mv('grapple', 'WRESTLING', 'double', { duo: 1, fix: ON_TOP, holds: doubleLegHolds() }), mv('grapple', 'WRESTLING', 'sprawl', { duo: 1 }),
+  mv('grapple', 'WRESTLING', 'stance', { duo: 1 }), mv('grapple', 'WRESTLING', 'double', { duo: 1, fix: ON_TOP, holds: doubleLegHolds() }), mv('grapple', 'WRESTLING', 'sprawl', { duo: 1, onThem: [2, 3], fix: { 1: { ox: 222 }, 2: { ox: 252 }, 3: { ox: 252 } }, holds: [   // (sprawled: chest on their upper back, their head under your chest, hands pressing head and shoulders; they are further out than the drawing, which lays your hips on their shoulders)
+    { by: 'me', hand: 'N', bone: 'Neck', at: [-0.08, 0.04, 0], on: [2, 3] }, { by: 'me', hand: 'F', bone: 'Spine2', at: [-0.1, 0.06, 0.12], on: [2, 3] }] }),
   mv('grapple', 'WRESTLING', 'armdrag', { duo: 1 }), mv('grapple', 'WRESTLING', 'bodylock', { duo: 1, fix: { 4: { t: 60, oa1: 100, oa2: 102, ob1: 98, ob2: 100 } }, holds: bodyLockHolds() }),
-  mv('grapple', 'WRESTLING', 'gutwrench', { duo: 1, fix: { 0: { oroll: 0 }, 1: { oroll: 0 }, 2: { oroll: 90, oa1: 40, oa2: 70, ob1: 30, ob2: 60 }, 3: { oroll: 180 } } }),   // (rolled over, their arms stay in at the chest)
-  mv('grapple', 'WRESTLING', 'standup', { duo: 1 }),
-  mv('grapple', 'WRESTLING', 'halfnelson', { duo: 1, fix: { 0: { oroll: 0 }, 1: { oroll: 0 }, 2: { oroll: 90 }, 3: { oroll: 180 } } }),
+  mv('grapple', 'WRESTLING', 'gutwrench', { duo: 1, onThem: [1, 2, 3], holds: [   // (hands locked round their waist, under the stomach, and kept through the roll)
+    { by: 'me', hand: 'N', bone: 'Spine', at: [0.13, 0, 0.05], on: [1, 2, 3] }, { by: 'me', hand: 'F', bone: 'Spine', at: [0.13, 0, -0.05], on: [1, 2, 3] }], fix: { 0: { oroll: 0 }, 1: { oroll: 0 }, 2: { oroll: 90, oa1: 40, oa2: 70, ob1: 30, ob2: 60 }, 3: { oroll: 180, t: 78 } } }),   // (rolled over, their arms stay in at the chest)
+  // (on hands and knees at the start: the hips at kneeling height, not standing height — drawn without one, the knees hung
+  //  in the air and the body sank flat to reach the mat)
+  mv('grapple', 'WRESTLING', 'standup', { duo: 1, odx: 14, fix: { 0: { t: 70 }, 1: { ot: 35 } }, holds: [
+    // their arms locked round your waist while you rise (they come up with you); standing, your hands take theirs to peel them off
+    { by: 'partner', hand: 'N', bone: 'Spine', at: [0.13, 0, 0.05], on: [0, 1, 2] }, { by: 'partner', hand: 'F', bone: 'Spine', at: [0.13, 0, -0.05], on: [0, 1, 2] },
+    { by: 'me', hand: 'N', bone: 'RightHand', at: [0, 0, 0], on: [2] }, { by: 'me', hand: 'F', bone: 'LeftHand', at: [0, 0, 0], on: [2] }] }),
+  mv('grapple', 'WRESTLING', 'halfnelson', { duo: 1, oz: 30, onThem: [3], holds: [   // (arm under their armpit, hand on the back of the neck, kept through the turn; pinned, the other hand on their chest)
+    { by: 'me', hand: 'N', bone: 'Neck', at: [-0.08, 0.03, 0], on: [1, 2, 3] }, { by: 'me', hand: 'F', bone: 'Spine2', at: [0.1, 0, 0], on: [2, 3] }],
+    // (beside them at their shoulders, not level with their hips: the drawing lays them in line in front of your knees)
+    fix: { 0: { oroll: 0, ox: 216 }, 1: { oroll: 0, ox: 216 }, 2: { oroll: 90, ox: 214 }, 3: { oroll: 180, ox: 222 } } }),
   mv('grapple', 'JUDO', 'stance', { duo: 1, oz: 10, fix: { 0: { ox: 296 }, 1: { ox: 296 } }, holds:   // (bow further apart: heads have size)
     judoGrips([3, 4, 5], [3, 4, 5], [3, 4, 5], [3, 4, 5]) }),
   mv('grapple', 'JUDO', 'breakfall'),
@@ -179,14 +191,23 @@ var MOVES = [
   mv('grapple', 'SAMBO', 'anklelock', { duo: 1, fix: { 0: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 1: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 2: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 3: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 } } }),   // (lying back, arms on the mat by their sides)
   mv('grapple', 'SAMBO', 'combat', { duo: 1, oz: 10, holds: judoGrips([3, 4], [3, 4], null, null) }),   // (gloves: the grips go as they fall — you stay up with your guard ready) // BJJ (ground): in the guard your knees go out round their waist, ankles crossed behind; in the mount your knees are on the
   // mat either side of them; in side control you are turned across their chest (myaw); on top of you they kneel astride (ospread)
-  mv('grapple', 'BJJ', 'guard', { duo: 1, odx: 14, fix: { 0: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 1: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 2: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 3: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 } } }), mv('grapple', 'BJJ', 'shrimp'),
+  mv('grapple', 'BJJ', 'guard', { duo: 1, odx: 2, fix: { 0: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0, ot: 50 }, 1: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0, ot: 50 }, 2: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0, ot: 62 }, 3: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0, ot: 62 } },
+    // their hands post on your chest and belly (posture); you grip the collar and the sleeve
+    holds: [{ by: 'partner', hand: 'N', bone: 'Spine2', at: [0.14, 0.02, 0], on: [0, 1, 2, 3], reach: 1 }, { by: 'partner', hand: 'F', bone: 'Spine', at: [0.14, 0, 0.08], on: [0, 1, 2, 3], reach: 1 },
+      { by: 'me', hand: 'N', bone: 'Spine2', at: [0.16, 0.06, -0.08], bend: [0, -1, 0], on: [1, 2, 3], reach: 1 }, { by: 'me', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: [1, 2, 3], reach: 1 }] }), mv('grapple', 'BJJ', 'shrimp'),
   // mount escape: you bridge and turn onto your shoulder, and they roll over SIDEWAYS onto their back (oroll) — the 2D
   // drawing can only show it as a dive over your head, and its last frame drawn in 3D would be them face down
   mv('grapple', 'BJJ', 'upa', { duo: 1, carry: [0, 1, 2, 3], fix: { 0: { ola: 70, olb: -90, ol: -70, olf: 90, kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ospread: 24, oroll: 0 }, 1: { ola: 70, olb: -90, ol: -70, olf: 90, kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ospread: 24, oroll: 0 }, 2: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, oa1: 70, oa2: 40, ob1: 64, ob2: 36, olift: 8, ospread: 24, oroll: 0 }, 3: { ot: 88, oh: 0, ola: -88, olb: -92, ol: 88, olf: 92, oa1: 150, oa2: 130, ob1: 140, ob2: 120, kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ox: 168, olift: 10, ospread: 0, oroll: 90, face: -1, x: 228, y: 176, t: 30, fN: { x: 196, y: 209 }, fF: { x: 190, y: 209 }, ftN: -90, ftF: -90, su: 60, sl: 80, fu: 50, fl: 70 }, 4: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ospread: 0, oroll: 180 } } }),
   mv('grapple', 'BJJ', 'hipbump', { duo: 1, odx: 14, fix: { 0: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 1: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 2: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 3: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 4: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6, myaw: 0 } } }),
   mv('grapple', 'BJJ', 'kneecut', { duo: 1, fix: { 0: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 1: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 2: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 3: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 90 } } }),
   mv('grapple', 'BJJ', 'mount', { duo: 1, fix: { 0: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 90 }, 1: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 45 }, 2: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6, myaw: 0 }, 3: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6, myaw: 0 } } }),
-  mv('grapple', 'BJJ', 'armbar', { duo: 1, odx: 14, fix: { 0: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 1: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 2: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 3: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 } } }), mv('grapple', 'BJJ', 'rnc', { duo: 1 }),
+  mv('grapple', 'BJJ', 'armbar', { duo: 1, odx: 2, fix: { 0: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0, ot: 62 }, 1: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ot: 50 }, 2: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ot: 56 }, 3: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0, ot: 62 } },
+    // their hand on your chest (as the lesson says — drawn reaching down it counted as a hand on the mat and dropped them);
+    // you hug that arm with both hands; pulled forward, their posture breaks as your leg comes over
+    holds: [{ by: 'partner', hand: 'N', bone: 'Spine2', at: [0.14, 0.02, 0], on: [0, 1, 2, 3], reach: 1 }, { by: 'partner', hand: 'F', bone: 'Spine', at: [0.14, 0, 0.08], on: [0, 1, 2, 3], reach: 1 },
+      { by: 'me', hand: 'N', bone: 'RightForeArm', at: [0, -0.05, 0], on: [1, 2], reach: 1 }, { by: 'me', hand: 'F', bone: 'RightHand', at: [0, 0, 0], on: [1, 2], reach: 1 }] }), mv('grapple', 'BJJ', 'rnc', { duo: 1, fix: { 0: { olift: 5 }, 1: { olift: 5 }, 2: { olift: 5 }, 3: { olift: 5 } }, holds: [   // (choking arm round the neck, other hand behind their head; their hands pull at your choking arm)
+    { by: 'me', hand: 'N', bone: 'Neck', at: [0.1, 0, 0.05], on: [1, 2] }, { by: 'me', hand: 'F', bone: 'Head', at: [-0.1, 0.04, 0], on: [2] },
+    { by: 'partner', hand: 'N', bone: 'RightForeArm', at: [0, -0.04, 0], on: [1, 2] }, { by: 'partner', hand: 'F', bone: 'RightForeArm', at: [0, 0.06, 0], on: [1, 2] }] }),
   mv('defence', 'SELFDEF', 'fence'), mv('defence', 'SELFDEF', 'distance'), mv('defence', 'SELFDEF', 'palm'), mv('defence', 'SELFDEF', 'hammer'),
   mv('defence', 'SELFDEF', 'elbow'), mv('defence', 'SELFDEF', 'kick'), mv('defence', 'SELFDEF', 'cover'),
   mv('defence', 'KRAV', 'stance'), mv('defence', 'KRAV', 'burst'), mv('defence', 'KRAV', 'inside'), mv('defence', 'KRAV', 'outside'),
@@ -1342,7 +1363,10 @@ function poseAvatar(n, theta, move, pins, who) {
   var gBody = 1e9;
   Object.keys(n0).forEach(function (k) { if (k !== 'head' && !/^[at][NF]$/.test(k)) gBody = Math.min(gBody, n0[k].y); });
   rest = Math.max(rest * grounded, Math.max(lying, 1 - smooth(0.05, 0.08, Math.max(0, gBody))) * (1 - maxFoot));
-  if (move && move.air) rest = 0;                           // thrown: nothing of theirs is lowered onto the mat (a trunk lying along your back is not lying on the floor)
+  if (move && move.air) rest = 0;
+  // (`onThem`, per move: on those key frames your chest rests on the partner's back or body, not on the mat — the drawing's
+  //  low trunk is them under you; lowered to the floor you sank through them, knees under the mat)
+  var kneesRest = A === avatar ? ON_THEM : 0;                // …the knees are what rest on the mat then (blended in)                           // thrown: nothing of theirs is lowered onto the mat (a trunk lying along your back is not lying on the floor)
   // standing on one leg: the body's weight moves sideways over that foot, as a person's hips do; the foot itself stays put.
   // (each foot starts under its own hip joint, so without this the weight would hang 11 cm to the side of a single standing foot)
   if (rest < 0.5 && Math.max(wH[0], wH[1]) < 0.5) {
@@ -1437,6 +1461,7 @@ function poseAvatar(n, theta, move, pins, who) {
     // lowest point of the body, leaving out limbs that end in a planted foot or hand (those are handled below)
     var lows = A.skin.lows(), low = lows[0], pen = 0;
     feet.forEach(function (f) { if (f.wo < 0.5) low = Math.min(low, lows[f.region], lows[f.region + 8]); else pen = Math.min(pen, lows[f.region + 8]); });
+    if (kneesRest > 0) low += (Math.min(lows[feet[0].region + 8], lows[feet[1].region + 8]) - low) * kneesRest;
     hands.forEach(function (H) { pen = Math.min(pen, lows[H.region + 4]); });   // arms never carry the resting body (a sunk hand is lifted on its own, below)
     // sunk into the floor → lift; a knee or elbow of a planted limb sunk → lift a little; meant to rest on the floor → lower until it touches
     // (the gap to leave is fixed on the first round, so the result varies smoothly with how firmly the lesson rests the body)
@@ -2138,7 +2163,9 @@ function bagCentre(A) {
   var fwd2 = A.fwd.clone().applyQuaternion(wquat(B.Spine2).multiply(A.RQ.Spine2.clone().invert()));
   return bk.addScaledVector(fwd2, -0.1);
 }
+var ON_THEM = 0;
 function poseOrHang(n, theta, q) {
+  ON_THEM = cur && cur.onThem ? framesW(cur.onThem, q.r) : 0;
   if (cur && cur.kit === 'lunge' && avatar) {                // both hands on top of the sandbag, near its ends
     var A0 = avatar; A0.hold = null; poseAvatar(n, theta, cur, q.pins);
     var c = bagCentre(A0), side = A0.right.clone().applyQuaternion(wquat(A0.B.Spine2).multiply(A0.RQ.Spine2.clone().invert())).normalize();
@@ -2463,6 +2490,7 @@ var CHECK_API = {
     faceQ.setFromAxisAngle(UPV, r.theta);
     var info = poseOrHang(n, r.theta, q);
     if (info && (cur.kit === 'push' || cur.kit === 'bench')) info.supported = 1;   // (leaning into the sled / lying on the bench: not standing on the feet)
+    if (info && ON_THEM > 0.5) info.supported = 1;   // (lying on the partner — your weight is on them, not over your feet)
     var pinfo = drawPartner(t, q);
     if (q.info) info = q.info;
     // for the checker: how far each fixed grip's palm is from its spot (yours and the partner's), and golf hands' spacing
