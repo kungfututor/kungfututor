@@ -119,7 +119,16 @@ var MOVES = [
     // (turned across you their right side is nearest: your right arm goes round under their head, your left hand holds their near arm)
     { by: 'me', hand: 'N', bone: 'Head', at: [-0.04, 0.27, 0], on: [0, 1, 2, 3] }, { by: 'me', hand: 'F', bone: 'RightArm', at: [0, 0.02, 0], on: [0, 1, 2, 3] }], fix: { 0: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 1: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 2: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 3: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 } } }),   // (their arms down by their sides on the mat, not up in the air)
   mv('grapple', 'SAMBO', 'anklelock', { duo: 1, fix: { 0: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 1: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 2: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 3: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 } } }),   // (lying back, arms on the mat by their sides)
-  mv('grapple', 'SAMBO', 'combat', { duo: 1, oz: 10, holds: judoGrips([3, 4], [3, 4, 5], null, null) }), mv('grapple', 'BJJ', 'shrimp'),
+  mv('grapple', 'SAMBO', 'combat', { duo: 1, oz: 10, holds: judoGrips([3, 4], [3, 4, 5], null, null) }), // BJJ (ground): in the guard your knees go out round their waist, ankles crossed behind; in the mount your knees are on the
+  // mat either side of them; in side control you are turned across their chest (myaw); on top of you they kneel astride (ospread)
+  mv('grapple', 'BJJ', 'guard', { duo: 1, odx: 14, fix: { 0: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 1: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 2: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 3: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 } } }), mv('grapple', 'BJJ', 'shrimp'),
+  // mount escape: you bridge and turn onto your shoulder, and they roll over SIDEWAYS onto their back (oroll) — the 2D
+  // drawing can only show it as a dive over your head, and its last frame drawn in 3D would be them face down
+  mv('grapple', 'BJJ', 'upa', { duo: 1, carry: [0, 1, 2, 3], fix: { 0: { ola: 70, olb: -90, ol: -70, olf: 90, kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ospread: 24, oroll: 0 }, 1: { ola: 70, olb: -90, ol: -70, olf: 90, kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ospread: 24, oroll: 0 }, 2: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, oa1: 70, oa2: 40, ob1: 64, ob2: 36, olift: 8, ospread: 24, oroll: 0 }, 3: { ot: 88, oh: 0, ola: -88, olb: -92, ol: 88, olf: 92, oa1: 150, oa2: 130, ob1: 140, ob2: 120, kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ox: 168, olift: 10, ospread: 0, oroll: 90, face: -1, x: 228, y: 176, t: 30, fN: { x: 196, y: 209 }, fF: { x: 190, y: 209 }, ftN: -90, ftF: -90, su: 60, sl: 80, fu: 50, fl: 70 }, 4: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ospread: 0, oroll: 180 } } }),
+  mv('grapple', 'BJJ', 'hipbump', { duo: 1, odx: 14, fix: { 0: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 1: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 2: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 3: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 4: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6, myaw: 0 } } }),
+  mv('grapple', 'BJJ', 'kneecut', { duo: 1, fix: { 0: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 1: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 2: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 3: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 90 } } }),
+  mv('grapple', 'BJJ', 'mount', { duo: 1, fix: { 0: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 90 }, 1: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 45 }, 2: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6, myaw: 0 }, 3: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6, myaw: 0 } } }),
+  mv('grapple', 'BJJ', 'armbar', { duo: 1, odx: 14, fix: { 0: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 1: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 2: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 3: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 } } }), mv('grapple', 'BJJ', 'rnc', { duo: 1 }),
   mv('defence', 'SELFDEF', 'fence'), mv('defence', 'SELFDEF', 'distance'), mv('defence', 'SELFDEF', 'palm'), mv('defence', 'SELFDEF', 'hammer'),
   mv('defence', 'SELFDEF', 'elbow'), mv('defence', 'SELFDEF', 'kick'), mv('defence', 'SELFDEF', 'cover'),
   mv('defence', 'KRAV', 'stance'), mv('defence', 'KRAV', 'burst'), mv('defence', 'KRAV', 'inside'), mv('defence', 'KRAV', 'outside'),
@@ -454,7 +463,23 @@ function pose3d(t) {
  */
 var GAIT = null;
 var JOINTS = ['hip', 'sh', 'head', 'hipN', 'hipF', 'kN', 'kF', 'aN', 'aF', 'tN', 'tF', 'shN', 'shF', 'eN', 'eF', 'hN', 'hF'];
-function rawJoints(t) { var r = pose3d(t), n = {}; JOINTS.forEach(function (k) { n[k] = r.V(k); }); return { r: r, n: n }; }
+function rawJoints(t) {
+  var r = pose3d(t), n = {};
+  JOINTS.forEach(function (k) { n[k] = r.V(k); });
+  // `myaw` (3D only, a lesson key set per frame with fix): you turned that many degrees about the partner's chest — side
+  // control has you across their chest, the mount in line with them; a side view can only draw you in line. Between frames
+  // the turn is shared out, so you swing round them as you move from one to the other.
+  if (cur && cur.duo && cur.mode !== 'front') {
+    var p = sideP.poseAt(t).pose, yaw = typeof p.myaw === 'number' ? p.myaw * DEG : 0;
+    if (Math.abs(yaw) > 1e-4) {
+      var X = p.ox + (cur.odx || 0), st = Math.sin((p.ot || 0) * DEG);
+      var pv = v3((X - 29 * st - x0) * K, 0, (typeof p.oz === 'number' ? p.oz : cur.oz || 0) * K);
+      Object.keys(n).forEach(function (k) { var y = n[k].y; n[k].y = 0; n[k].sub(pv).applyAxisAngle(UPV, yaw).add(pv); n[k].y = y; });
+      r.theta += yaw;
+    }
+  }
+  return { r: r, n: n };
+}
 // where a foot meets the floor (under the ankle, or under the toes when the heel is up) and how firmly it is down (0…1)
 function footSpot(n, k) {
   var a = n['a' + k], t = n['t' + k], toe = 1 - smooth(0.005, 0.03, t.y - a.y);     // toes up → the heel is what touches
@@ -1496,6 +1521,22 @@ function partnerJoints(t, q, raw) {
   });
   // `oyaw` (3D only, per move): the partner turned that many degrees about the shoulder `opivot`, all but the arm `okeep` (which
   // stays as drawn) — the armlock has them lying across you, their arm along your body; a side view can only draw them in line
+  // `ospread` (3D only, move or per frame): the partner's knees and feet that many lesson units out to each side — kneeling
+  // astride you (the mount) a flat drawing has their knees inside your body
+  var spr = (typeof p.ospread === 'number' ? p.ospread : cur.ospread || 0) * K;
+  if (spr) ['N', 'F'].forEach(function (f) {
+    var out = Math.sign(n['hip' + f].z - n.hip.z) || (f === 'N' ? 1 : -1);
+    n['k' + f].z += out * spr; n['a' + f].z += out * spr * 0.9; n['t' + f].z += out * spr * 0.9;
+  });
+  // `oroll` (3D only, per frame): the partner rolled that many degrees about the line of their own trunk — falling over
+  // sideways (the mount escape rolls them over onto their back). A side view can only show it as a dive over your head.
+  var roll = typeof p.oroll === 'number' ? p.oroll * DEG : 0;
+  if (Math.abs(roll) > 1e-4) {
+    var ax = n.sh.clone().sub(n.hip).normalize(), pc = n.sh.clone().add(n.hip).multiplyScalar(0.5), low = 1e9;
+    Object.keys(n).forEach(function (k) { n[k].sub(pc).applyAxisAngle(ax, roll).add(pc); });
+    Object.keys(n).forEach(function (k) { if (k !== 'head') low = Math.min(low, n[k].y); });
+    if (low < 0.02) Object.keys(n).forEach(function (k) { n[k].y += 0.02 - low; });   // (nothing ends up under the mat)
+  }
   if (cur.oyaw) {
     var pv = n[cur.opivot || 'shF'].clone(), yaw = cur.oyaw * DEG, keep = cur.okeep || [];
     Object.keys(n).forEach(function (k) { if (keep.indexOf(k) < 0) n[k].sub(pv).applyAxisAngle(UPV, yaw).add(pv); });

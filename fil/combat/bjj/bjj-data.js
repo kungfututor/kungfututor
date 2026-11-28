@@ -12,11 +12,12 @@
   function cap(zh, en) { return { zh: zh, en: en }; }
 
   var X0 = 140, BLUE = '#2F5DA8', EDGE = '#AEB3BE', G = 210;
-  var BASE = m(KP.base, { hit: 0, ox: 250, oa1: 40, oa2: 20, ob1: 34, ob2: 14, ola: 0, olb: -90, ol: 0, olf: -90, oh: 0, olift: 0, face: 1 });
+  // (kneeling: both shins back along the mat — the far shin's key has the opposite sign, so +90 here is the same way as olb −90)
+  var BASE = m(KP.base, { hit: 0, ox: 250, oa1: 40, oa2: 20, ob1: 34, ob2: 14, ola: 0, olb: -90, ol: 0, olf: 90, oh: 0, olift: 0, face: 1 });
   // every pose here places your hip absolutely (floor at y ~211)
   function ab() { return m.apply(null, [BASE, { ftN: 90, ftF: 90, kbN: 1, kbF: 1, lift: 0, h: 0, laN: 1 }].concat([].slice.call(arguments))); }
   // partner kneeling upright (in your guard / on top of you)
-  var KNEEL = { ot: 4, ola: 0, olb: -90, ol: 0, olf: -90 };
+  var KNEEL = { ot: 4, ola: 0, olb: -90, ol: 0, olf: 90 };
   // partner lying on their back, head away from you, legs towards you
   var DOWN = { ot: -88, oh: 0, ola: 88, olb: 92, ol: -88, olf: -92, oa1: 150, oa2: 130, ob1: 140, ob2: 120, olift: 0 };
   // partner lying on their back the other way round (head away to the left)
