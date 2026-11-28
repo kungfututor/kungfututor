@@ -93,7 +93,7 @@ var MOVES = [
   mv('kungfu', 'STRIKES', 'side', { mode: 'front', fix: { 0: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 }, 1: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 }, 2: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 }, 3: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 }, 4: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 } } }), mv('kungfu', 'STRIKES', 'snap'), mv('kungfu', 'STRIKES', 'heel'), mv('kungfu', 'STRIKES', 'stretch'),
   mv('kungfu', 'WINGCHUN', 'stance', { mode: 'both', gait: false, pivots: true }), mv('kungfu', 'WINGCHUN', 'punch'), mv('kungfu', 'WINGCHUN', 'chain'), mv('kungfu', 'WINGCHUN', 'tan'),
   mv('kungfu', 'WINGCHUN', 'bong', { mode: 'front' }), mv('kungfu', 'WINGCHUN', 'fuk'), mv('kungfu', 'WINGCHUN', 'pak', { mode: 'front' }), mv('kungfu', 'WINGCHUN', 'kick'),
-  mv('kungfu', 'TAICHI', 1), mv('kungfu', 'TAICHI', 2), mv('kungfu', 'TAICHI', 3), mv('kungfu', 'TAICHI', 4), mv('kungfu', 'TAICHI', 5), mv('kungfu', 'TAICHI', 6), mv('kungfu', 'TAICHI', 7), mv('kungfu', 'TAICHI', 8), mv('kungfu', 'TAICHI', 9), mv('kungfu', 'TAICHI', 10, { mode: 'front' }), mv('kungfu', 'TAICHI', 11), mv('kungfu', 'TAICHI', 12),
+  mv('kungfu', 'TAICHI', 1), mv('kungfu', 'TAICHI', 2), mv('kungfu', 'TAICHI', 3), mv('kungfu', 'TAICHI', 4), mv('kungfu', 'TAICHI', 5), mv('kungfu', 'TAICHI', 6), mv('kungfu', 'TAICHI', 7), mv('kungfu', 'TAICHI', 8), mv('kungfu', 'TAICHI', 9, { armAt: { 0: { back: [-0.4, 0.02, 0.52] }, 1: { front: [0.48, 0.14, 0.1], back: [-0.42, 0.04, 0.55] } }, fix: { 1: { fz: 1.6 } } }), mv('kungfu', 'TAICHI', 10, { mode: 'front' }), mv('kungfu', 'TAICHI', 11, { armAt: { 0: { back: [-0.4, 0.02, 0.52] }, 1: { front: [0.48, 0.14, 0.1], back: [-0.42, 0.04, 0.55] } }, fix: { 1: { fz: 1.6 } } }), mv('kungfu', 'TAICHI', 12, { armAt: { 0: { front: [0.48, 0.14, 0.1], back: [-0.42, 0.04, 0.55] } }, fix: { 0: { fz: 1.6 } } }),
   mv('kungfu', 'TAICHI', 13), mv('kungfu', 'TAICHI', 14), mv('kungfu', 'TAICHI', 15), mv('kungfu', 'TAICHI', 16), mv('kungfu', 'TAICHI', 17), mv('kungfu', 'TAICHI', 18), mv('kungfu', 'TAICHI', 19), mv('kungfu', 'TAICHI', 20), mv('kungfu', 'TAICHI', 21), mv('kungfu', 'TAICHI', 22), mv('kungfu', 'TAICHI', 23), mv('kungfu', 'TAICHI', 24),
   mv('strike', 'BOXING', 'stance'), mv('strike', 'BOXING', 'jab'), mv('strike', 'BOXING', 'cross'), mv('strike', 'BOXING', 'onetwo'),
   mv('strike', 'BOXING', 'hook'), mv('strike', 'BOXING', 'upper'), mv('strike', 'BOXING', 'slip'), mv('strike', 'BOXING', 'weave'),
@@ -198,7 +198,8 @@ var MOVES = [
   // mount escape: you bridge and turn onto your shoulder, and they roll over SIDEWAYS onto their back (oroll) — the 2D
   // drawing can only show it as a dive over your head, and its last frame drawn in 3D would be them face down
   mv('grapple', 'BJJ', 'upa', { duo: 1, carry: [0, 1, 2, 3], fix: { 0: { ola: 70, olb: -90, ol: -70, olf: 90, kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ospread: 24, oroll: 0 }, 1: { ola: 70, olb: -90, ol: -70, olf: 90, kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ospread: 24, oroll: 0 }, 2: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, oa1: 70, oa2: 40, ob1: 64, ob2: 36, olift: 8, ospread: 24, oroll: 0 }, 3: { ot: 88, oh: 0, ola: -88, olb: -92, ol: 88, olf: 92, oa1: 150, oa2: 130, ob1: 140, ob2: 120, kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ox: 168, olift: 10, ospread: 0, oroll: 90, face: -1, x: 228, y: 176, t: 30, fN: { x: 196, y: 209 }, fF: { x: 190, y: 209 }, ftN: -90, ftF: -90, su: 60, sl: 80, fu: 50, fl: 70 }, 4: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ospread: 0, oroll: 180 } } }),
-  mv('grapple', 'BJJ', 'hipbump', { duo: 1, odx: 14, fix: { 0: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 1: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 2: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 3: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 4: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6, myaw: 0 } } }),
+  // (bumped, they are still kneeling: the drawing's far leg on that frame was turned the other way and stood them up)
+  mv('grapple', 'BJJ', 'hipbump', { duo: 1, odx: 14, fix: { 0: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 1: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 2: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ola: 15, olb: -90, ol: -15, olf: 90, olift: 0 }, 3: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 4: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6, myaw: 0 } } }),
   mv('grapple', 'BJJ', 'kneecut', { duo: 1, fix: { 0: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 1: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 2: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0 }, 3: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 90 } } }),
   mv('grapple', 'BJJ', 'mount', { duo: 1, fix: { 0: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 90 }, 1: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 45 }, 2: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6, myaw: 0 }, 3: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6, myaw: 0 } } }),
   mv('grapple', 'BJJ', 'armbar', { duo: 1, odx: 2, fix: { 0: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0, ot: 62 }, 1: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ot: 50 }, 2: { kzN: 0, kzF: 0, fzN: 1, fzF: 1, myaw: 0, ot: 56 }, 3: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0, ot: 62 } },
@@ -233,6 +234,7 @@ var MOVES = [
 ].filter(function (m) { return window[m.lib] && LIB[m.lib]; }).map(function (m) {
   if (m.side === undefined) m.side = m.lib === 'TAICHI' ? TC_SIDE[m.key] : SIDE[m.lib];
   if (m.lib === 'TAICHI' && TC_STEPS[m.key]) { m.gaitOnly = TC_STEPS[m.key]; m.slides = true; }
+  if (m.lib === 'TAICHI' && m.key !== 14 && m.key !== 21) m.openHands = 1;   // (only Strike the Ears and Deflect, Parry and Punch make fists)
   if (m.golf) { m.model = 'golfer'; m.pivots = true; }   // (the back foot turns on its toes in the finish)
   m.s = window[m.lib].LIST.filter(function (s) { return typeof m.key === 'number' ? s.n === m.key : s.id === m.key; })[0];
   m.slug = m.lib.toLowerCase() + '-' + m.key;
@@ -1331,8 +1333,20 @@ function poseAvatar(n, theta, move, pins, who) {
       var fdir = hold.at.clone().sub(barWrist(hold)); if (hold.axis) fdir.addScaledVector(hold.axis, -fdir.dot(hold.axis)); fdir.normalize();
       setWQ(hand, wquat(hand).slerp(frameRot(tw(d.finger), UPV, fdir, hold.palm.clone().negate()).multiply(W0(H.X + 'Hand')), hold.w));
     }
-    A.fist[H.X].forEach(function (p) { p[0].quaternion.copy(p[2]).multiply(IDQ.clone().slerp(p[1], 1 - H.w)); });
+    // (Tai Chi: open, relaxed hands — fingers gently curved — except the postures that punch)
+    var curlAir = A === avatar && cur && cur.openHands ? 0.12 : 1;
+    A.fist[H.X].forEach(function (p) { p[0].quaternion.copy(p[2]).multiply(IDQ.clone().slerp(p[1], (1 - H.w) * curlAir)); });
     if (H.w > 0) A.open[H.X].forEach(function (p) { p[0].quaternion.multiply(IDQ.clone().slerp(p[1], H.w)); });
+    // shaped hands (per move, `armAt`): an open palm pushing forward — fingers up, palm to the front — or a hook hand —
+    // fingertips pinched together, wrist bent so the fingers point down, the back of the wrist up and out
+    if (hold && hold.shape && hold.w > 0 && H.w < 0.5) {
+      var sw = hold.w, curl = hold.shape === 'hook' ? 0.65 : 0;
+      A.fist[H.X].forEach(function (p) { p[0].quaternion.copy(p[2]).multiply(IDQ.clone().slerp(p[1], 1 - sw + curl * sw)); });
+      var fT, bT;
+      if (hold.shape === 'palm') { fT = UPV.clone().addScaledVector(FW, 0.3).normalize(); bT = FW.clone().negate(); }
+      else { fT = UPV.clone().negate().addScaledVector(fd, 0.2).normalize(); bT = fd.clone(); bT.y = 0; bT.normalize(); }
+      setWQ(hand, wquat(hand).slerp(frameRot(tw(d.finger), UPV, fT, bT).multiply(W0(H.X + 'Hand')), sw));
+    }
     hand.updateMatrixWorld(true);
     H.elbow = ud.angleTo(fd); H.short = r.short; H.T = T;
     info.hands[H.k] = H;
@@ -2163,9 +2177,35 @@ function bagCentre(A) {
   var fwd2 = A.fwd.clone().applyQuaternion(wquat(B.Spine2).multiply(A.RQ.Spine2.clone().invert()));
   return bk.addScaledVector(fwd2, -0.1);
 }
+/* Hands placed by plan (3D only, per move: `armAt: { frame: { front: [fwd, up, out], back: [...] } }`): metres from the
+ * middle of your shoulders — forward, up, and out to that hand's own side. `front` is the hand the lesson has further
+ * forward (an open palm pushing), `back` the other (a hook hand). A side-view drawing cannot show an arm out to the side,
+ * so single whip's hook hand pointed straight back and both arms made one stiff line — the mistake the lesson warns of. */
+function selfArmSpots(A, n, r) {
+  var AA = cur.armAt, nF = clip.frames.length, j = Math.min(nF - 1, r.seg), j2 = (j + 1) % nF, ks = r.k * r.k * (3 - 2 * r.k), B = A.B;
+  var fw = A.fwd.clone().applyQuaternion(wquat(B.Hips).multiply(A.RQ.Hips.clone().invert())); fw.y = 0; fw.normalize();
+  var sideN = wpos(B.RightArm).sub(wpos(B.LeftArm)); sideN.y = 0; sideN.addScaledVector(fw, -sideN.dot(fw)).normalize();
+  var side = { N: sideN, F: sideN.clone().negate() }, base = wpos(B.LeftArm).add(wpos(B.RightArm)).multiplyScalar(0.5);
+  var front = n.hN.clone().sub(n.sh).dot(fw) >= n.hF.clone().sub(n.sh).dot(fw) ? 'N' : 'F', role = { front: front, back: front === 'N' ? 'F' : 'N' };
+  function spot(key, rl) { var e = AA[key] && AA[key][rl]; return e ? base.clone().addScaledVector(fw, e[0]).addScaledVector(UPV, e[1]).addScaledVector(side[role[rl]], e[2]) : null; }
+  var out = null;
+  ['front', 'back'].forEach(function (rl) {
+    var a = spot(j, rl), b = spot(j2, rl), w = (a ? 1 - ks : 0) + (b ? ks : 0);
+    if (w < 0.001) return;
+    out = out || {};
+    out[role[rl]] = { at: a && b ? a.lerp(b, ks) : (a || b), w: Math.min(1, w), shape: rl === 'front' ? 'palm' : 'hook', reach: 1 };
+  });
+  return out;
+}
 var ON_THEM = 0;
 function poseOrHang(n, theta, q) {
   ON_THEM = cur && cur.onThem ? framesW(cur.onThem, q.r) : 0;
+  if (cur && cur.armAt && avatar && !cur.duo) {
+    var A1 = avatar; A1.hold = null;
+    var inf1 = poseAvatar(n, theta, cur, q.pins), sp = selfArmSpots(A1, n, q.r);
+    if (sp) { A1.hold = sp; inf1 = poseAvatar(n, theta, cur, q.pins); inf1 = fixGrips(A1, n, theta, cur, q.pins) || inf1; }
+    A1.hold = null; return inf1;
+  }
   if (cur && cur.kit === 'lunge' && avatar) {                // both hands on top of the sandbag, near its ends
     var A0 = avatar; A0.hold = null; poseAvatar(n, theta, cur, q.pins);
     var c = bagCentre(A0), side = A0.right.clone().applyQuaternion(wquat(A0.B.Spine2).multiply(A0.RQ.Spine2.clone().invert())).normalize();
