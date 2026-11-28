@@ -18,7 +18,7 @@
   var BASE = m(KP.base, { hit: 0, oa1: 45, oa2: 162, ob1: 30, ob2: 167, ola: 18, olb: 4, ol: 20, oh: 4 });
   function P() { return m.apply(null, [BASE, LEGS, GUARD].concat([].slice.call(arguments))); }
   // the opponent lying on their back, head away from you, hands up to cover
-  var DOWN = { ot: -88, oh: 0, ola: 88, olb: 92, ol: -88, oa1: 170, oa2: 175, ob1: 165, ob2: 172 };
+  var DOWN = { ot: -88, oh: 0, ola: 88, olb: 92, ol: -88, olf: -92, oa1: 170, oa2: 175, ob1: 165, ob2: 172 };
 
   // Technical stand-up, in absolute positions (a flat foot rests at y 211, a hand at y 209).
   // The posted hand really is on the floor (hF = the spot it presses on). The hips lift high on that straight arm and the

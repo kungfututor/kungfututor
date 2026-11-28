@@ -24,7 +24,7 @@
   // partner on hands and knees, facing left (par terre / referee's position bottom)
   var FOURS = { ot: 80, oh: -8, ola: 0, olb: -90, ol: 0, olf: -90, oa1: 0, oa2: 0, ob1: 0, ob2: 0, olift: 0 };
   // partner flat on their stomach, head to the left
-  var FLAT = { ot: 88, oh: 0, ola: -86, olb: -90, ol: 86, olf: 90, oa1: 20, oa2: 60, ob1: 10, ob2: 50, olift: 0 };
+  var FLAT = { ot: 88, oh: 0, ola: -86, olb: -90, ol: 86, olf: 90, oa1: 80, oa2: 85, ob1: 75, ob2: 80, olift: 0 };   // arms along the mat (lower arms pushed the body up off it)
   // you kneeling (relative targets: shins on the mat behind you)
   var KNEEL = { fN: { x: -36, y: 44 }, fF: { x: -40, y: 44 }, ftN: -90, ftF: -90 };
   // you on hands and knees

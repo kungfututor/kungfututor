@@ -88,6 +88,47 @@ export function run(api) {
     return { out: o, dir: side > Math.abs(along) ? 'beside' : along < 0 ? 'behind' : 'in front of' };
   }
 
+  // ---- two-person moves: the bodies must not pass through each other ----
+  // Each body is a set of capsules (bone to bone, with a radius); every skin point of the other body is tested against them.
+  // Bodies pressed together squash a little, so only overlap deeper than 4 cm is a fault.
+  var CAPS = [['torso', 'Hips', 'Neck', 0.12, 0, 0.86], ['neck', 'Neck', 'Head', 0.055], ['head', 'Head', 'Head', 0.1, 0.09], ['R upper arm', 'RightArm', 'RightForeArm', 0.045], ['L upper arm', 'LeftArm', 'LeftForeArm', 0.045],
+    ['R forearm', 'RightForeArm', 'RightHand', 0.038], ['L forearm', 'LeftForeArm', 'LeftHand', 0.038], ['R thigh', 'RightUpLeg', 'RightLeg', 0.075], ['L thigh', 'LeftUpLeg', 'LeftLeg', 0.075],
+    ['R shin', 'RightLeg', 'RightFoot', 0.052], ['L shin', 'LeftLeg', 'LeftFoot', 0.052]];
+  var REG = ['body', 'R foot', 'L foot', 'R hand', 'L hand', 'R thumb', 'L thumb', 'R arm', 'L arm', 'R leg', 'L leg'];
+  function capsules(X) {
+    return CAPS.map(function (c) {
+      var a = api.wpos(X.B[c[1]]), b = api.wpos(X.B[c[2]]);
+      if (c[4]) { var up = api.wpos(X.B.Head).sub(api.wpos(X.B.Neck)).normalize(); a = a.clone().addScaledVector(up, c[4]); b = a.clone(); }
+      if (c[5]) b.lerp(a, 1 - c[5]);
+      return { name: c[0], a: a, ab: b.clone().sub(a), r: c[3] };
+    });
+  }
+  function overlap(X, Y) {                                   // deepest point of Y's skin inside X's capsules
+    var caps = capsules(X), S = Y.skin, best = { d: 0 }, p = new THREE.Vector3(), w = new THREE.Vector3();
+    S.refresh();
+    for (var j = 0; j < S.count; j++) {
+      S.at(j, p);
+      for (var c = 0; c < caps.length; c++) {
+        var C = caps[c], L2 = C.ab.lengthSq(), t = L2 > 1e-9 ? Math.max(0, Math.min(1, w.subVectors(p, C.a).dot(C.ab) / L2)) : 0;
+        var d = C.r - p.distanceTo(w.copy(C.a).addScaledVector(C.ab, t));
+        if (d > best.d) best = { d: d, into: C.name, part: REG[S.region[j]] };
+      }
+    }
+    return best;
+  }
+  function measureDuo(P, f, m) {
+    var Pt = api.partner();
+    if (!Pt || !P.partner) return;
+    var o1 = overlap(A, Pt), o2 = overlap(Pt, A), plow = Math.min.apply(null, Pt.full.lows());
+    m.clash = Math.max(o1.d, o2.d);
+    if (o1.d > 0.04) f.push('partner ' + o1.part + ' inside your ' + o1.into + ' ' + (o1.d * 100).toFixed(0) + 'cm');
+    if (o2.d > 0.04) f.push('your ' + o2.part + ' inside partner ' + o2.into + ' ' + (o2.d * 100).toFixed(0) + 'cm');
+    m.plow = plow;
+    if (plow < -0.006) f.push('partner sinks ' + (plow * 100).toFixed(1) + 'cm');
+    // (a partner being carried over your hip is meant to be off the floor)
+    if (P.partner.g < 0.005 && plow > 0.008 && !P.partner.carried) f.push('partner floats ' + (plow * 100).toFixed(1) + 'cm');
+  }
+
   function measure(P) {
     var I = P.info, f = [], lows = A.full.lows(), all = Math.min.apply(null, lows);
     var grounded = I.g < 0.005, m = { low: all, g: I.g, pitch: I.pitch * DEG, passes: I.passes, flags: f };
@@ -122,6 +163,7 @@ export function run(api) {
       }
     });
     if (api.barbell.visible && api.barbell.position.y < api.plateR() - 0.004) f.push('bar plates sink');
+    measureDuo(P, f, m);
     var bal = balance(P);
     m.bal = bal ? bal.out : 0; m.balDir = bal ? bal.dir : '';
     return m;
@@ -149,6 +191,7 @@ export function run(api) {
     var prev = null, off = { n: 0, max: 0, dir: '', t: 0 };
     // a planted foot must stay where it was planted: follow the ball of each foot for as long as it is down
     var spot = { N: null, F: null }, moved = { N: { far: 0, t: 0 }, F: { far: 0, t: 0 } };
+    var pspot = { N: null, F: null }, pmoved = { N: { far: 0, t: 0 }, F: { far: 0, t: 0 } };   // the partner's feet too
     for (var s = 0; s < N; s++) {
       var t = total * s / N, P = api.pose(t), m = measure(P);
       if (m.bal > 0.08) { off.n++; if (m.bal > off.max) { off.max = m.bal; off.dir = m.balDir; off.t = Math.round(t); } }
@@ -163,6 +206,20 @@ export function run(api) {
           });
           spot[sd.k].push([bp.x, bp.z, hp.x, hp.z]);
         } else spot[sd.k] = null;
+      });
+      var Pt = api.partner();
+      // (a partner lying on the floor is not standing on its feet; the loop's jump from lying back to standing is the restart)
+      if (Pt && P.partner && (P.partner.rest > 0.3 || P.partner.restart)) pspot = { N: null, F: null };
+      else if (Pt && P.partner) api.SIDES.forEach(function (sd) {
+        var bp = api.wpos(Pt.B[sd.X + 'ToeBase']), hp = api.wpos(Pt.B[sd.X + 'Foot']);
+        if (P.partner.feet[sd.k].w > 0.97) {
+          if (!pspot[sd.k]) pspot[sd.k] = [];
+          pspot[sd.k].forEach(function (q) {
+            var d = Math.min(Math.hypot(q[0] - bp.x, q[1] - bp.z), Math.hypot(q[2] - hp.x, q[3] - hp.z));
+            if (d > pmoved[sd.k].far) { pmoved[sd.k].far = d; pmoved[sd.k].t = Math.round(t); }
+          });
+          pspot[sd.k].push([bp.x, bp.z, hp.x, hp.z]);
+        } else pspot[sd.k] = null;
       });
       Object.keys(m).forEach(function (k) {
         if (typeof m[k] !== 'number') return;
@@ -184,6 +241,9 @@ export function run(api) {
     Object.keys(R.flags).forEach(function (k) { if (/^floats/.test(k) && R.flags[k].n < 2) delete R.flags[k]; });
     api.SIDES.forEach(function (sd) {
       if (moved[sd.k].far > 0.06 && !o.m.pivots && !o.m.slides) R.flags['planted ' + sd.X[0] + ' foot moved'] = { n: 1, eg: 'planted ' + sd.X[0] + ' foot moved ' + (moved[sd.k].far * 100).toFixed(0) + 'cm across the floor', t: moved[sd.k].t };
+    });
+    api.SIDES.forEach(function (sd) {
+      if (pmoved[sd.k].far > 0.06) R.flags['partner planted ' + sd.X[0] + ' foot moved'] = { n: 1, eg: 'partner planted ' + sd.X[0] + ' foot moved ' + (pmoved[sd.k].far * 100).toFixed(0) + 'cm across the floor', t: pmoved[sd.k].t };
     });
     R.slideN = moved.N.far; R.slideF = moved.F.far;
     R.ok = Object.keys(R.flags).length === 0;

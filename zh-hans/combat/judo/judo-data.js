@@ -12,17 +12,18 @@
   function cap(zh, en) { return { zh: zh, en: en }; }
 
   var X0 = 140, BLUE = '#2F5DA8', EDGE = '#AEB3BE';
-  var LEGS = { x: X0, t: 6, h: 4, fN: { x: 22, y: 80 }, fF: { x: -26, y: 80 }, ftN: 90, ftF: 70, kbN: 1, kbF: 1, lift: 0 };
+  // natural posture while gripping: upright, knees only soft, feet a short step apart
+  var LEGS = { x: X0, t: 4, h: 4, fN: { x: 16, y: 85 }, fF: { x: -18, y: 85 }, ftN: 90, ftF: 70, kbN: 1, kbF: 1, lift: 0 };
   var OPEN = { su: 40, sl: 120, fu: 34, fl: 125, laN: 1 };          // hands forward, open, ready to grip
   var GRIP = { su: 72, sl: 96, fu: 80, fl: 92, laN: 1 };            // lead hand on the lapel, rear hand on the sleeve
   var PO = { oa1: 40, oa2: 120, ob1: 34, ob2: 125 }, PG = { oa1: 72, oa2: 96, ob1: 80, ob2: 92 };
-  var BASE = m(KP.base, PG, { hit: 0, ox: 228, ola: 14, olb: 4, ol: 18, oh: 2, olift: 0, face: 1 });
+  var BASE = m(KP.base, PG, { hit: 0, ox: 228, ola: 10, olb: 3, ol: 12, oh: 2, olift: 0, face: 1 });
   function P() { return m.apply(null, [BASE, LEGS, GRIP].concat([].slice.call(arguments))); }
   // partner falling backward, then lying on their back (head away from you)
   var FALL = { ot: -55, ola: 70, olb: 62, ol: -30, oa1: 120, oa2: 140, ob1: 110, ob2: 130, olift: 10 };
-  var DOWN = { ot: -88, oh: 0, ola: 88, olb: 92, ol: -88, oa1: 170, oa2: 175, ob1: 165, ob2: 172, olift: 0 };
+  var DOWN = { ot: -88, oh: 0, ola: 88, olb: 92, ol: -88, olf: -92, oa1: 170, oa2: 175, ob1: 165, ob2: 172, olift: 0 };
   // lying on their back with the head towards you (armlock)
-  var UP = { ot: 88, oh: 0, ola: -88, olb: -92, ol: 88, ob1: 110, ob2: 100, olift: 0 };
+  var UP = { ot: 88, oh: 0, ola: -88, olb: -92, ol: 88, olf: 92, ob1: 110, ob2: 100, olift: 0 };
   var STAND_OVER = { t: 14, su: 38, sl: 52, fu: 32, fl: 46 };       // you stay standing, still holding the sleeve
 
   // whole-body poses with the hip placed absolutely (floor at y ~211)
@@ -30,8 +31,10 @@
 
   var CLIPS = {
     stance: { trail: 'hN', frames: [
-      { d: 1000, p: P({ ox: 262, t: 28, h: 6, su: 4, sl: 8, fu: -4, fl: 0, fN: { x: 10, y: 80 }, fF: { x: -12, y: 80 }, ot: 28, oh: 6, oa1: 4, oa2: 8, ob1: -4, ob2: 0, ola: 4, olb: 2, ol: 6 }), c: cap('互相鞠躬（禮），表示尊重', 'Bow to each other (rei) as a sign of respect') },
-      { d: 800, p: P(OPEN, PO, { ox: 262 }), c: cap('自然體：雙腳與肩同寬、膝微彎、背挺直', 'Natural posture (shizentai): feet shoulder-width apart, knees soft, back straight') },
+      // standing bow: heels together, legs straight, about 30° from the hips with a straight back, hands sliding to the thighs
+      { d: 1000, p: P({ ox: 262, t: 30, h: 0, su: -16, sl: -16, fu: -18, fl: -18, fN: { x: 2, y: 87.9 }, fF: { x: -2, y: 87.9 }, ot: 30, oh: 0, oa1: -16, oa2: -16, ob1: -18, ob2: -18, ola: 1, olb: 0, ol: 1 }), c: cap('互相鞠躬（禮），表示尊重', 'Bow to each other (rei) as a sign of respect') },
+      // natural posture: upright, feet side by side shoulder-width apart (one behind the other in this side view), knees only soft
+      { d: 800, p: P({ ox: 262, t: 2, h: 0, su: 8, sl: 14, fu: -6, fl: 0, fN: { x: 4, y: 87.6 }, fF: { x: -4, y: 87.6 }, ot: 2, oh: 0, oa1: 8, oa2: 14, ob1: -6, ob2: 0, ola: 2, olb: 1, ol: 2 }), c: cap('自然體：雙腳與肩同寬、膝微彎、背挺直', 'Natural posture (shizentai): feet shoulder-width apart, knees soft, back straight') },
       { d: 600, p: P(OPEN, PO, { ox: 240, x: X0 + 4 }), c: cap('滑步靠近，腳不離地', 'Slide in with small steps, feet close to the mat') },
       { d: 900, p: P({ ox: 228, x: X0 + 4 }), c: cap('組手：前手抓衣領，後手抓袖子（肘部下方）', 'Grip (kumikata): lead hand on the lapel, rear hand on the sleeve below the elbow') },
       { d: 700, p: P({ ox: 224, x: X0 + 2, t: -2, su: 60, sl: 82, fu: 66, fl: 80, ot: 10, oh: 6 }), c: cap('破勢：拉袖、提領，讓對方重心移到腳尖', 'Off-balance them (kuzushi): pull the sleeve and lift the lapel so their weight goes onto their toes') },

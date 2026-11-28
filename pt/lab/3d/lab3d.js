@@ -39,6 +39,16 @@ var SIDE = { BOXING: 'l', MUAYTHAI: 'l', LETHWEI: 'l', MMA: 'l', KRAV: 'l', SELF
 // floor, as it does in the form, and the hips travel on to it — so steps are planned only for the walk back to the start (these stretches).
 var TC_STEPS = { 16: [4, 5, 6], 17: [3, 4, 5] };
 var TC_SIDE = { 2: 'l', 3: 'legs', 4: 'legs', 5: 'l', 7: 'l', 9: 'l', 11: 'l', 12: 'legs', 15: 'l', 16: 'l', 19: 'legs', 20: 'legs', 21: 'legs', 22: 'l' };
+// judo grips (3D holds): your right hand on their left lapel, your left hand on their right sleeve below the elbow — and theirs
+// the same on you — for the key frames listed (null = that grip not used)
+function judoGrips(meLapel, meSleeve, pLapel, pSleeve) {
+  var g = [];
+  if (meLapel) g.push({ by: 'me', hand: 'N', bone: 'Spine2', at: [0.16, 0.06, -0.08], bend: [0, -1, 0], on: meLapel });
+  if (meSleeve) g.push({ by: 'me', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: meSleeve });
+  if (pLapel) g.push({ by: 'partner', hand: 'N', bone: 'Spine2', at: [0.16, 0.06, -0.08], bend: [0, -1, 0], on: pLapel });
+  if (pSleeve) g.push({ by: 'partner', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: pSleeve });
+  return g;
+}
 function mv(cat, lib, key, extra) { var o = { cat: cat, lib: lib, key: key }; for (var k in extra || {}) o[k] = extra[k]; return o; }
 var MOVES = [
   mv('kungfu', 'STANCES', 'horse', { mode: 'both', toes: 0.25 }), mv('kungfu', 'STANCES', 'bow'), mv('kungfu', 'STANCES', 'drop', { mode: 'front' }),
@@ -55,7 +65,11 @@ var MOVES = [
   mv('strike', 'BOXING', 'parry'), mv('strike', 'BOXING', 'footwork'),
   mv('strike', 'MUAYTHAI', 'stance'), mv('strike', 'MUAYTHAI', 'jab'), mv('strike', 'MUAYTHAI', 'cross'), mv('strike', 'MUAYTHAI', 'teep'),
   mv('strike', 'MUAYTHAI', 'kick'), mv('strike', 'MUAYTHAI', 'lowkick'), mv('strike', 'MUAYTHAI', 'elbow'), mv('strike', 'MUAYTHAI', 'knee'),
-  mv('strike', 'MUAYTHAI', 'check'),
+  mv('strike', 'MUAYTHAI', 'check'), mv('strike', 'MUAYTHAI', 'clinch', { duo: 1, fix: { 2: { ot: 50, oh: 14, ox: 240 }, 3: { ot: 50, oh: 14, ox: 240 } }, holds: [   // both hands cupped behind their head, elbows down on the collarbones
+    { by: 'me', hand: 'N', bone: 'Neck', at: [-0.08, 0.04, -0.05], bend: [0, -1, 0], on: [2, 3] }, { by: 'me', hand: 'F', bone: 'Neck', at: [-0.1, 0.01, 0.04], bend: [0, -1, 0], on: [2, 3] },
+    // (your right hand goes to their left side and the other way round: you face each other)
+    // (their hands on your hips, trying to keep you away)
+    { by: 'partner', hand: 'N', bone: 'Spine', at: [0.1, 0, -0.16], on: [1, 2, 3] }, { by: 'partner', hand: 'F', bone: 'Spine', at: [0.1, 0, 0.16], on: [1, 2, 3] }] }),
   mv('strike', 'LETHWEI', 'stance'), mv('strike', 'LETHWEI', 'straight'), mv('strike', 'LETHWEI', 'hook'), mv('strike', 'LETHWEI', 'headbutt'),
   mv('strike', 'LETHWEI', 'elbow'), mv('strike', 'LETHWEI', 'flyknee'), mv('strike', 'LETHWEI', 'kick'), mv('strike', 'LETHWEI', 'push'),
   mv('strike', 'LETHWEI', 'cover'),
@@ -66,7 +80,33 @@ var MOVES = [
   // (double-leg takedown and sprawl lean on an opponent, and the technical stand-up props the body on a hand behind the hips:
   //  they come back with the two-person / ground moves, which need their own floor-support handling)
   mv('grapple', 'WRESTLING', 'stance'),
-  mv('grapple', 'JUDO', 'breakfall'), mv('grapple', 'SAMBO', 'breakfall'), mv('grapple', 'BJJ', 'shrimp'),
+  mv('grapple', 'JUDO', 'stance', { duo: 1, oz: 10, fix: { 0: { ox: 296 }, 1: { ox: 296 } }, holds:   // (bow further apart: heads have size)
+    judoGrips([3, 4, 5], [3, 4, 5], [3, 4, 5], [3, 4, 5]) }),
+  mv('grapple', 'JUDO', 'breakfall'),
+  // foot sweep: your right foot sweeps their left ankle from the outside, so their left foot is just inside your right
+  mv('grapple', 'JUDO', 'deashi', { duo: 1, oz: -6, holds: judoGrips([0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2], [0, 1, 2]) }),
+  // minor inner reap: your right foot hooks their left heel from between their feet
+  mv('grapple', 'JUDO', 'kouchi', { duo: 1, oz: 12, holds: judoGrips([0, 1, 2, 3], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3], [0, 1, 2, 3]) }),
+  // hip throw: your right arm round their waist (on their back), left hand keeps the sleeve
+  mv('grapple', 'JUDO', 'ogoshi', { duo: 1, oz: 0,
+    // (bodies with thickness: your back against their front needs more room than the drawn lines, and they land a little
+    //  further in front of your feet; lifted and rolling over your hip they rest on your back — carry)
+    fix: { 2: { ox: 230, ot: 24 }, 3: { ot: 66, ola: -10, olb: -30, ol: -16, olf: -36, olift: 40, oa1: 70, oa2: 40, ob1: 60, ob2: 30 }, 4: { ot: 128, ola: -120, olb: -130, ol: 128, olf: 120, olift: 48 }, 5: { ox: 92 } }, carry: [3, 4], onBack: [3], holds: [{ by: 'me', hand: 'N', bone: 'Spine', at: [-0.14, 0.02, 0.04], on: [2, 3] }].concat(judoGrips([0, 1], [0, 1, 2, 3, 4, 5], [0, 1], [0, 1])) }), mv('grapple', 'JUDO', 'osoto', { duo: 1, oz: 30, holds: [   // right hand on their left lapel, left hand on their right sleeve — and theirs the same on you
+    { by: 'me', hand: 'N', bone: 'Spine2', at: [0.16, 0.06, -0.08], bend: [0, -1, 0], on: [0, 1, 2, 3] }, { by: 'me', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: [0, 1, 2, 3, 4, 5] },
+    { by: 'partner', hand: 'N', bone: 'Spine2', at: [0.16, 0.06, -0.08], bend: [0, -1, 0], on: [0, 1, 2, 3] }, { by: 'partner', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: [0, 1, 2, 3] }] }), mv('grapple', 'JUDO', 'kesa', { duo: 1, oz: 42,
+    // you sit at their right side and lean sideways on to their chest (the drawing's forward lean), right arm round the neck,
+    // left hand on their right sleeve, their right arm trapped against your side
+    // (both legs spread out on the side away from them: right leg forward, left leg back)
+    fix: { 0: { t: 18, lz: 26, fzN: -1, fzF: 3.5, kzN: -24, kzF: -6 }, 1: { t: 22, lz: 34, fzN: -1, fzF: 3.5, kzN: -24, kzF: -6 }, 2: { t: 22, lz: 36, fzN: -1, fzF: 3.5, kzN: -24, kzF: -6 }, 3: { t: 20, lz: 36, fzN: -1, fzF: 3.5, kzN: -24, kzF: -6 } }, holds: [
+    { by: 'me', hand: 'N', bone: 'Neck', at: [-0.06, 0.02, -0.1], bend: [1, 0.5, 0], on: [1, 2, 3] }, { by: 'me', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: [1, 2, 3] },
+    { by: 'partner', hand: 'N', bone: 'Spine1', at: [0.02, 0.1, -0.2], on: [0, 1, 2, 3] }] }), // cross armlock: they lie across you — their shoulder at your crotch, your legs over their face and chest, their arm along
+  // your body to your chest (the side view can only draw them in line: oyaw turns them, all but that arm)
+  mv('grapple', 'JUDO', 'juji', { duo: 1, oyaw: 90, opivot: 'shF', okeep: ['eF', 'hF'], odx: 24, holds: [
+    // their left arm stretched along your body, wrist at your chest; you hug the forearm with both hands, thumb up
+    { by: 'partner', hand: 'F', bone: 'Spine2', at: [0.16, 0.04, 0.02], on: [0, 1, 2, 3] },
+    { by: 'me', hand: 'N', bone: 'LeftForeArm', at: [0, 0.02, 0], on: [0, 1, 2, 3] }, { by: 'me', hand: 'F', bone: 'LeftForeArm', at: [0, -0.06, 0], on: [0, 1, 2, 3] }],
+    fix: { 0: { fN: { x: 306, y: 179 }, fF: { x: 300, y: 181 }, fzN: 34, fzF: -30, kzN: 24, kzF: -20 }, 1: { fN: { x: 306, y: 179 }, fF: { x: 300, y: 181 }, fzN: 34, fzF: -30, kzN: 24, kzF: -20 }, 2: { fN: { x: 306, y: 179 }, fF: { x: 300, y: 181 }, fzN: 34, fzF: -30, kzN: 24, kzF: -20 }, 3: { fN: { x: 306, y: 179 }, fF: { x: 300, y: 181 }, fzN: 34, fzF: -30, kzN: 24, kzF: -20 } } }),
+  mv('grapple', 'SAMBO', 'breakfall'), mv('grapple', 'BJJ', 'shrimp'),
   mv('defence', 'SELFDEF', 'fence'), mv('defence', 'SELFDEF', 'distance'), mv('defence', 'SELFDEF', 'palm'), mv('defence', 'SELFDEF', 'hammer'),
   mv('defence', 'SELFDEF', 'elbow'), mv('defence', 'SELFDEF', 'kick'), mv('defence', 'SELFDEF', 'cover'),
   mv('defence', 'KRAV', 'stance'), mv('defence', 'KRAV', 'burst'), mv('defence', 'KRAV', 'inside'), mv('defence', 'KRAV', 'outside'),
@@ -104,7 +144,16 @@ var KTFigure_BASE = { x: 200, lift: 0, t: 0, h: 0, su: 8, sl: 14, fu: -8, fl: -2
 
 function build(m, view) {
   var L = window[m.lib], lang = KT.getLang();
-  return m.lib === 'STANCES' ? L.makeClip(m.s.id, view, 1, lang) : L.makeClip(m.s, view, 1, lang);
+  var c = m.lib === 'STANCES' ? L.makeClip(m.s.id, view, 1, lang) : L.makeClip(m.s, view, 1, lang);
+  // `fix` (3D only, per move): lesson pose keys changed at some key frames — { frame: { key: value } } — for what bodies with
+  // thickness need and thin drawn lines do not (a partner bending further so the head meets your chest, not your face)
+  if (!m.fix || view !== 'side') return c;
+  var c2 = {}, k0; for (k0 in c) c2[k0] = c[k0];
+  c2.frames = c.frames.map(function (fr, i) {
+    if (!m.fix[i]) return fr;
+    var o = {}, k; for (k in fr) o[k] = fr[k]; o.p = {}; for (k in fr.p) o.p[k] = fr.p[k]; for (k in m.fix[i]) o.p[k] = m.fix[i][k]; return o;
+  });
+  return c2;
 }
 function solveAt(player, t, flat) {
   var p = {}, k, src = player.poseAt(t).pose;
@@ -342,6 +391,13 @@ function pose3d(t) {
         y = (FLOOR - (py + offy * outw)) * K;
         z = ((px + offx * outw) - Jf.hip.x) * K;
       }
+    }
+    // `kzN` / `kzF` (3D only): that knee bends out sideways by that many lesson units (+ = towards the near side) instead of up —
+    // a leg lying on its side on the mat (sitting in a hold, a guard) — the knee goes beside the hip→ankle line, not above it
+    var kzk = !pt && !Jf && /^k[NF]$/.test(src) ? P0['kz' + src.charAt(1)] : undefined;
+    if (typeof kzk === 'number' && kzk) {
+      var hq = Js['hip' + src.charAt(1)], aq = Js['a' + src.charAt(1)];
+      x = (mode === 'front' ? 0 : ((hq.x + aq.x) / 2 - x0) * K - hx); y = (FLOOR - (hq.y + aq.y) / 2) * K; z = (DEPTH[src] || 0) + kzk * K;
     }
     if (wide && (src === 'hN' || src === 'hF')) z = src === 'hN' ? wide : -wide;
     // push-up hands (lesson gives luN/luF): planted on the floor at shoulder width, straight under the shoulders
@@ -644,7 +700,7 @@ function lessonJoints(t) {
  * N (near, +z) is the body's right side, F its left.
  */
 // two models: the instructor for every lesson, and the golfer (made for KungfuTutor with Meshy, private licence) for golf
-var MODELS = { instructor: '/assets/models/instructor/kt-instructor.glb', golfer: '/assets/models/golfer/kt-golfer.glb' };
+var MODELS = { instructor: '/assets/models/instructor/kt-instructor.glb', golfer: '/assets/models/golfer/kt-golfer.glb', partner: '/assets/models/instructor/kt-instructor.glb' };
 var avatar = null, AVS = {}, avKey = null, avLoading = {};
 var AV = { v1: new THREE.Vector3(), v2: new THREE.Vector3(), q1: new THREE.Quaternion(), q2: new THREE.Quaternion(), q3: new THREE.Quaternion() };
 // three.js drops the colon from "mixamorig:Hips", so match on the part after the prefix
@@ -847,8 +903,8 @@ var RIGID = ['hip', 'sh', 'head'];
 /* n: lesson joints in metres (floor at y = 0), theta: facing, move: the move being shown.
  * The lesson's own joint angles are kept wherever they can be; contact with the floor is then made exact.
  * Returns what was done, for the barbell and the self-check. */
-function poseAvatar(n, theta, move, pins) {
-  var A = avatar, B = A.B, D = A.D, info = { feet: {}, hands: {}, pitch: 0 };
+function poseAvatar(n, theta, move, pins, who) {
+  var A = who || avatar, B = A.B, D = A.D, info = { feet: {}, hands: {}, pitch: 0 };
   var frontView = move && move.mode && move.mode !== 'side', bar = move && move.bar;
   var face = new THREE.Quaternion().setFromUnitVectors(A.fwd, v3(1, 0, 0).applyAxisAngle(UPV, theta));
   var FW = A.fwd.clone().applyQuaternion(face), RT = A.right.clone().applyQuaternion(face), LF = RT.clone().negate();
@@ -857,7 +913,8 @@ function poseAvatar(n, theta, move, pins) {
   var g = 1e9, n0 = n;                                      // n0: the lesson as written (n may be tipped or hinged below)
   Object.keys(n).forEach(function (k) { if (k !== 'head') g = Math.min(g, n[k].y); });
   g = Math.max(0, g);
-  var grounded = 1 - smooth(0.09, 0.16, g);                  // lessons draw floor contact a few units above the line (a sitting hip ~7)
+  var grounded = move && move.air ? 0 : 1 - smooth(0.09, 0.16, g);   // lessons draw floor contact a few units above the line (a sitting hip ~7)
+  // (move.air: a partner being thrown — nothing of theirs rests on the floor, whatever is near it)
 
   // pelvis, spine and head at the lesson's hip (no height correction yet)
   function core(n) {
@@ -895,7 +952,7 @@ function poseAvatar(n, theta, move, pins) {
   function planFoot(s, n, w) {
     var d = D[s.X], a = n['a' + s.k], t = n['t' + s.k], kn = n['k' + s.k], hp = n['hip' + s.k], f = { X: s.X, k: s.k, region: s.foot, turn: 0, slide: 0, adj: 0 };
     f.touch = 1 - smooth(0.035, 0.08, Math.max(0, Math.min(a.y, t.y)));   // drawn at floor level, whatever its angle
-    f.w = w === undefined ? f.touch : w;
+    f.w = w === undefined ? (move && move.air ? 0 : f.touch) : w;
     f.rel = a.clone().sub(hp);                               // the lesson's hip → ankle
     f.ext = Math.min(1, f.rel.length() / (d.thigh + d.shin));
     f.bendDir = perp(kn.clone().sub(hp), f.rel.clone().normalize());
@@ -920,6 +977,7 @@ function poseAvatar(n, theta, move, pins) {
   function planHand(s, n, C, w) {
     var d = D[s.X], h = n['h' + s.k], sh = n['sh' + s.k], S = C.Sh[s.X], H = { X: s.X, k: s.k, region: s.hand, slide: 0, adj: 0 };
     H.w = w === undefined ? (bar ? 0 : (1 - smooth(0.045, 0.075, Math.max(0, h.y))) * grounded) : w;
+    if (A.hold && A.hold[s.k]) H.w *= 1 - A.hold[s.k].w;     // a hand holding the other person is not on the floor
     H.rel = h.clone().sub(sh).multiplyScalar((d.upper + d.fore) / ((KTFigure.DIM.upper + KTFigure.DIM.fore) * K));   // the lesson's shoulder → hand, at this arm's length
     H.bendDir = perp(n['e' + s.k].clone().sub(sh), H.rel.clone().normalize());
     H.at = v3(S.x + H.rel.x, 0, S.z + H.rel.z);              // the spot on the floor under that hand
@@ -1086,6 +1144,9 @@ function poseAvatar(n, theta, move, pins) {
       bend = C.up.clone().multiplyScalar(-1).addScaledVector(C.pFwd, -0.4);
     }
     if (wb) { T.y += (H.barW - T.y) * wb; T.x += (H.barX - T.x) * wb; }   // bar resting on the floor: hands on the bar itself
+    var hold = A.hold && A.hold[H.k];                        // a hand holding the other person: on that spot of their body
+    if (hold && hold.w > 0) { var gp = hold.at.clone().addScaledVector(hold.at.clone().sub(S).normalize(), -(d.grip + 0.02)); T.lerp(gp, hold.w);   // (the palm on the spot, so the wrist stops short of it)
+      bend = bend.clone().lerp(hold.bend || bend, hold.w); }
     if (barPush) T.addScaledVector(FW, barPush);             // the bar kept just in front of the model's legs (they have thickness, the lesson's lines do not)
     if (H.w > 0) {                                           // hand on the floor: under where the lesson's arm reaches, as far as the arm allows
       var wy = d.wristH + H.adj, dy = S.y - wy, hl = Math.hypot(H.rel.x, H.rel.z), far = Math.sqrt(Math.max(0, reach * reach - dy * dy)), hd = Math.min(hl, far);
@@ -1324,16 +1385,56 @@ function poseAvatar(n, theta, move, pins) {
   info.kneeDrop = kneeDrop; info.rest = rest; info.g = g; info.wb = wb; info.C = C; info.n = n;
   return info;
 }
+function redJacket(mat, geo) {
+  var tex = mat.map, img = tex && tex.image;
+  if (!img || !img.width) { mat.color.setRGB(0.85, 0.35, 0.35); return; }
+  var cv = document.createElement('canvas'); cv.width = img.width; cv.height = img.height;
+  var cx = cv.getContext('2d'); cx.drawImage(img, 0, 0);
+  var d = cx.getImageData(0, 0, cv.width, cv.height), p = d.data;
+  // only the upper body (the jacket): the parts of the picture used by triangles below the hips of the model as built (trousers,
+  // shoes) are kept, a few pixels wider so their edges stay clean; everything else may turn red (so the jacket has no pale seams)
+  var M = null, pos = geo && geo.attributes.position, uv = geo && geo.attributes.uv;
+  if (pos && uv) {
+    var mk = document.createElement('canvas'); mk.width = cv.width; mk.height = cv.height;
+    var mx2 = mk.getContext('2d'); mx2.fillStyle = mx2.strokeStyle = '#fff'; mx2.lineWidth = 6;
+    geo.computeBoundingBox();
+    var y0 = geo.boundingBox.min.y, cut = y0 + 0.49 * (geo.boundingBox.max.y - y0), idx = geo.index, nT = (idx ? idx.count : pos.count) / 3;
+    var U = function (v) { return [uv.getX(v) * cv.width, (tex.flipY ? 1 - uv.getY(v) : uv.getY(v)) * cv.height]; };
+    for (var f = 0; f < nT; f++) {
+      var a = idx ? idx.getX(3 * f) : 3 * f, b2 = idx ? idx.getX(3 * f + 1) : 3 * f + 1, c2 = idx ? idx.getX(3 * f + 2) : 3 * f + 2;
+      if ((pos.getY(a) + pos.getY(b2) + pos.getY(c2)) / 3 >= cut) continue;
+      var A = U(a), B = U(b2), Cc = U(c2);
+      mx2.beginPath(); mx2.moveTo(A[0], A[1]); mx2.lineTo(B[0], B[1]); mx2.lineTo(Cc[0], Cc[1]); mx2.closePath(); mx2.fill(); mx2.stroke();
+    }
+    M = mx2.getImageData(0, 0, cv.width, cv.height).data;
+  }
+  for (var i = 0; i < p.length; i += 4) {
+    if (M && M[i] >= 128) continue;                              // trousers and shoes stay
+    var r = p[i], gg = p[i + 1], b = p[i + 2], mx = Math.max(r, gg, b), mn = Math.min(r, gg, b), l = (r + gg + b) / 765;
+    var sat = mx ? (mx - mn) / mx : 0;
+    if (l < 0.42 || sat > 0.22) continue;                      // dark cloth, skin and hair stay
+    var w = Math.min(1, (l - 0.42) / 0.12) * Math.min(1, (0.22 - sat) / 0.08), s = l * 1.05;
+    p[i] = r + (Math.min(255, 255 * s * 0.95) - r) * w; p[i + 1] = gg + (255 * s * 0.18 - gg) * w; p[i + 2] = b + (255 * s * 0.16 - b) * w;
+  }
+  cx.putImageData(d, 0, 0);
+  var t2 = new THREE.CanvasTexture(cv);
+  t2.flipY = tex.flipY; t2.colorSpace = tex.colorSpace; t2.wrapS = tex.wrapS; t2.wrapT = tex.wrapT; t2.channel = tex.channel;
+  mat.map = t2; mat.needsUpdate = true;
+}
 function loadAvatar(key, done) {
   if (AVS[key]) { if (done) done(); return; }
   if (avLoading[key]) { if (done) avLoading[key].push(done); return; }
   avLoading[key] = done ? [done] : [];
   new GLTFLoader().load(MODELS[key], function (g) {
+    // the partner is a second copy of the instructor in a red jacket: the light, colourless parts of the picture wrapped round the
+    // model (the jacket) are turned red with their shading kept; skin (warm colours), dark trousers and the shoes stay as they are
+    if (key === 'partner') g.scene.traverse(function (o) { if (o.isMesh && o.material) { o.material = o.material.clone(); redJacket(o.material, o.geometry); } });
     var a = setupAvatar(g.scene);
     if (!a) return;
     AVS[key] = a; a.rig.visible = false;
     if (key === 'instructor') { barbell.scale.setScalar(1.155); PLATE_R = 0.225 * 1.155; }   // the barbell at the instructor's size
     if (avKey === key) useModel(key, true);
+    if (key === 'partner' && clip) draw();
     avLoading[key].forEach(function (f) { f(); }); avLoading[key] = null;
   }, undefined, function (e) { console.error('3D model could not be loaded:', key, e && (e.stack || e.message || e)); });
 }
@@ -1350,15 +1451,284 @@ function useModel(key, force) {
 (function startModels() {
   // the self-check needs every model in memory before it starts
   if (/[?&]check\b/.test(location.search)) {
-    loadAvatar('instructor', function () { loadAvatar('golfer', function () { useModel(cur && cur.model, true); import('./lab3d-check.js').then(function (m) { m.run(CHECK_API); }); }); });
+    loadAvatar('instructor', function () { loadAvatar('golfer', function () { loadAvatar('partner', function () { useModel(cur && cur.model, true); import('./lab3d-check.js').then(function (m) { m.run(CHECK_API); }); }); }); });
   } else loadAvatar(cur && cur.model === 'golfer' ? 'golfer' : 'instructor');
 })();
 
+/* ---------- the partner (two-person lessons) ----------
+ * The 2D lessons draw the partner with kt-partner.js from the pose keys ox (hip x), ot / oh (lean), oa1 / oa2 and ob1 / ob2
+ * (near and far arm), ola / olb (near leg), ol / olf (far leg) and olift: the same stick figure, solved and then turned
+ * round to face you. Here the same joints are turned into 3D and a second model is posed on them. Facing you, the limbs the
+ * lesson draws nearest the viewer are the partner's left ones. The partner moves with you when your steps move the body.
+ */
+var PARTNER_MOVE = { mode: 'side' }, PARTNER_AIR = { mode: 'side', air: 1 };
+function partnerJoints(t, q, raw) {
+  var p = sideP.poseAt(t).pose;
+  var pq = { x: p.ox + (cur.odx || 0), t: p.ot || 0, h: p.oh || 0, su: p.oa1, sl: p.oa2, fu: p.ob1, fl: p.ob2, tu: p.ola, tl: p.olb, bu: -(p.ol || 0),
+    bl: typeof p.olf === 'number' ? -p.olf : -(p.ol || 0) * 0.6, lift: p.olift || 0 };
+  var O = KTFigure.solve(pq, OPT), X = O.hip.x, sd = sidesNow(), sh = q.shift || { x: 0, z: 0 }, n = {};
+  // `odx` (3D only, per move): the partner that many lesson units nearer (−) or further — bodies with thickness stand further
+  // apart at the same hip distance than the drawn lines do, so a chest-to-chest clinch needs them closer.
+  // `oz` (3D only): the partner stands or lies that many lesson units to the side (+ = towards the viewer of the 2D lesson) —
+  // a flat drawing cannot show that you sit beside them, or that your foot steps outside theirs
+  var oz = (typeof p.oz === 'number' ? p.oz : cur.oz || 0) * K * (sd.legs ? -1 : 1);
+  JOINTS.forEach(function (k) {
+    var j = O[k], z = DEPTH[k] || 0, name = k;
+    // facing you, the limbs drawn nearest the viewer are the partner's left ones; shown mirrored (with you), they are its right
+    // ones on the far side
+    var mir = (sd.legs && /^(hip|k|a|t)[NF]$/.test(k)) || (sd.arms && /^(sh|e|h)[NF]$/.test(k));
+    if (mir) z = -z;
+    else if (/^(hip|k|a|t|sh|e|h)[NF]$/.test(k)) name = k.slice(0, -1) + (k.slice(-1) === 'N' ? 'F' : 'N');
+    n[name] = new THREE.Vector3((2 * X - j.x - x0) * K + sh.x, (FLOOR - j.y) * K, z + sh.z + oz);
+  });
+  // `oyaw` (3D only, per move): the partner turned that many degrees about the shoulder `opivot`, all but the arm `okeep` (which
+  // stays as drawn) — the armlock has them lying across you, their arm along your body; a side view can only draw them in line
+  if (cur.oyaw) {
+    var pv = n[cur.opivot || 'shF'].clone(), yaw = cur.oyaw * DEG, keep = cur.okeep || [];
+    Object.keys(n).forEach(function (k) { if (keep.indexOf(k) < 0) n[k].sub(pv).applyAxisAngle(UPV, yaw).add(pv); });
+  }
+  if (!raw) partnerSteps(t, n);
+  return n;
+}
+// closest points of segments a→a+ab and b→b+bb: returns their distance and the two points
+function segSeg(a, ab, b, bb) {
+  var r = a.clone().sub(b), A2 = ab.dot(ab), E = bb.dot(bb), f = bb.dot(r), s = 0, t = 0;
+  if (A2 < 1e-9 && E < 1e-9) { s = t = 0; }
+  else if (A2 < 1e-9) t = Math.max(0, Math.min(1, f / E));
+  else {
+    var c = ab.dot(r);
+    if (E < 1e-9) s = Math.max(0, Math.min(1, -c / A2));
+    else {
+      var bq = ab.dot(bb), den = A2 * E - bq * bq;
+      s = den > 1e-9 ? Math.max(0, Math.min(1, (bq * f - c * E) / den)) : 0;
+      t = (bq * s + f) / E;
+      if (t < 0) { t = 0; s = Math.max(0, Math.min(1, -c / A2)); } else if (t > 1) { t = 1; s = Math.max(0, Math.min(1, (bq - c) / A2)); }
+    }
+  }
+  var p = a.clone().addScaledVector(ab, s), q = b.clone().addScaledVector(bb, t);
+  return { d: p.distanceTo(q), p: p, q: q };
+}
+// how much of a per-frame setting applies now: 1 on the key frames listed, fading in and out between them (like holds)
+function framesW(list, r) {
+  if (!list || !list.length) return 0;
+  var nF = clip.frames.length, j = Math.min(nF - 1, r.seg), j2 = (j + 1) % nF;
+  var w = (list.indexOf(j) >= 0 ? 1 - r.k : 0) + (list.indexOf(j2) >= 0 ? r.k : 0);
+  return w * w * (3 - 2 * w);
+}
+/* On your back (3D only, per move: `onBack: [frames]`): the partner lifted on your hip lies with their front along your back —
+ * hips on your hips, chest on your shoulder blades, head the same way as yours. The drawing only says "over the hip"; the
+ * whole partner is turned and moved there (fading in and out like a hold), and carryApart then clears what still touches. */
+function layOnBack(np, w) {
+  if (w < 0.001) return;
+  var B = avatar.B, hip = wpos(B.Hips), sp = wpos(B.Neck).sub(hip).normalize();
+  var fw = avatar.fwd.clone().applyQuaternion(wquat(B.Hips).multiply(avatar.RQ.Hips.clone().invert()));
+  var back = fw.addScaledVector(sp, -fw.dot(sp)).normalize().negate();
+  var T = hip.clone().addScaledVector(back, 0.25).addScaledVector(sp, 0.08);
+  var P = np.hip.clone(), R = new THREE.Quaternion().setFromUnitVectors(np.sh.clone().sub(P).normalize(), sp);
+  R.slerp(new THREE.Quaternion(), 1 - w);
+  var H = P.clone().lerp(T, w);
+  Object.keys(np).forEach(function (k) { if (np[k] && np[k].isVector3) np[k].sub(P).applyQuaternion(R).add(H); });
+}
+/* Carried (3D only, per move: `carry: [frames]`): on those key frames the partner is off the floor, lying on your back or
+ * rolling over your hip. The drawing's lines run through each other there (a flat figure has no thickness), so the whole
+ * partner is moved out of your body — the shortest way out, a centimetre clear — and posed again, until nothing is inside. */
+function carryApart(np, AP, theta, w, PM) {
+  if (w < 0.001) return;
+  var M = bodyCaps(avatar), orig = {}, wv = new THREE.Vector3();
+  Object.keys(np).forEach(function (k) { if (np[k] && np[k].isVector3) orig[k] = np[k].clone(); });
+  function shift(dv) { Object.keys(orig).forEach(function (k) { np[k].add(dv); }); }
+  // 1. the body (chest, neck, head) clear of yours: the whole partner moves, the shortest way out
+  for (var it = 0; it < 8; it++) {
+    poseAvatar(np, theta, PM, null, AP);
+    var best = null;
+    bodyCaps(AP).forEach(function (c1, i1) {
+      M.forEach(function (c2, i2) {
+        if (i1 > 2 && i2 > 2) return;                          // (their legs count against your body, not against your legs)
+        var sg = segSeg(c1.a, c1.ab, c2.a, c2.ab), need = c1.r + c2.r + 0.01;
+        if (sg.d < need && (!best || need - sg.d > best.depth)) best = { depth: need - sg.d, dir: sg.d > 1e-4 ? sg.p.clone().sub(sg.q).divideScalar(sg.d) : UPV.clone() };
+      });
+    });
+    if (!best || best.depth < 0.004) break;
+    shift(best.dir.multiplyScalar(best.depth));
+  }
+  // 2. then each leg on its own: knee and foot moved out of your body (a hanging leg goes round yours, it does not lift them)
+  function out(p, m) {
+    var q = p.clone();
+    for (var r = 0; r < 3; r++) M.forEach(function (C) {
+      var L2 = C.ab.lengthSq(), t = L2 > 1e-9 ? Math.max(0, Math.min(1, wv.subVectors(q, C.a).dot(C.ab) / L2)) : 0;
+      wv.copy(C.a).addScaledVector(C.ab, t);
+      var d = q.distanceTo(wv), need = C.r + m;
+      if (d < need && d > 1e-4) q.copy(wv).addScaledVector(q.clone().sub(wv).divideScalar(d), need);
+    });
+    return q.sub(p);
+  }
+  for (var round = 0; round < 4; round++) {
+    var moved = false, B = AP.B;
+    SIDES.forEach(function (sd) {
+      var hp = wpos(B[sd.X + 'UpLeg']), kn = wpos(B[sd.X + 'Leg']), an = wpos(B[sd.X + 'Foot']);
+      var dk = out(kn, 0.075), dt = out(hp.clone().lerp(kn, 0.6), 0.085), da = out(an, 0.06), ds = out(kn.clone().lerp(an, 0.5), 0.06);
+      var mk = dk.lengthSq() > dt.lengthSq() ? dk : dt, ma = da.lengthSq() > ds.lengthSq() ? da : ds;
+      if (mk.lengthSq() > 1e-5) { np['k' + sd.k].addScaledVector(mk, 1.2); np['a' + sd.k].addScaledVector(mk, 1.2); np['t' + sd.k].addScaledVector(mk, 1.2); moved = true; }
+      if (ma.lengthSq() > 1e-5) { np['a' + sd.k].addScaledVector(ma, 1.2); np['t' + sd.k].addScaledVector(ma, 1.2); moved = true; }
+    });
+    if (!moved) break;
+    poseAvatar(np, theta, PM, null, AP);
+  }
+  // part-way in or out of a carry frame: that share of the change
+  Object.keys(orig).forEach(function (k) { np[k].sub(orig[k]).multiplyScalar(w).add(orig[k]); });
+}
+/* The partner's feet: the lesson draws them relative to the partner's hips, so a partner pulled forward or pushed back has
+ * feet that glide. Between two key frames a foot that is down at both ends either stays on its spot (the lesson moves it
+ * less than 3 cm) or really steps: it lifts, travels and sets down where the next key frame has it. When both feet must
+ * step, the one with further to go steps first. A partner lying or sitting (hips low) is left as drawn. */
+var PGAIT = null;
+function partnerPlan() {
+  if (PGAIT && PGAIT.src === GAIT && PGAIT.move === cur && PGAIT.flip === !!state.flip) return PGAIT;
+  var fr = sideP.frames, T = [], acc = 0;
+  fr.forEach(function (f) { T.push(acc); acc += f.d; });
+  var spots = T.map(function (t) { var n = partnerJoints(t, lessonJoints(t), true); return { N: footSpot(n, 'N'), F: footSpot(n, 'F'), low: n.hip.y < 0.6 }; });
+  var nF = T.length, seg = T.map(function (t, j) {
+    var A = spots[j], B = spots[(j + 1) % nF], o = {}, dist = {};
+    ['N', 'F'].forEach(function (f) {
+      var a = A[f], b = B[f]; dist[f] = Math.hypot(a.x - b.x, a.z - b.z);
+      o[f] = A.low || B.low ? 'free' : a.g < 0.5 && b.g < 0.5 ? 'free' : a.g < 0.5 ? 'land' : b.g < 0.5 ? 'lift' : dist[f] < 0.03 ? 'hold' : 'step';
+    });
+    if (o.N === 'step' && o.F === 'step') { var nf = dist.N >= dist.F; o.N = nf ? 'first' : 'second'; o.F = nf ? 'second' : 'first'; }
+    return o;
+  });
+  PGAIT = { src: GAIT, move: cur, flip: !!state.flip, T: T, spots: spots, seg: seg, total: acc };
+  return PGAIT;
+}
+function partnerSteps(t, n) {
+  var G = partnerPlan(), nF = G.T.length, tt = ((t % G.total) + G.total) % G.total, j = 0;
+  while (j < nF - 1 && G.T[j + 1] <= tt) j++;
+  var k = (tt - G.T[j]) / ((j < nF - 1 ? G.T[j + 1] : G.total) - G.T[j]);
+  n.restart = j === nF - 1 && (G.spots[j].low || G.spots[0].low);   // the loop's jump from lying back to standing
+  ['N', 'F'].forEach(function (f) {
+    var mode = G.seg[j][f];
+    if (mode === 'free') return;
+    var A = G.spots[j][f], B = G.spots[(j + 1) % nF][f], now = footSpot(n, f), go = 0, lift = 0;
+    if (mode === 'lift' || mode === 'land') {                // leaving the floor from its spot / setting down on the next one
+      var S2 = mode === 'lift' ? A : B, wg = now.g;
+      ['a', 't'].forEach(function (p2) { var v = n[p2 + f]; v.x += (S2.x - now.x) * wg; v.z += (S2.z - now.z) * wg; });
+      n['k' + f].x += (S2.x - now.x) * wg * 0.5; n['k' + f].z += (S2.z - now.z) * wg * 0.5;
+      return;
+    }
+    if (mode !== 'hold') {
+      var u = mode === 'first' ? k / 0.5 : mode === 'second' ? (k - 0.5) / 0.5 : k;
+      u = Math.max(0, Math.min(1, u)); go = smooth(0.3, 0.85, u);                // (across the floor only once the foot is up)
+      lift = Math.max(0.06, Math.min(0.1, 0.3 * Math.hypot(B.x - A.x, B.z - A.z))) * Math.sin(Math.PI * u);
+    }
+    var dx = A.x + (B.x - A.x) * go - now.x, dz = A.z + (B.z - A.z) * go - now.z;
+    ['a', 't'].forEach(function (p2) { var v = n[p2 + f]; v.x += dx; v.z += dz; v.y += lift; });
+    var kn = n['k' + f]; kn.x += dx * 0.5; kn.z += dz * 0.5; kn.y += lift * 0.5;
+  });
+}
+function drawPartner(time, q) {
+  var AP = AVS.partner;
+  if (avatar) avatar.hold = null;
+  if (!cur || !cur.duo || cur.mode === 'front') { if (AP) AP.rig.visible = false; return null; }
+  if (!AP) { loadAvatar('partner'); return null; }
+  AP.rig.visible = true;
+  var np = partnerJoints(time, q);
+  AP.hold = holdsNow('partner', avatar, q.r);
+  var restart = np.restart; delete np.restart;
+  var pth = Math.PI + (cur.oyaw || 0) * DEG, cw = framesW(cur.carry, q.r), PM = cw > 0.01 ? PARTNER_AIR : PARTNER_MOVE;
+  layOnBack(np, framesW(cur.onBack, q.r));
+  carryApart(np, AP, pth, cw, PM);
+  var pinfo = armsOutside(np, pth, PM, null, AP, bodyCaps(avatar));   // the partner's hands stop on your body (a grip)
+  if (pinfo) { pinfo.restart = restart; pinfo.carried = cw > 0.01; }
+  avatar.hold = holdsNow('me', AP, q.r);
+  var mine = armsOutside(q.n, q.r.theta, cur, q.pins, avatar, bodyCaps(AP), !avatar.hold);   // …and yours on theirs
+  if (mine) q.info = mine;
+  return pinfo;
+}
+// Poses X on lesson joints n, then measures where its hands and elbows really are: any that ended inside the other body's
+// capsules have their lesson joint moved by the same amount outwards and the body is posed again (up to 3 rounds).
+// (The model's arms are not the lesson's length, so the lesson's hand point alone cannot be trusted.)
+function armsOutside(n, theta, move, pins, X, caps, posed) {
+  var info = posed ? null : poseAvatar(n, theta, move, pins, X), w = new THREE.Vector3();
+  function push(p, m) {                                      // how far p must move to be m clear of every capsule
+    var out = new THREE.Vector3(), q = p.clone();
+    for (var it = 0; it < 3; it++) caps.forEach(function (C) {
+      var L2 = C.ab.lengthSq(), t = L2 > 1e-9 ? Math.max(0, Math.min(1, w.subVectors(q, C.a).dot(C.ab) / L2)) : 0;
+      w.copy(C.a).addScaledVector(C.ab, t);
+      var d = q.distanceTo(w), need = C.r + m;
+      if (d >= need || d < 1e-4) return;
+      q.copy(w).addScaledVector(q.clone().sub(w).divideScalar(d), need);
+    });
+    return out.subVectors(q, p);
+  }
+  for (var round = 0; round < 3; round++) {
+    var moved = false;
+    SIDES.forEach(function (s) {
+      var B = X.B, wr = wpos(B[s.X + 'Hand']), kn = wr.clone().lerp(wpos(B[s.X + 'HandMiddle1']), 1.6), el = wpos(B[s.X + 'ForeArm']), mid = el.clone().lerp(wr, 0.5);
+      var dh = push(kn, 0.02), dw = push(wr, 0.035), de = push(el, 0.045), dm = push(mid, 0.04);
+      var hand = dh.lengthSq() > dw.lengthSq() ? dh : dw, elb = de.lengthSq() > dm.lengthSq() ? de : dm;
+      if (X.hold && X.hold[s.k] && X.hold[s.k].w > 0.5) return;   // a holding hand is where the hold puts it
+      if (hand.lengthSq() > 1e-6) { n['h' + s.k].addScaledVector(hand, 1.1); moved = true; }
+      if (elb.lengthSq() > 1e-6) { n['e' + s.k].addScaledVector(elb, 2); if (dm.lengthSq() > 1e-6) n['h' + s.k].addScaledVector(dm, 1); moved = true; }
+    });
+    if (!moved && info) break;
+    if (!moved && !info) return null;
+    info = poseAvatar(n, theta, move, pins, X);
+  }
+  return info;
+}
+/* Holds (3D only, per move in MOVES): a hand fixed to a spot on the other person's body for the key frames listed —
+ *   { by: 'me' | 'partner', hand: 'N' | 'F', bone: 'Neck', at: [forward, up, right] metres in that body's own frame, on: [frame, …] }
+ * (N / F are the holder's right / left hand.) Between two key frames the hold fades in or out. */
+function holdsNow(by, X, r) {
+  var hs = (cur.holds || []).filter(function (h) { return h.by === by; }), out = null;
+  if (!hs.length || !X) return null;
+  var nF = clip.frames.length, j = Math.min(nF - 1, r.seg), j2 = (j + 1) % nF;
+  hs.forEach(function (h) {
+    var w = (h.on.indexOf(j) >= 0 ? 1 - r.k : 0) + (h.on.indexOf(j2) >= 0 ? r.k : 0);
+    w = w * w * (3 - 2 * w);
+    if (w < 0.001) return;
+    var b = X.B[h.bone], turn = wquat(b).multiply(X.RQ[h.bone].clone().invert());
+    var o = X.fwd.clone().multiplyScalar(h.at[0]).addScaledVector(UPV, h.at[1]).addScaledVector(X.right, h.at[2]).applyQuaternion(turn);
+    var hand = h.hand === 'N' ? 'N' : 'F';
+    (out = out || {})[hand] = { at: wpos(b).add(o), w: w, bend: h.bend ? v3(h.bend[0], h.bend[1], h.bend[2]) : null };
+  });
+  return out;
+}
+// a body as capsules (bone to bone, radius in metres): what another body's hands must stay outside of
+var CAPS = [['Hips', 'Neck', 0.12, 0, 0.86], ['Neck', 'Head', 0.055], ['Head', 'Head', 0.1, 0.09], ['RightUpLeg', 'RightLeg', 0.075], ['LeftUpLeg', 'LeftLeg', 0.075], ['RightLeg', 'RightFoot', 0.052], ['LeftLeg', 'LeftFoot', 0.052]];
+function bodyCaps(X) {
+  return CAPS.map(function (c) {
+    var a = wpos(X.B[c[0]]), b = wpos(X.B[c[1]]);
+    if (c[3]) { a.addScaledVector(wpos(X.B.Head).sub(wpos(X.B.Neck)).normalize(), c[3]); b = a.clone(); }
+    if (c[4]) b.lerp(a, 1 - c[4]);                            // the chest ends below the base of the neck
+    return { a: a, ab: b.sub(a), r: c[2] };
+  });
+}
+// moves the hand targets of lesson joints n out of the capsules (to the surface, plus a hand's thickness); true if any moved
+function pushOut(n, caps) {
+  var moved = false, w = new THREE.Vector3();
+  ['hN', 'hF'].forEach(function (k) {
+    var p = n[k];
+    for (var it = 0; it < 3; it++) {
+      var any = false;
+      caps.forEach(function (C) {
+        var L2 = C.ab.lengthSq(), t = L2 > 1e-9 ? Math.max(0, Math.min(1, w.subVectors(p, C.a).dot(C.ab) / L2)) : 0;
+        w.copy(C.a).addScaledVector(C.ab, t);
+        var d = p.distanceTo(w), need = C.r + 0.035;
+        if (d >= need) return;
+        var dir = d > 1e-4 ? p.clone().sub(w).divideScalar(d) : n['sh' + k.charAt(1)].clone().sub(w).normalize();
+        p.copy(w).addScaledVector(dir, need); any = moved = true;
+      });
+      if (!any) break;
+    }
+  });
+  return moved;
+}
 function drawBody(time) {
   var q = lessonJoints(time), r = q.r, J = r.J, V = r.V, n = q.n;
   faceQ.setFromAxisAngle(UPV, r.theta);
   if (avatar) {
     drawBar(r, J, V, poseAvatar(n, r.theta, cur, q.pins));
+    drawPartner(time, q);
     drawStick(r); drawClub(r);
     return r.seg;
   }
@@ -1562,6 +1932,7 @@ if (MOVES.length) {
 var CHECK_API = {
   THREE: THREE, MOVES: MOVES, K: K, SIDES: SIDES, plateR: function () { return PLATE_R; }, scene: scene, barbell: barbell, wpos: wpos, stick: stick,
   avatar: function () { return avatar; },
+  partner: function () { return cur && cur.duo ? AVS.partner : null; },
   gait: function () { return GAIT; },
   load: function (i) { setPlaying(false); setMove(i, true); return state.total; },
   frames: function () { return clip.frames; },
@@ -1571,8 +1942,10 @@ var CHECK_API = {
     var q = lessonJoints(t), r = q.r, n = q.n;
     faceQ.setFromAxisAngle(UPV, r.theta);
     var info = poseAvatar(n, r.theta, cur, q.pins);
+    var pinfo = drawPartner(t, q);
+    if (q.info) info = q.info;
     drawBar(r, r.J, r.V, info);
     drawStick(r); drawClub(r);
-    return { info: info, n: n, theta: r.theta };
+    return { info: info, n: n, theta: r.theta, partner: pinfo };
   }
 };
