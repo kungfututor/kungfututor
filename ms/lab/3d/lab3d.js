@@ -106,7 +106,15 @@ var MOVES = [
   mv('grapple', 'JUDO', 'ogoshi', { duo: 1, oz: 0,
     // (bodies with thickness: your back against their front needs more room than the drawn lines, and they land a little
     //  further in front of your feet; lifted and rolling over your hip they rest on your back — carry)
-    fix: { 2: { ox: 230, ot: 24 }, 3: { ot: 66, ola: -10, olb: -30, ol: -16, olf: -36, olift: 40, oa1: 70, oa2: 40, ob1: 60, ob2: 30 }, 4: { ot: 128, ola: -120, olb: -130, ol: 128, olf: 120, olift: 48 }, 5: { ox: 92 } }, carry: [3, 4], onBack: [3], holds: [{ by: 'me', hand: 'N', bone: 'Spine', at: [-0.14, 0.02, 0.04], on: [2, 3] }].concat(judoGrips([0, 1], [0, 1, 2, 3, 4, 5], [0, 1], [0, 1])) }), mv('grapple', 'JUDO', 'osoto', { duo: 1, oz: 30, holds: [   // right hand on their left lapel, left hand on their right sleeve — and theirs the same on you
+    fix: { 2: { ox: 230, ot: 24 }, 3: { ot: 66, ola: -10, olb: -30, ol: -16, olf: -36, olift: 40, oa1: 70, oa2: 40, ob1: 60, ob2: 30 }, 4: { ot: 128, ola: -120, olb: -130, ol: 128, olf: 120, olift: 48 }, 5: { ox: 82, t: 50, oz: 20, fN: { x: 20, y: 70 }, fF: { x: -18, y: 70 } } }, carry: [3, 4], throwPath: { 3: { pitch: 60, at: [-0.27, -0.06, 0] }, 4: { pitch: 160, at: [0.05, 0.2, 0.32] } }, holds: [{ by: 'me', hand: 'N', bone: 'Spine', at: [-0.14, 0.02, 0.04], on: [2, 3] },
+      // turned in and lifting, their grips change: their right arm (the sleeve you pull) comes round your left side to the
+      // front of your hip; their left hand rests on the back of your right shoulder (each hand travels round your body)
+      { by: 'partner', hand: 'N', bone: 'Spine', at: [0.12, 0.02, -0.17], on: [2, 3] }, { by: 'partner', hand: 'F', bone: 'Spine2', at: [-0.13, 0.06, 0.12], on: [2, 3] },
+      // your left hand never lets go of the sleeve: as they go over and land it follows their arm (however far it swings)
+      // (over and down, the sleeve's end: their pulled arm stays up in your hand, and you bend to keep it)
+      { by: 'me', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: [3] }, { by: 'me', hand: 'F', bone: 'RightHand', at: [0, 0, 0], on: [4, 5], reach: 1 },
+      { by: 'partner', hand: 'N', bone: 'LeftHand', at: [0, 0, 0], on: [4] }]
+      .concat(judoGrips([0, 1], [0, 1, 2], [0, 1], [0, 1])) }), mv('grapple', 'JUDO', 'osoto', { duo: 1, oz: 30, holds: [   // right hand on their left lapel, left hand on their right sleeve — and theirs the same on you
     { by: 'me', hand: 'N', bone: 'Spine2', at: [0.16, 0.06, -0.08], bend: [0, -1, 0], on: [0, 1, 2, 3] }, { by: 'me', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: [0, 1, 2, 3, 4, 5] },
     { by: 'partner', hand: 'N', bone: 'Spine2', at: [0.16, 0.06, -0.08], bend: [0, -1, 0], on: [0, 1, 2, 3] }, { by: 'partner', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: [0, 1, 2, 3] }] }), mv('grapple', 'JUDO', 'kesa', { duo: 1, oz: 42,
     // you sit at their right side and lean sideways on to their chest (the drawing's forward lean), right arm round the neck,
@@ -131,9 +139,12 @@ var MOVES = [
     { by: 'me', hand: 'N', bone: 'LeftLeg', at: [-0.07, 0.06, -0.03], on: [2, 3] }, { by: 'me', hand: 'F', bone: 'LeftLeg', at: [-0.07, 0.1, 0.04], on: [2, 3] }] }),
   // side hold-down: you kneel at their side, chest across their chest — they lie across you, not in line (oyaw)
   mv('grapple', 'SAMBO', 'holddown', { duo: 1, oyaw: 90, opivot: 'sh', odx: -10, oz: 18, holds: [
-    // (turned across you their right side is nearest: your right arm goes round under their head, your left hand holds their near arm;
-    //  reach: 1 — reached for while you settle, left as they were before the grip correction, which unsettled this move)
-    { by: 'me', hand: 'N', bone: 'Head', at: [-0.04, 0.27, 0], on: [0, 1, 2, 3], reach: 1 }, { by: 'me', hand: 'F', bone: 'RightArm', at: [0, 0.02, 0], on: [0, 1, 2, 3], reach: 1 }], fix: { 0: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 1: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 2: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 3: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 } } }),   // (their arms down by their sides on the mat, not up in the air)
+    // (turned across you their right side is nearest: your right arm goes under their neck, the hand cupping the far side of it;
+    //  your left hand holds their near arm. Kneeling up beside them first, your right hand is on their chest, the left on their near arm; the right slides under
+    //  the neck as you lean your chest on to theirs. reach: 1 — reached for while you settle. (Hands that let go and grip
+    //  again made the body jump: a half-held hand counts as half on the floor)
+    { by: 'me', hand: 'N', bone: 'Spine2', at: [0.12, 0.02, -0.04], on: [0], reach: 1 }, { by: 'me', hand: 'N', bone: 'Neck', at: [-0.06, 0.04, -0.12], on: [1, 2, 3], reach: 1 },
+    { by: 'me', hand: 'F', bone: 'RightArm', at: [0, 0.02, 0], on: [0, 1, 2, 3], reach: 1 }], fix: { 0: { t: 66, y: 172, oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 1: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 2: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 3: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 } } }),   // (their arms down by their sides on the mat, not up in the air)
   mv('grapple', 'SAMBO', 'anklelock', { duo: 1, fix: { 0: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 1: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 2: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 3: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 } } }),   // (lying back, arms on the mat by their sides)
   mv('grapple', 'SAMBO', 'combat', { duo: 1, oz: 10, holds: judoGrips([3, 4], [3, 4, 5], null, null) }), // BJJ (ground): in the guard your knees go out round their waist, ankles crossed behind; in the mount your knees are on the
   // mat either side of them; in side control you are turned across their chest (myaw); on top of you they kneel astride (ospread)
@@ -1300,6 +1311,7 @@ function poseAvatar(n, theta, move, pins, who) {
   var gBody = 1e9;
   Object.keys(n0).forEach(function (k) { if (k !== 'head' && !/^[at][NF]$/.test(k)) gBody = Math.min(gBody, n0[k].y); });
   rest = Math.max(rest * grounded, Math.max(lying, 1 - smooth(0.05, 0.08, Math.max(0, gBody))) * (1 - maxFoot));
+  if (move && move.air) rest = 0;                           // thrown: nothing of theirs is lowered onto the mat (a trunk lying along your back is not lying on the floor)
   // standing on one leg: the body's weight moves sideways over that foot, as a person's hips do; the foot itself stays put.
   // (each foot starts under its own hip joint, so without this the weight would hang 11 cm to the side of a single standing foot)
   if (rest < 0.5 && Math.max(wH[0], wH[1]) < 0.5) {
@@ -1545,8 +1557,24 @@ function useModel(key, force) {
  * lesson draws nearest the viewer are the partner's left ones. The partner moves with you when your steps move the body.
  */
 var PARTNER_MOVE = { mode: 'side' }, PARTNER_AIR = { mode: 'side', air: 1 };
+var LANDED = null;
 function partnerJoints(t, q, raw) {
   var p = sideP.poseAt(t).pose;
+  // the loop's way back from lying to standing: the drawing turns the partner the long way round (a backward flip through
+  // a headstand); they stay where they landed and the next repeat starts standing
+  if (cur.duo && !raw) {
+    var fr = sideP.frames, nF = fr.length, tot = sideP.total, tt = ((t % tot) + tot) % tot, last = tot - fr[nF - 1].d;
+    if (tt >= last) {
+      var pl = sideP.poseAt(last).pose, p0 = sideP.poseAt(0).pose;
+      var lowL = Math.abs(pl.ot || 0) > 60, lowS = Math.abs(p0.ot || 0) > 60;
+      if (lowL !== lowS) {
+        p = pl;
+        // …and where they landed: your own steps back to the start shift you (and anything drawn with you), not them
+        if (!LANDED || LANDED.move !== cur || LANDED.flip !== !!state.flip) LANDED = { move: cur, flip: !!state.flip, shift: lessonJoints(last).shift };
+        q = { shift: LANDED.shift };
+      }
+    }
+  }
   var pq = { x: p.ox + (cur.odx || 0), t: p.ot || 0, h: p.oh || 0, su: p.oa1, sl: p.oa2, fu: p.ob1, fl: p.ob2, tu: p.ola, tl: p.olb, bu: -(p.ol || 0),
     bl: typeof p.olf === 'number' ? -p.olf : -(p.ol || 0) * 0.6, lift: p.olift || 0 };
   var O = KTFigure.solve(pq, OPT), X = O.hip.x, sd = sidesNow(), sh = q.shift || { x: 0, z: 0 }, n = {};
@@ -1619,6 +1647,52 @@ function framesW(list, r) {
   var w = (list.indexOf(j) >= 0 ? 1 - r.k : 0) + (list.indexOf(j2) >= 0 ? r.k : 0);
   return w * w * (3 - 2 * w);
 }
+/* Thrown over your hip (3D only, per move: `throwPath: { frame: { pitch, at: [forward, up, near] } }`): on those key frames the
+ * whole partner is placed by plan, not by the drawing — their hips `at` metres from your hips (forward of you, up, out to
+ * your near side, the hip they go over) and their trunk leaning `pitch` degrees forward over you (0 upright, 90 lying along
+ * your back, 180 head down, 270 on their back with the head towards you). On the frames either side they are as drawn; in
+ * between they turn smoothly the short way round and their hips travel on a smooth curve. Their arms and legs keep the
+ * drawing's shape. (Pushing a flat drawing out of your body made them jump on and off your back and fly over your head.) */
+var THROW_OWN = null;
+function bodyFrame(n) {
+  var u = n.sh.clone().sub(n.hip).normalize(), lr = n.shN.clone().sub(n.shF);
+  lr.addScaledVector(u, -lr.dot(u)).normalize();
+  var fr = new THREE.Vector3().crossVectors(lr, u), m = new THREE.Matrix4().makeBasis(lr, u, fr);
+  return { P: n.hip.clone(), Q: new THREE.Quaternion().setFromRotationMatrix(m), lr: lr };
+}
+function throwPath(np, r) {
+  var TP = cur.throwPath;
+  if (!TP) return;
+  var fr = clip.frames, nF = fr.length, j = Math.min(nF - 1, r.seg), j2 = (j + 1) % nF;
+  if (!TP[j] && !TP[j2]) return;
+  if (!THROW_OWN || THROW_OWN.move !== cur || THROW_OWN.flip !== !!state.flip) {
+    var acc = 0, own = fr.map(function (f) { var o = bodyFrame(partnerJoints(acc, lessonJoints(acc), true)); acc += f.d; return o; });
+    THROW_OWN = { move: cur, flip: !!state.flip, own: own };
+  }
+  var own = THROW_OWN.own, B = avatar.B, hip = wpos(B.Hips);
+  var f = avatar.fwd.clone().applyQuaternion(wquat(B.Hips).multiply(avatar.RQ.Hips.clone().invert())); f.y = 0; f.normalize();
+  var near = wpos(B.RightUpLeg).sub(hip); near.y = 0; near.addScaledVector(f, -near.dot(f)).normalize();
+  var side = new THREE.Vector3().crossVectors(f, UPV).normalize();
+  var firstKey = +Object.keys(TP)[0];
+  if (side.dot(own[(firstKey - 1 + nF) % nF].lr) < 0) side.negate();
+  function at(i) {
+    var K = TP[(i + nF) % nF];
+    if (!K) return own[(i + nF) % nF];
+    var p = K.pitch * DEG, u = UPV.clone().multiplyScalar(Math.cos(p)).addScaledVector(f, Math.sin(p));
+    var lr = side.clone().addScaledVector(u, -side.dot(u)).normalize(), fv = new THREE.Vector3().crossVectors(lr, u);
+    return { P: hip.clone().addScaledVector(f, K.at[0]).addScaledVector(UPV, K.at[1]).addScaledVector(near, K.at[2]),
+      Q: new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(lr, u, fv)) };
+  }
+  var A0 = at(j - 1), A = at(j), Bk = at(j + 1), B2 = at(j + 2), k = r.k, k2 = k * k, k3 = k2 * k;
+  // hips: a Catmull-Rom curve through the key frames' spots
+  var P = A0.P.clone().multiplyScalar(-0.5 * k3 + k2 - 0.5 * k).addScaledVector(A.P, 1.5 * k3 - 2.5 * k2 + 1)
+    .addScaledVector(Bk.P, -1.5 * k3 + 2 * k2 + 0.5 * k).addScaledVector(B2.P, 0.5 * k3 - 0.5 * k2);
+  // coming down off a key onto the mat, they turn over first and drop after: back first onto the mat, not head first
+  var landing = TP[j] && !TP[(j + 1) % nF], ks = landing ? 1 - Math.pow(1 - k, 2.5) : k * k * (3 - 2 * k), Q = A.Q.clone().slerp(Bk.Q, ks);
+  if (landing) { var kd = k * k; P = A.P.clone().lerp(Bk.P, k); P.y = A.P.y + (Bk.P.y - A.P.y) * kd; }
+  var me = bodyFrame(np), D = Q.multiply(me.Q.clone().invert());
+  Object.keys(np).forEach(function (key) { if (np[key] && np[key].isVector3) np[key].sub(me.P).applyQuaternion(D).add(P); });
+}
 /* On your back (3D only, per move: `onBack: [frames]`): the partner lifted on your hip lies with their front along your back —
  * hips on your hips, chest on your shoulder blades, head the same way as yours. The drawing only says "over the hip"; the
  * whole partner is turned and moved there (fading in and out like a hold), and carryApart then clears what still touches. */
@@ -1642,19 +1716,29 @@ function carryApart(np, AP, theta, w, PM) {
   Object.keys(np).forEach(function (k) { if (np[k] && np[k].isVector3) orig[k] = np[k].clone(); });
   function shift(dv) { Object.keys(orig).forEach(function (k) { np[k].add(dv); }); }
   // 1. the body (chest, neck, head) clear of yours: the whole partner moves, the shortest way out
-  for (var it = 0; it < 8; it++) {
+  for (var it = 0; it < (cur.throwPath ? 0 : 8); it++) {
     poseAvatar(np, theta, PM, null, AP);
     var best = null;
     bodyCaps(AP).forEach(function (c1, i1) {
       M.forEach(function (c2, i2) {
-        if (i1 > 2 && i2 > 2) return;                          // (their legs count against your body, not against your legs)
+        // only their trunk, neck and head move the whole body; their legs are moved out of the way one by one below — a
+        // hanging thigh against your hips lifted the whole partner into the air
+        if (i1 > 2) return;
         var sg = segSeg(c1.a, c1.ab, c2.a, c2.ab), need = c1.r + c2.r + 0.01;
         if (sg.d < need && (!best || need - sg.d > best.depth)) best = { depth: need - sg.d, dir: sg.d > 1e-4 ? sg.p.clone().sub(sg.q).divideScalar(sg.d) : UPV.clone() };
       });
     });
     if (!best || best.depth < 0.004) break;
+    // carried, they come off your body outwards from your back or upwards — never pushed down through you to the mat
+    if (best.dir.y < 0.2) {
+      var Bm = avatar.B, spm = wpos(Bm.Neck).sub(wpos(Bm.Hips)).normalize();
+      var fwm = avatar.fwd.clone().applyQuaternion(wquat(Bm.Hips).multiply(avatar.RQ.Hips.clone().invert()));
+      var backm = fwm.addScaledVector(spm, -fwm.dot(spm)).normalize().negate();
+      best.dir = backm.addScaledVector(UPV, 0.6).normalize();
+    }
     shift(best.dir.multiplyScalar(best.depth));
   }
+  if (cur.throwPath) poseAvatar(np, theta, PM, null, AP);
   // 2. then each leg on its own: knee and foot moved out of your body (a hanging leg goes round yours, it does not lift them)
   function out(p, m) {
     var q = p.clone();
@@ -1738,6 +1822,7 @@ function drawPartner(time, q) {
   AP.hold = holdsNow('partner', avatar, q.r, AP);
   var restart = np.restart; delete np.restart;
   var pth = Math.PI + (cur.oyaw || 0) * DEG, cw = framesW(cur.carry, q.r), PM = cw > 0.01 ? PARTNER_AIR : PARTNER_MOVE;
+  throwPath(np, q.r);
   layOnBack(np, framesW(cur.onBack, q.r));
   carryApart(np, AP, pth, cw, PM);
   var pinfo = armsOutside(np, pth, PM, null, AP, bodyCaps(avatar));   // the partner's hands stop on your body (a grip)
@@ -1803,9 +1888,22 @@ function holdsNow(by, X, r, holder) {
       if (w < 0.001) return;
     }
     out = out || {};
-    if (out[hand]) {                                        // one hand moving from one grip to the next: the spot blends across
-      var o0 = out[hand], wt = o0.w + w; o0.at.multiplyScalar(o0.w / wt).addScaledVector(at, w / wt); o0.w = Math.min(1, wt);
-      if (h.bend) o0.bend = v3(h.bend[0], h.bend[1], h.bend[2]);
+    if (out[hand]) {                                        // one hand moving from one grip to the next
+      var o0 = out[hand];
+      if (o0.at.distanceTo(at) > 0.15) {
+        // far apart (lapel at the front, then round their back): a straight blend would pass through their body — the hand
+        // travels round it instead, at the blended height and a little outside the body, the short way round
+        var c = wpos(X.B.Spine1), a0 = o0.at.clone().sub(c), a1 = at.clone().sub(c), f = w / (o0.w + w);
+        var ang0 = Math.atan2(a0.z, a0.x), ang1 = Math.atan2(a1.z, a1.x), da = ang1 - ang0;
+        while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;
+        var ang = ang0 + da * f, rad = Math.hypot(a0.x, a0.z) * (1 - f) + Math.hypot(a1.x, a1.z) * f + 0.05 * Math.sin(Math.PI * f);
+        o0.at = v3(c.x + Math.cos(ang) * rad, c.y + a0.y * (1 - f) + a1.y * f, c.z + Math.sin(ang) * rad);
+        o0.w = Math.min(1, o0.w + w);
+        if (f > 0.5) { o0.bend = h.bend ? v3(h.bend[0], h.bend[1], h.bend[2]) : null; o0.reach = h.reach; }
+      } else {                                              // close together: the spot slides across
+        var wt = o0.w + w; o0.at.multiplyScalar(o0.w / wt).addScaledVector(at, w / wt); o0.w = Math.min(1, wt);
+        if (h.bend) o0.bend = v3(h.bend[0], h.bend[1], h.bend[2]);
+      }
     } else out[hand] = { at: at, w: w, bend: h.bend ? v3(h.bend[0], h.bend[1], h.bend[2]) : null, reach: h.reach };
   });
   return out;
@@ -1816,7 +1914,13 @@ function palmOf(X, side) { var w = wpos(X.B[side + 'Hand']); return w.add(wpos(X
 function fixGrips(X, n, theta, move, pins) {
   if (!X || !X.hold) return null;
   var want = {}, info = null, any = false;
-  ['N', 'F'].forEach(function (k) { if (X.hold[k] && X.hold[k].w > 0.5 && !X.hold[k].barGrip && !X.hold[k].reach) { want[k] = X.hold[k].at.clone(); any = true; } });
+  ['N', 'F'].forEach(function (k) {
+    var h = X.hold[k];
+    if (!h || h.w <= 0.5 || h.barGrip) return;
+    // (an always-reached grip is fine-tuned too while the spot is within the arm's stretch — beyond it the arm is already straight)
+    if (h.reach) { var s2 = k === 'N' ? 'Right' : 'Left', d = X.D[s2]; if (wpos(X.B[s2 + 'Arm']).distanceTo(h.at) > d.upper + d.fore + d.grip) return; }
+    want[k] = h.at.clone(); any = true;
+  });
   if (!any) return null;
   for (var it = 0; it < 3; it++) {
     var worst = 0;

@@ -261,6 +261,9 @@ export function run(api) {
     if (sheets) {
       var times = [], acc = 0;
       frames.forEach(function (fr) { times.push(acc); acc += fr.d; });
+      // &dense=N: N evenly spaced moments across the loop instead of the key frames (the in-between motion)
+      var DENSE = +(qs.get('dense') || 0);
+      if (DENSE) { times = []; for (var di = 0; di < DENSE; di++) times.push(Math.round(acc * di / DENSE)); }
       var groups = [];
       if (PER) for (var g0 = 0; g0 < times.length; g0 += PER) groups.push(times.slice(g0, g0 + PER));
       else groups = [times.length > 7 ? times.filter(function (_, i) { return i % Math.ceil(times.length / 7) === 0; }) : times];
