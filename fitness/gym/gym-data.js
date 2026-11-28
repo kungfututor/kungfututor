@@ -125,8 +125,10 @@
       fN: { x: hip.x + 46, y: GA }, fF: { x: hip.x + 42, y: GA }, ftN: 90, ftF: 90, kbN: 1, kbF: 1 },
       // elbows tucked about 45° also point out to the side, so the upper arm looks shorter part-way down;
       // that keeps the forearms upright under the bar the whole way
-      arms(sh, bar, lowerOf, 0.85 + 0.15 * k - 0.37 * Math.sin(Math.PI * k)));
+      wrapUp(arms(sh, bar, lowerOf, 0.85 + 0.15 * k - 0.37 * Math.sin(Math.PI * k))));
   }
+  // arm angles kept on one side of "straight down" so the tween between two frames never swings an arm the long way round
+  function wrapUp(o) { ['su', 'sl', 'fu', 'fl'].forEach(function (k) { if (o[k] < -90) o[k] += 360; else if (o[k] > 270) o[k] -= 360; }); return o; }
   /* ---------- pull-up ---------- */
   // bar high enough that a body hanging with straight arms and bent knees keeps its feet off the floor
   var BAR = { x: 205, y: 0 };

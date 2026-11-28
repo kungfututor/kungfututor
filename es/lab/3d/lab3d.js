@@ -148,7 +148,10 @@ var MOVES = [
   mv('defence', 'SELFDEF', 'elbow'), mv('defence', 'SELFDEF', 'kick'), mv('defence', 'SELFDEF', 'cover'),
   mv('defence', 'KRAV', 'stance'), mv('defence', 'KRAV', 'burst'), mv('defence', 'KRAV', 'inside'), mv('defence', 'KRAV', 'outside'),
   mv('defence', 'KRAV', 'kick'), mv('defence', 'KRAV', 'escape'),
-  mv('fit', 'GYM', 'squat', { bar: 'back' }), mv('fit', 'GYM', 'deadlift', { bar: 'hands' }), mv('fit', 'GYM', 'press', { bar: 'hands' }),
+  mv('fit', 'GYM', 'squat', { bar: 'back' }), mv('fit', 'GYM', 'deadlift', { bar: 'hands' }),
+  // bench press: lying on a flat bench (top 0.39 m, as the 2D lesson places it), the barbell in the hands; pull-up: hanging
+  // from a bar 2 m up on a frame
+  mv('fit', 'GYM', 'bench', { bar: 'hands', kit: 'bench' }), mv('fit', 'GYM', 'pullup', { kit: 'pullbar', gait: false }), mv('fit', 'GYM', 'press', { bar: 'hands' }),
   mv('fit', 'GYM', 'row', { bar: 'hands' }), mv('fit', 'GYM', 'lunge'),
   // (hands and toes on the floor the whole time: nothing steps, so the planted-feet planner is left out)
   mv('fit', 'GYM', 'pushup', { gait: false }), mv('fit', 'GYM', 'plank', { gait: false }), mv('fit', 'GYM', 'bridge'),
@@ -1302,7 +1305,8 @@ function poseAvatar(n, theta, move, pins, who) {
   // barbell resting on the floor (deadlift start): the bar sits over the model's mid-foot and straight arms must reach it.
   // First the knees bend a little more (the hips stay above the knees, the back keeps the lesson's angle);
   // only if that is not enough does the back hinge further.
-  var wb = bar === 'hands' ? 1 - smooth(PLATE_R + 0.02, PLATE_R + 0.2, Math.min(n0.hN.y, n0.hF.y)) : 0;
+  // (lying on a bench the bar comes down to the chest, not to the floor: never rested on the floor there)
+  var wb = bar === 'hands' && !(move && move.kit === 'bench') ? 1 - smooth(PLATE_R + 0.02, PLATE_R + 0.2, Math.min(n0.hN.y, n0.hF.y)) : 0;
   var lift = feetLift(feet), barDrop = 0;
   if (wb) {
     var midX = 0, mfw = 0;
@@ -2007,6 +2011,15 @@ function drawKit(r, t) {
     var fwd2 = avatar.fwd.clone().applyQuaternion(wquat(B.Spine2).multiply(avatar.RQ.Spine2.clone().invert()));
     bk.addScaledVector(fwd2, -0.1);
     var bag = kbox('bag', KITM.sand, bk.x, bk.y, bk.z, 0.22, 0.17, 0.62);   // a flat bag lying across the shoulders
+  } else if (cur.kit === 'bench') {
+    var bl = X(230 - 95), br = X(230 + 18), bt = (FLOOR - 170) * K;          // the 2D lesson's bench: hip x 230, top at y 170
+    kbox('pad', KITM.black, (bl + br) / 2, bt - 0.05, 0, br - bl, 0.1, 0.3);
+    kbox('frame', KITM.dark, (bl + br) / 2, bt - 0.13, 0, br - bl - 0.1, 0.05, 0.16);
+    kbox('legH', KITM.dark, bl + 0.12, (bt - 0.15) / 2, 0, 0.05, bt - 0.15, 0.36); kbox('legF', KITM.dark, br - 0.12, (bt - 0.15) / 2, 0, 0.05, bt - 0.15, 0.36);
+  } else if (cur.kit === 'pullbar') {
+    var bx = X(205), by = (FLOOR - 0) * K + 0.02;                             // the 2D lesson's bar: x 205, y 0 (hands on its top)
+    krod('bar', KITM.steel, v3(bx, by, -0.62), v3(bx, by, 0.62), 0.016);
+    [-0.62, 0.62].forEach(function (z, i) { kbox('post' + i, KITM.dark, bx, (by + 0.1) / 2, z, 0.06, by + 0.1, 0.06); kbox('foot' + i, KITM.dark, bx, 0.02, z, 0.7, 0.04, 0.08); });
   } else if (cur.kit === 'wall') {
     var wx = hip.x + 0.95, tgt = 3.0;
     kbox('wall', KITM.grey, wx + 0.1, 1.75, 0, 0.2, 3.5, 0.34);           // a narrow target post (a wide wall would hide you from the front)
@@ -2151,7 +2164,7 @@ var CHECK_API = {
     var q = lessonJoints(t), r = q.r, n = q.n;
     faceQ.setFromAxisAngle(UPV, r.theta);
     var info = poseAvatar(n, r.theta, cur, q.pins);
-    if (info && cur.kit === 'push') info.supported = 1;              // (leaning into the sled: the hands carry weight)
+    if (info && (cur.kit === 'push' || cur.kit === 'bench')) info.supported = 1;   // (leaning into the sled / lying on the bench: not standing on the feet)
     var pinfo = drawPartner(t, q);
     if (q.info) info = q.info;
     drawBar(r, r.J, r.V, info);
