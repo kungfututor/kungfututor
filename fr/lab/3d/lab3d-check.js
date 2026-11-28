@@ -138,8 +138,12 @@ export function run(api) {
     if (all < -0.006) f.push(part + ' sinks ' + (all * 100).toFixed(1) + 'cm');
     if (grounded && all > 0.008) f.push('floats ' + (all * 100).toFixed(1) + 'cm');
     // a pull-up: each hand must stay on the bar
-    // (measured from the middle of the palm, which sits a few centimetres off the bar's centre line when the hand wraps it)
-    if (typeof I.barGap === 'number' && I.barGap > 0.08) f.push('hand off the bar ' + (I.barGap * 100).toFixed(0) + 'cm');
+    // a fixed grip (judo lapel / sleeve, clinch, holds): the palm on its spot
+    if (typeof I.gripMiss === 'number' && I.gripMiss > 0.08) f.push('hand off its grip ' + (I.gripMiss * 100).toFixed(0) + 'cm');
+    // golf: both hands together on the club
+    if (typeof I.golfApart === 'number' && I.golfApart > 0.12) f.push('golf hands apart ' + (I.golfApart * 100).toFixed(0) + 'cm');
+    // (measured at the base of the middle finger, where the bar sits in a hand wrapped round it)
+    if (typeof I.barGap === 'number' && I.barGap > 0.05) f.push('hand off the bar ' + (I.barGap * 100).toFixed(0) + 'cm');
     api.SIDES.forEach(function (s) {
       var F = I.feet[s.k], H = I.hands[s.k], d = A.D[s.X], tag = s.X[0];
       var knee = F.knee * DEG, twist = F.twist * DEG, ankle = F.ankle * DEG, hip = F.hip * DEG, elbow = H.elbow * DEG;

@@ -131,8 +131,9 @@ var MOVES = [
     { by: 'me', hand: 'N', bone: 'LeftLeg', at: [-0.07, 0.06, -0.03], on: [2, 3] }, { by: 'me', hand: 'F', bone: 'LeftLeg', at: [-0.07, 0.1, 0.04], on: [2, 3] }] }),
   // side hold-down: you kneel at their side, chest across their chest — they lie across you, not in line (oyaw)
   mv('grapple', 'SAMBO', 'holddown', { duo: 1, oyaw: 90, opivot: 'sh', odx: -10, oz: 18, holds: [
-    // (turned across you their right side is nearest: your right arm goes round under their head, your left hand holds their near arm)
-    { by: 'me', hand: 'N', bone: 'Head', at: [-0.04, 0.27, 0], on: [0, 1, 2, 3] }, { by: 'me', hand: 'F', bone: 'RightArm', at: [0, 0.02, 0], on: [0, 1, 2, 3] }], fix: { 0: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 1: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 2: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 3: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 } } }),   // (their arms down by their sides on the mat, not up in the air)
+    // (turned across you their right side is nearest: your right arm goes round under their head, your left hand holds their near arm;
+    //  reach: 1 — reached for while you settle, left as they were before the grip correction, which unsettled this move)
+    { by: 'me', hand: 'N', bone: 'Head', at: [-0.04, 0.27, 0], on: [0, 1, 2, 3], reach: 1 }, { by: 'me', hand: 'F', bone: 'RightArm', at: [0, 0.02, 0], on: [0, 1, 2, 3], reach: 1 }], fix: { 0: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 1: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 2: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 3: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 } } }),   // (their arms down by their sides on the mat, not up in the air)
   mv('grapple', 'SAMBO', 'anklelock', { duo: 1, fix: { 0: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 1: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 2: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 3: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 } } }),   // (lying back, arms on the mat by their sides)
   mv('grapple', 'SAMBO', 'combat', { duo: 1, oz: 10, holds: judoGrips([3, 4], [3, 4, 5], null, null) }), // BJJ (ground): in the guard your knees go out round their waist, ankles crossed behind; in the mount your knees are on the
   // mat either side of them; in side control you are turned across their chest (myaw); on top of you they kneel astride (ospread)
@@ -963,6 +964,12 @@ function aimBone(bone, child, dir) {
   bone.updateMatrixWorld(true);
 }
 var RIGID = ['hip', 'sh', 'head'];
+var BAR_GRIP = 0.14;                                         // wrist to the finger crease (where a bar sits in the hand)
+function barCrease(B, X) {
+  var w = wpos(B[X + 'Hand']), m1 = wpos(B[X + 'HandMiddle1']), m4 = wpos(B[X + 'HandMiddle4']);
+  return m1.clone().lerp(m4, 0.12).addScaledVector(w.clone().sub(m1).normalize(), 0.014);
+}
+function barWrist(hold) { return hold.at.clone().addScaledVector(UPV, -BAR_GRIP).addScaledVector(hold.palm, -0.025); }
 /* n: lesson joints in metres (floor at y = 0), theta: facing, move: the move being shown.
  * The lesson's own joint angles are kept wherever they can be; contact with the floor is then made exact.
  * Returns what was done, for the barbell and the self-check. */
@@ -1048,8 +1055,8 @@ function poseAvatar(n, theta, move, pins, who) {
     H.c = d.wristH + Math.sqrt(Math.max(0, dl * dl - hd * hd)) - S.y;   // body lift that keeps the lesson's elbow angle with this hand down
     var h0 = n0['h' + s.k];
     H.barX = h0.x + barShift;
-    H.barY = Math.max(h0.y, PLATE_R) + d.grip * Math.max(0, -H.rel.y / Math.max(dl, 1e-4));  // wrist height that puts the grip on the bar
-    H.barW = Math.max(h0.y, PLATE_R) + d.grip;                           // the same with the arm hanging straight down
+    H.barY = Math.max(h0.y, PLATE_R) + BAR_GRIP * Math.max(0, -H.rel.y / Math.max(dl, 1e-4));  // wrist height that puts the bar in the finger crease
+    H.barW = Math.max(h0.y, PLATE_R) + BAR_GRIP;                          // the same with the arm hanging straight down
     // forearm on the floor too (forearm plank): the shoulder sits one upper arm above the elbow
     var e = n['e' + s.k], we = H.w * (1 - smooth(0.045, 0.075, Math.max(0, n0['e' + s.k].y)));
     H.fore = we;
@@ -1203,12 +1210,18 @@ function poseAvatar(n, theta, move, pins, who) {
     if (sb) { sb.quaternion.copy(A.rest[H.X + 'Shoulder']); sb.updateMatrixWorld(true); }
     var S = wpos(B[H.X + 'Arm']), T = S.clone().add(H.rel), bend = H.bendDir;
     if (bar === 'back') {                                    // hands on the bar across the upper back, elbows down and back
-      T = wpos(B.Neck).addScaledVector(C.pFwd, -0.1).addScaledVector(C.up, -0.02).addScaledVector(C.hr, 0.36 * side);
+      // each hand on the bar out at the grip: the wrist below and a little behind it, so the fingers come up round the bar
+      T = wpos(B.Neck).addScaledVector(C.pFwd, -0.1).addScaledVector(C.up, -0.02).addScaledVector(C.hr, 0.36 * side).addScaledVector(C.up, -BAR_GRIP).addScaledVector(C.pFwd, -0.025);
       bend = C.up.clone().multiplyScalar(-1).addScaledVector(C.pFwd, -0.4);
     }
     if (wb) { T.y += (H.barW - T.y) * wb; T.x += (H.barX - T.x) * wb; }   // bar resting on the floor: hands on the bar itself
     var hold = A.hold && A.hold[H.k];                        // a hand holding the other person: on that spot of their body
-    if (hold && hold.w > 0) { var gp = hold.at.clone().addScaledVector(hold.at.clone().sub(S).normalize(), -(d.grip + 0.02)); T.lerp(gp, hold.w);   // (the palm on the spot, so the wrist stops short of it)
+    if (hold && hold.w > 0 && hold.barGrip) {                // a hand round a bar: the bar in the crease where the fingers meet the palm —
+      // the hand rises from the wrist and the fingers curl over: the wrist 14 cm straight below that spot and a little behind it
+      // (the palm faces hold.palm), wherever the shoulder is
+      var gpB = barWrist(hold); T.lerp(gpB, hold.w);
+      bend = bend.clone().lerp(hold.bend || bend, hold.w);
+    } else if (hold && hold.w > 0) { var gp = hold.at.clone().addScaledVector(hold.at.clone().sub(S).normalize(), -(d.grip + 0.02)); T.lerp(gp, hold.w);   // (the palm on the spot, so the wrist stops short of it)
       bend = bend.clone().lerp(hold.bend || bend, hold.w); }
     if (barPush) T.addScaledVector(FW, barPush);             // the bar kept just in front of the model's legs (they have thickness, the lesson's lines do not)
     if (H.w > 0) {                                           // hand on the floor: under where the lesson's arm reaches, as far as the arm allows
@@ -1248,6 +1261,12 @@ function poseAvatar(n, theta, move, pins, who) {
       // (a wrist held up by the forearm resting on the floor: the hand dips so the fingers still touch)
       var dip = Math.asin(Math.max(0, Math.min(0.34, H.adj / 0.16))), fd2 = hh.clone().multiplyScalar(Math.cos(dip)).addScaledVector(UPV, -Math.sin(dip));
       setWQ(hand, wquat(hand).slerp(frameRot(tw(d.finger), UPV, fd2, UPV).multiply(W0(H.X + 'Hand')), H.w));
+    }
+    if (hold && hold.w > 0 && hold.barGrip) {                // round the bar: the hand straight on from the forearm, palm facing hold.palm, so the
+      // curled fingers wrap over the bar (the back of the hand faces the other way; palms face down in the T-pose: rest 'up' = back)
+      // (the fingers cross the bar: the forearm's lean along the bar is taken up by the wrist)
+      var fdir = hold.at.clone().sub(barWrist(hold)); if (hold.axis) fdir.addScaledVector(hold.axis, -fdir.dot(hold.axis)); fdir.normalize();
+      setWQ(hand, wquat(hand).slerp(frameRot(tw(d.finger), UPV, fdir, hold.palm.clone().negate()).multiply(W0(H.X + 'Hand')), hold.w));
     }
     A.fist[H.X].forEach(function (p) { p[0].quaternion.copy(p[2]).multiply(IDQ.clone().slerp(p[1], 1 - H.w)); });
     if (H.w > 0) A.open[H.X].forEach(function (p) { p[0].quaternion.multiply(IDQ.clone().slerp(p[1], H.w)); });
@@ -1716,15 +1735,17 @@ function drawPartner(time, q) {
   if (!AP) { loadAvatar('partner'); return null; }
   AP.rig.visible = true;
   var np = partnerJoints(time, q);
-  AP.hold = holdsNow('partner', avatar, q.r);
+  AP.hold = holdsNow('partner', avatar, q.r, AP);
   var restart = np.restart; delete np.restart;
   var pth = Math.PI + (cur.oyaw || 0) * DEG, cw = framesW(cur.carry, q.r), PM = cw > 0.01 ? PARTNER_AIR : PARTNER_MOVE;
   layOnBack(np, framesW(cur.onBack, q.r));
   carryApart(np, AP, pth, cw, PM);
   var pinfo = armsOutside(np, pth, PM, null, AP, bodyCaps(avatar));   // the partner's hands stop on your body (a grip)
+  pinfo = fixGrips(AP, np, pth, PM, null) || pinfo;
   if (pinfo) { pinfo.restart = restart; pinfo.carried = cw > 0.01; }
-  avatar.hold = holdsNow('me', AP, q.r);
+  avatar.hold = holdsNow('me', AP, q.r, avatar);
   var mine = armsOutside(q.n, q.r.theta, cur, q.pins, avatar, bodyCaps(AP), !avatar.hold);   // …and yours on theirs
+  mine = fixGrips(avatar, q.n, q.r.theta, cur, q.pins) || mine;
   if (mine) q.info = mine;
   return pinfo;
 }
@@ -1763,7 +1784,7 @@ function armsOutside(n, theta, move, pins, X, caps, posed) {
 /* Holds (3D only, per move in MOVES): a hand fixed to a spot on the other person's body for the key frames listed —
  *   { by: 'me' | 'partner', hand: 'N' | 'F', bone: 'Neck', at: [forward, up, right] metres in that body's own frame, on: [frame, …] }
  * (N / F are the holder's right / left hand.) Between two key frames the hold fades in or out. */
-function holdsNow(by, X, r) {
+function holdsNow(by, X, r, holder) {
   var hs = (cur.holds || []).filter(function (h) { return h.by === by; }), out = null;
   if (!hs.length || !X) return null;
   var nF = clip.frames.length, j = Math.min(nF - 1, r.seg), j2 = (j + 1) % nF;
@@ -1773,10 +1794,41 @@ function holdsNow(by, X, r) {
     if (w < 0.001) return;
     var b = X.B[h.bone], turn = wquat(b).multiply(X.RQ[h.bone].clone().invert());
     var o = X.fwd.clone().multiplyScalar(h.at[0]).addScaledVector(UPV, h.at[1]).addScaledVector(X.right, h.at[2]).applyQuaternion(turn);
-    var hand = h.hand === 'N' ? 'N' : 'F';
-    (out = out || {})[hand] = { at: wpos(b).add(o), w: w, bend: h.bend ? v3(h.bend[0], h.bend[1], h.bend[2]) : null };
+    var hand = h.hand === 'N' ? 'N' : 'F', at = wpos(b).add(o);
+    // a grip the arm cannot reach (the partner thrown a metre away, falling out of a leg grab) is let go: it fades out past
+    // the arm's full stretch, and the hand keeps its drawn place instead of stretching into the air
+    if (holder && !h.reach) {                               // (reach: 1 — always reached for, e.g. settling into a hold)
+      var X2 = hand === 'N' ? 'Right' : 'Left', d = holder.D[X2], reach = d.upper + d.fore + d.grip + 0.04;
+      w *= 1 - smooth(reach, reach + 0.15, wpos(holder.B[X2 + 'Arm']).distanceTo(at));
+      if (w < 0.001) return;
+    }
+    out = out || {};
+    if (out[hand]) {                                        // one hand moving from one grip to the next: the spot blends across
+      var o0 = out[hand], wt = o0.w + w; o0.at.multiplyScalar(o0.w / wt).addScaledVector(at, w / wt); o0.w = Math.min(1, wt);
+      if (h.bend) o0.bend = v3(h.bend[0], h.bend[1], h.bend[2]);
+    } else out[hand] = { at: at, w: w, bend: h.bend ? v3(h.bend[0], h.bend[1], h.bend[2]) : null, reach: h.reach };
   });
   return out;
+}
+// A gripping hand aims its wrist along the arm, but the wrist bends, so the palm lands a few centimetres off the spot: where
+// each gripping palm really is gets measured and its aim corrected by the miss, a few rounds (returns the last pose's info)
+function palmOf(X, side) { var w = wpos(X.B[side + 'Hand']); return w.add(wpos(X.B[side + 'HandMiddle1']).sub(w).multiplyScalar(0.62)); }
+function fixGrips(X, n, theta, move, pins) {
+  if (!X || !X.hold) return null;
+  var want = {}, info = null, any = false;
+  ['N', 'F'].forEach(function (k) { if (X.hold[k] && X.hold[k].w > 0.5 && !X.hold[k].barGrip && !X.hold[k].reach) { want[k] = X.hold[k].at.clone(); any = true; } });
+  if (!any) return null;
+  for (var it = 0; it < 3; it++) {
+    var worst = 0;
+    Object.keys(want).forEach(function (k) {
+      var miss = want[k].clone().sub(palmOf(X, k === 'N' ? 'Right' : 'Left')).multiplyScalar(X.hold[k].w);
+      worst = Math.max(worst, miss.length()); X.hold[k].at.add(miss);
+    });
+    if (worst < 0.015) break;
+    info = poseAvatar(n, theta, move, pins, X);
+  }
+  Object.keys(want).forEach(function (k) { X.hold[k].at.copy(want[k]); });   // (the spot itself, for anyone reading it later)
+  return info;
 }
 // a body as capsules (bone to bone, radius in metres): what another body's hands must stay outside of
 var CAPS = [['Hips', 'Neck', 0.12, 0, 0.86], ['Neck', 'Head', 0.055], ['Head', 'Head', 0.1, 0.09], ['RightUpLeg', 'RightLeg', 0.075], ['LeftUpLeg', 'LeftLeg', 0.075], ['RightLeg', 'RightFoot', 0.052], ['LeftLeg', 'LeftFoot', 0.052]];
@@ -1853,7 +1905,9 @@ function drawBar(r, J, V, info) {
       barbell.position.copy(wpos(B.Neck)).addScaledVector(C.pFwd, -0.1).addScaledVector(C.up, -0.02);
       barbell.quaternion.setFromUnitVectors(ZV, C.hr);
     } else {
-      var gr = SIDES.map(function (s) { var w = wpos(B[s.X + 'Hand']); return w.add(wpos(B[s.X + 'HandMiddle1']).sub(w).multiplyScalar(0.62)); });
+      // through each hand's finger crease (the base of the fingers, a little towards the wrist): the curled fingers wrap round it —
+      // through the middle of the palm the fists sat on top of the bar
+      var gr = SIDES.map(function (s) { return barCrease(B, s.X); });
       barbell.position.copy(gr[0]).add(gr[1]).multiplyScalar(0.5);
       barbell.quaternion.setFromUnitVectors(ZV, gr[0].clone().sub(gr[1]).normalize());
     }
@@ -1866,16 +1920,21 @@ function drawBar(r, J, V, info) {
   barbell.quaternion.copy(faceQ);
 }
 
+// the club's direction from the lesson (ca: its angle; leaning forward to the ball as it points down; turned with the body)
+function clubDir(r) {
+  var a = (r.pose.ca || 0) * Math.PI / 180, GS = GOLFREF && GOLFREF.side, fwd = GS ? Math.max(0, (GS.hN.y < 0 ? 0 : 1)) : 1;
+  var dir = new THREE.Vector3(0.55 * Math.max(0, Math.cos(a)) * fwd, -Math.cos(a), Math.sin(a)).normalize();
+  if (r.gTurn) { var cg = Math.cos(r.gTurn), sg = Math.sin(r.gTurn), dx1 = dir.x * cg - dir.z * sg; dir.z = dir.x * sg + dir.z * cg; dir.x = dx1; }
+  return dir;
+}
 // the stick follows the right fist; its angle comes from the lesson (sk: 0 = pointing down, 90 = forward, 180 = up)
 // the club: from the grip (between the two hands) along the lesson's club angle, leaning forward to the ball as it points down
 function drawClub(r) {
   club.visible = golfBall.visible = !!(cur && cur.golf && avatar);
   if (!club.visible) return;
   var B = avatar.B, gr = SIDES.map(function (s) { var w = wpos(B[s.X + 'Hand']); return w.add(wpos(B[s.X + 'HandMiddle1']).sub(w).multiplyScalar(0.62)); });
-  var g = gr[0].clone().add(gr[1]).multiplyScalar(0.5), a = (r.pose.ca || 0) * Math.PI / 180, L = Math.max(0.3, (r.pose.cl || 80) * K * 1.12);
-  var GS = GOLFREF && GOLFREF.side, fwd = GS ? Math.max(0, (GS.hN.y < 0 ? 0 : 1)) : 1;
-  var dir = new THREE.Vector3(0.55 * Math.max(0, Math.cos(a)) * fwd, -Math.cos(a), Math.sin(a)).normalize();
-  if (r.gTurn) { var cg = Math.cos(r.gTurn), sg = Math.sin(r.gTurn), dx1 = dir.x * cg - dir.z * sg; dir.z = dir.x * sg + dir.z * cg; dir.x = dx1; }
+  var g = gr[0].clone().add(gr[1]).multiplyScalar(0.5), L = Math.max(0.3, (r.pose.cl || 80) * K * 1.12);
+  var dir = clubDir(r);
   // never into the floor: the head rests on it
   if (g.y + dir.y * L < 0.03) { var need = (0.03 - g.y) / L; dir.y = need; var hz = Math.hypot(dir.x, dir.z) || 1, k2 = Math.sqrt(Math.max(0, 1 - need * need)) / hz; dir.x *= k2; dir.z *= k2; }
   club.position.copy(g); club.quaternion.setFromUnitVectors(UPV, dir);
@@ -1897,34 +1956,102 @@ function drawStick(r) {
   stick.quaternion.setFromUnitVectors(UPV, dir.normalize());
 }
 
+/* ---------- golf: both hands on the grip ----------
+ * The two hands of a golf grip touch: their palms sit about 8.5 cm apart along the handle. The drawing places each hand on
+ * its own, which let them drift up to 31 cm apart (top of the swing, finish). The hand higher up the club keeps the lesson's
+ * place; the other is held just below it on the handle, in line with the club. */
+function poseGolf(n, theta, q) {
+  var A = avatar, info = poseAvatar(n, theta, cur, q.pins), dir = clubDir(q.r);
+  // the hand whose arm has more slack (more bent) goes to the other one — just above it on the handle if it is the lead
+  // hand, just below if it is the trail hand; the straighter arm keeps the lesson's place (it cannot reach any further)
+  for (var it = 0; it < 2; it++) {
+    var gN = gripPoint('Right'), gF = gripPoint('Left');
+    if (gN.distanceTo(gF) < 0.095) break;
+    var leadIsN = gN.dot(dir) < gF.dot(dir);
+    var slackN = (A.D.Right.upper + A.D.Right.fore) - wpos(A.B.RightArm).distanceTo(wpos(A.B.RightHand));
+    var slackF = (A.D.Left.upper + A.D.Left.fore) - wpos(A.B.LeftArm).distanceTo(wpos(A.B.LeftHand));
+    var mover = slackN >= slackF ? 'N' : 'F', other = mover === 'N' ? gF : gN, moverIsLead = (mover === 'N') === leadIsN;
+    var want = other.clone().addScaledVector(dir, moverIsLead ? -0.085 : 0.085), mx = mover === 'N' ? 'Right' : 'Left';
+    A.hold = {}; A.hold[mover] = { at: want.clone(), w: 1 };
+    // the hold aims the wrist along the arm, but a golf grip bends the wrist: where the palm really lands is measured and the
+    // aim corrected by the miss, a few rounds
+    for (var k = 0; k < 4; k++) {
+      info = poseAvatar(n, theta, cur, q.pins);
+      var miss = want.clone().sub(gripPoint(mx));
+      if (miss.length() < 0.008) break;
+      A.hold[mover].at.add(miss);
+    }
+  }
+  A.hold = null;
+  return info;
+}
+
 /* ---------- the pull-up: hands on the bar, the body hanging from them ----------
  * Both palms are fixed on the bar a little wider than the shoulders (a hold on a fixed spot); the model's arms are not the
  * drawing's length, so where a hand cannot reach the bar the whole body is raised until it can — it hangs from its hands. */
 // (2.25 m, a usual bar height: the model's arms are longer than the drawing's, and at 2.0 m its feet reached the floor in the dead hang)
 function pullBar() { return { x: (205 - x0) * K, y: 2.25, z: 0.27 }; }
+// the sandbag across the upper back (lunges): its centre, from the posed body
+function bagCentre(A) {
+  var B = A.B, bk = wpos(B.Neck).lerp(wpos(B.Spine2), 0.35);
+  var fwd2 = A.fwd.clone().applyQuaternion(wquat(B.Spine2).multiply(A.RQ.Spine2.clone().invert()));
+  return bk.addScaledVector(fwd2, -0.1);
+}
 function poseOrHang(n, theta, q) {
+  if (cur && cur.kit === 'lunge' && avatar) {                // both hands on top of the sandbag, near its ends
+    var A0 = avatar; A0.hold = null; poseAvatar(n, theta, cur, q.pins);
+    var c = bagCentre(A0), side = A0.right.clone().applyQuaternion(wquat(A0.B.Spine2).multiply(A0.RQ.Spine2.clone().invert())).normalize();
+    // each fist on the bag's top edge, near its end; where the palm really lands is measured and the aim corrected (the
+    // wrist bends, so aiming along the arm alone left the fists hovering above the bag)
+    var want = { N: c.clone().addScaledVector(side, 0.22).addScaledVector(UPV, 0.07), F: c.clone().addScaledVector(side, -0.22).addScaledVector(UPV, 0.07) };
+    A0.hold = { N: { at: want.N.clone(), w: 1, bend: v3(0, -1, 0) }, F: { at: want.F.clone(), w: 1, bend: v3(0, -1, 0) } };
+    var inf0;
+    for (var k = 0; k < 5; k++) {
+      inf0 = poseAvatar(n, theta, cur, q.pins);
+      var worst = 0;
+      [['N', 'Right'], ['F', 'Left']].forEach(function (h) { var miss = want[h[0]].clone().sub(gripPoint(h[1])); worst = Math.max(worst, miss.length()); A0.hold[h[0]].at.add(miss); });
+      if (worst < 0.01) break;
+    }
+    A0.hold = null; return inf0;
+  }
+  if (cur && cur.golf && avatar) return poseGolf(n, theta, q);
   if (!cur || cur.kit !== 'pullbar' || !avatar) return poseAvatar(n, theta, cur, q.pins);
   var b = pullBar(), A = avatar, info;
   // elbows point down and out to the sides (a pull-up), palms on the bar
-  A.hold = { N: { at: v3(b.x, b.y, b.z), w: 1, bend: v3(0.15, -1, 0.55) }, F: { at: v3(b.x, b.y, -b.z), w: 1, bend: v3(0.15, -1, -0.55) } };
+  // overhand grip: palms facing forward (away from you), thumbs inward, the bar in the finger crease
+  var palm = v3(1, 0, 0), axis = v3(0, 0, 1);
+  A.hold = { N: { at: v3(b.x, b.y, b.z), w: 1, bend: v3(0.15, -1, 0.55), barGrip: 1, palm: palm, axis: axis }, F: { at: v3(b.x, b.y, -b.z), w: 1, bend: v3(0.15, -1, -0.55), barGrip: 1, palm: palm, axis: axis } };
   // how bent the lesson's arms are: shoulder-to-hand distance against the drawn arm's length (1 = straight, a dead hang)
   var ratio = {};
   SIDES.forEach(function (sd) { ratio[sd.k] = Math.min(1, n['sh' + sd.k].distanceTo(n['h' + sd.k]) / ((KTFigure.DIM.upper + KTFigure.DIM.fore) * K)); });
+  // pulling up, the body sits a little behind the bar (up to 11 cm, as the arms bend): the shoulders can then rise beside the
+  // hands and the chin clears the bar — straight under it a fully bent arm would stop the shoulders below the wrists
+  var bentAll = 1 - smooth(0.85, 0.98, (ratio.N + ratio.F) / 2);
+  Object.keys(n).forEach(function (k) { n[k].x -= 0.11 * bentAll; });
   for (var it = 0; it < 8; it++) {
     info = poseAvatar(n, theta, cur, q.pins);
     var dy = 0, cnt = 0;
     SIDES.forEach(function (sd) {
-      var d = A.D[sd.X], S = wpos(A.B[sd.X + 'Arm']), at = A.hold[sd.k].at;
-      var want = ratio[sd.k] * (d.upper + d.fore - 0.004) + d.grip + 0.02;     // the same bend on the model's own arm
+      var d = A.D[sd.X], S = wpos(A.B[sd.X + 'Arm']), at = barWrist(A.hold[sd.k]);   // (measured to where the wrist goes)
+      var want = ratio[sd.k] * (d.upper + d.fore - 0.004);                     // the same bend on the model's own arm
       var hz = Math.hypot(at.x - S.x, at.z - S.z), v = at.y - S.y, need = Math.sqrt(Math.max(0, want * want - hz * hz));
-      dy += v - need; cnt++;                                // + : the body comes up, − : it hangs lower
+      var dyArm = v - need;                                 // + : the body comes up, − : it hangs lower
+      // arms bent (pulling up): the shoulders where the lesson has them below the bar, so the chin clears it as drawn;
+      // straight arms (the hang): by the arm's bend, so the hang stays a dead hang on the model's longer arms
+      var dyLesson = (b.y - (n['h' + sd.k].y - n['sh' + sd.k].y)) - S.y, wStraight = smooth(0.85, 0.98, ratio[sd.k]);
+      var dyS = dyLesson + (dyArm - dyLesson) * wStraight;
+      // a fully bent arm cannot fold tighter than ~16 cm shoulder-to-wrist: the shoulder never rises closer to the wrist than that
+      var Sy = S.y + dyS, close = 0.16;
+      if (hz < close && Math.abs(at.y - Sy) < Math.sqrt(close * close - hz * hz)) dyS = (at.y - Math.sqrt(close * close - hz * hz)) - S.y;
+      dy += dyS; cnt++;
     });
     dy /= cnt;
     if (Math.abs(dy) < 0.001) break;
     Object.keys(n).forEach(function (k) { n[k].y += dy; });
   }
   var gapMax = 0;
-  SIDES.forEach(function (sd) { var g = gripPoint(sd.X), c = v3(b.x, b.y, Math.max(-0.62, Math.min(0.62, g.z))); gapMax = Math.max(gapMax, g.distanceTo(c)); });
+  // (measured at the base of the middle finger: the bar sits in that crease)
+  SIDES.forEach(function (sd) { var g = wpos(A.B[sd.X + 'HandMiddle1']), c = v3(b.x, b.y, Math.max(-0.62, Math.min(0.62, g.z))); gapMax = Math.max(gapMax, g.distanceTo(c)); });
   info.barGap = gapMax;
   return info;
 }
@@ -2039,9 +2166,7 @@ function drawKit(r, t) {
       kball('kb' + h[0], KITM.black, h[1].clone().add(v3(0, -0.15, 0)), 0.11);
     });
   } else if (cur.kit === 'lunge') {
-    var nk = wpos(B.Neck), sp2 = wpos(B.Spine2), bk = nk.clone().lerp(sp2, 0.35);
-    var fwd2 = avatar.fwd.clone().applyQuaternion(wquat(B.Spine2).multiply(avatar.RQ.Spine2.clone().invert()));
-    bk.addScaledVector(fwd2, -0.1);
+    var bk = bagCentre(avatar);
     var bag = kbox('bag', KITM.sand, bk.x, bk.y, bk.z, 0.22, 0.17, 0.62);   // a flat bag lying across the shoulders
   } else if (cur.kit === 'bench') {
     var bl = X(230 - 95), br = X(230 + 18), bt = (FLOOR - 170) * K;          // the 2D lesson's bench: hip x 230, top at y 170
@@ -2057,7 +2182,7 @@ function drawKit(r, t) {
     kbox('wall', KITM.grey, wx + 0.1, 1.75, 0, 0.2, 3.5, 0.34);           // a narrow target post (a wide wall would hide you from the front)
     var ring2 = kp('target', UNIT_CYL, KITM.red); ring2.position.set(wx - 0.005, tgt, 0); ring2.scale.set(0.17, 0.01, 0.17); ring2.rotation.z = Math.PI / 2;
     var inn = Math.max(0, Math.min(1, p.ballIn === undefined ? 1 : p.ballIn));
-    var held = g.clone().add(v3(0.12, 0.05, 0)), at = v3(wx - 0.18, tgt, 0), bp = at.clone().lerp(held, inn);
+    var held = g.clone().add(v3(0.13, 0.01, 0)), at = v3(wx - 0.18, tgt, 0), bp = at.clone().lerp(held, inn);   // (held between the palms, just in front of the hands)
     if (inn < 1) bp.y += Math.sin(Math.PI * (1 - inn)) * 0.25;
     kball('ball', KITM.black, bp, 0.17);
   }
@@ -2199,6 +2324,14 @@ var CHECK_API = {
     if (info && (cur.kit === 'push' || cur.kit === 'bench')) info.supported = 1;   // (leaning into the sled / lying on the bench: not standing on the feet)
     var pinfo = drawPartner(t, q);
     if (q.info) info = q.info;
+    // for the checker: how far each fixed grip's palm is from its spot (yours and the partner's), and golf hands' spacing
+    if (info) {
+      var gm = 0;
+      [avatar, AVS.partner].forEach(function (X) { if (!X || !X.hold || (X === AVS.partner && !cur.duo)) return;
+        [['N', 'Right'], ['F', 'Left']].forEach(function (h) { var o = X.hold[h[0]]; if (o && o.w > 0.9 && !o.barGrip) gm = Math.max(gm, palmOf(X, h[1]).distanceTo(o.at)); }); });
+      info.gripMiss = gm;
+      if (cur.golf && avatar) info.golfApart = palmOf(avatar, 'Right').distanceTo(palmOf(avatar, 'Left'));
+    }
     drawBar(r, r.J, r.V, info);
     drawStick(r); drawClub(r); drawKit(r, TIME_NOW);
     return { info: info, n: n, theta: r.theta, partner: pinfo };
