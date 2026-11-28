@@ -21,7 +21,8 @@
   function P() { return m.apply(null, [BASE, LEGS, GRIP].concat([].slice.call(arguments))); }
   // partner falling backward, then lying on their back (head away from you)
   var FALL = { ot: -55, ola: 70, olb: 62, ol: -30, oa1: 120, oa2: 140, ob1: 110, ob2: 130, olift: 10 };
-  var DOWN = { ot: -88, oh: 0, ola: 88, olb: 92, ol: -88, olf: -92, oa1: 170, oa2: 175, ob1: 165, ob2: 172, olift: 0 };
+  // (arms down by the sides on the mat — the breakfall slap — not raised in the air)
+  var DOWN = { ot: -88, oh: 0, ola: 88, olb: 92, ol: -88, olf: -92, oa1: 100, oa2: 102, ob1: 98, ob2: 100, olift: 0 };
   // lying on their back with the head towards you (armlock)
   var UP = { ot: 88, oh: 0, ola: -88, olb: -92, ol: 88, olf: 92, ob1: 110, ob2: 100, olift: 0 };
   var STAND_OVER = { t: 14, su: 38, sl: 52, fu: 32, fl: 46 };       // you stay standing, still holding the sleeve

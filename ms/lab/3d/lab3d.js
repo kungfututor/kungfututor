@@ -106,7 +106,20 @@ var MOVES = [
     { by: 'partner', hand: 'F', bone: 'Spine2', at: [0.16, 0.04, 0.02], on: [0, 1, 2, 3] },
     { by: 'me', hand: 'N', bone: 'LeftForeArm', at: [0, 0.02, 0], on: [0, 1, 2, 3] }, { by: 'me', hand: 'F', bone: 'LeftForeArm', at: [0, -0.06, 0], on: [0, 1, 2, 3] }],
     fix: { 0: { fN: { x: 306, y: 179 }, fF: { x: 300, y: 181 }, fzN: 34, fzF: -30, kzN: 24, kzF: -20 }, 1: { fN: { x: 306, y: 179 }, fF: { x: 300, y: 181 }, fzN: 34, fzF: -30, kzN: 24, kzF: -20 }, 2: { fN: { x: 306, y: 179 }, fF: { x: 300, y: 181 }, fzN: 34, fzF: -30, kzN: 24, kzF: -20 }, 3: { fN: { x: 306, y: 179 }, fF: { x: 300, y: 181 }, fzN: 34, fzF: -30, kzN: 24, kzF: -20 } } }),
-  mv('grapple', 'SAMBO', 'breakfall'), mv('grapple', 'BJJ', 'shrimp'),
+  mv('grapple', 'SAMBO', 'stance', { duo: 1, oz: 10, holds: judoGrips([2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4]) }),
+  mv('grapple', 'SAMBO', 'breakfall'),
+  mv('grapple', 'SAMBO', 'footsweep', { duo: 1, oz: -6, holds: judoGrips([0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2], [0, 1, 2]) }),
+  // back trip: your lead leg steps deep behind their lead leg, from the outside
+  mv('grapple', 'SAMBO', 'backtrip', { duo: 1, oz: 30, holds: judoGrips([0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2], [0, 1, 2]) }),
+  // single-leg pick-up: both hands behind their lead (left) knee
+  mv('grapple', 'SAMBO', 'legpick', { duo: 1, oz: 8, holds: [
+    { by: 'me', hand: 'N', bone: 'LeftLeg', at: [-0.07, 0.06, -0.03], on: [2, 3] }, { by: 'me', hand: 'F', bone: 'LeftLeg', at: [-0.07, 0.1, 0.04], on: [2, 3] }] }),
+  // side hold-down: you kneel at their side, chest across their chest — they lie across you, not in line (oyaw)
+  mv('grapple', 'SAMBO', 'holddown', { duo: 1, oyaw: 90, opivot: 'sh', odx: -10, oz: 18, holds: [
+    // (turned across you their right side is nearest: your right arm goes round under their head, your left hand holds their near arm)
+    { by: 'me', hand: 'N', bone: 'Head', at: [-0.04, 0.27, 0], on: [0, 1, 2, 3] }, { by: 'me', hand: 'F', bone: 'RightArm', at: [0, 0.02, 0], on: [0, 1, 2, 3] }], fix: { 0: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 1: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 2: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 3: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 } } }),   // (their arms down by their sides on the mat, not up in the air)
+  mv('grapple', 'SAMBO', 'anklelock', { duo: 1, fix: { 0: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 1: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 2: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 3: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 } } }),   // (lying back, arms on the mat by their sides)
+  mv('grapple', 'SAMBO', 'combat', { duo: 1, oz: 10, holds: judoGrips([3, 4], [3, 4, 5], null, null) }), mv('grapple', 'BJJ', 'shrimp'),
   mv('defence', 'SELFDEF', 'fence'), mv('defence', 'SELFDEF', 'distance'), mv('defence', 'SELFDEF', 'palm'), mv('defence', 'SELFDEF', 'hammer'),
   mv('defence', 'SELFDEF', 'elbow'), mv('defence', 'SELFDEF', 'kick'), mv('defence', 'SELFDEF', 'cover'),
   mv('defence', 'KRAV', 'stance'), mv('defence', 'KRAV', 'burst'), mv('defence', 'KRAV', 'inside'), mv('defence', 'KRAV', 'outside'),
