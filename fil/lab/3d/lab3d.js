@@ -93,8 +93,8 @@ var MOVES = [
   mv('kungfu', 'STRIKES', 'side', { mode: 'front', fix: { 0: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 }, 1: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 }, 2: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 }, 3: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 }, 4: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 } } }), mv('kungfu', 'STRIKES', 'snap'), mv('kungfu', 'STRIKES', 'heel'), mv('kungfu', 'STRIKES', 'stretch'),
   mv('kungfu', 'WINGCHUN', 'stance', { mode: 'both', gait: false, pivots: true }), mv('kungfu', 'WINGCHUN', 'punch'), mv('kungfu', 'WINGCHUN', 'chain'), mv('kungfu', 'WINGCHUN', 'tan'),
   mv('kungfu', 'WINGCHUN', 'bong', { mode: 'front' }), mv('kungfu', 'WINGCHUN', 'fuk'), mv('kungfu', 'WINGCHUN', 'pak', { mode: 'front' }), mv('kungfu', 'WINGCHUN', 'kick'),
-  mv('kungfu', 'TAICHI', 1), mv('kungfu', 'TAICHI', 2), mv('kungfu', 'TAICHI', 3), mv('kungfu', 'TAICHI', 4), mv('kungfu', 'TAICHI', 5), mv('kungfu', 'TAICHI', 6), mv('kungfu', 'TAICHI', 7), mv('kungfu', 'TAICHI', 8), mv('kungfu', 'TAICHI', 9, { armAt: { 0: { back: [-0.4, 0.02, 0.52] }, 1: { front: [0.48, 0.14, 0.1], back: [-0.42, 0.04, 0.55] } }, fix: { 1: { fz: 1.6 } } }), mv('kungfu', 'TAICHI', 10, { mode: 'front' }), mv('kungfu', 'TAICHI', 11, { armAt: { 0: { back: [-0.4, 0.02, 0.52] }, 1: { front: [0.48, 0.14, 0.1], back: [-0.42, 0.04, 0.55] } }, fix: { 1: { fz: 1.6 } } }), mv('kungfu', 'TAICHI', 12, { armAt: { 0: { front: [0.48, 0.14, 0.1], back: [-0.42, 0.04, 0.55] } }, fix: { 0: { fz: 1.6 } } }),
-  mv('kungfu', 'TAICHI', 13), mv('kungfu', 'TAICHI', 14), mv('kungfu', 'TAICHI', 15), mv('kungfu', 'TAICHI', 16), mv('kungfu', 'TAICHI', 17), mv('kungfu', 'TAICHI', 18), mv('kungfu', 'TAICHI', 19), mv('kungfu', 'TAICHI', 20), mv('kungfu', 'TAICHI', 21), mv('kungfu', 'TAICHI', 22), mv('kungfu', 'TAICHI', 23), mv('kungfu', 'TAICHI', 24),
+  mv('kungfu', 'TAICHI', 1), mv('kungfu', 'TAICHI', 2), mv('kungfu', 'TAICHI', 3), mv('kungfu', 'TAICHI', 4, { palmPush: 1 }), mv('kungfu', 'TAICHI', 5), mv('kungfu', 'TAICHI', 6, { palmPush: 1 }), mv('kungfu', 'TAICHI', 7, { palmPush: 1 }), mv('kungfu', 'TAICHI', 8, { palmPush: 1 }), mv('kungfu', 'TAICHI', 9, { armAt: { 0: { back: [-0.4, 0.02, 0.52] }, 1: { front: [0.48, 0.14, 0.1], back: [-0.42, 0.04, 0.55] } }, fix: { 1: { fz: 1.6 } } }), mv('kungfu', 'TAICHI', 10, { mode: 'front' }), mv('kungfu', 'TAICHI', 11, { armAt: { 0: { back: [-0.4, 0.02, 0.52] }, 1: { front: [0.48, 0.14, 0.1], back: [-0.42, 0.04, 0.55] } }, fix: { 1: { fz: 1.6 } } }), mv('kungfu', 'TAICHI', 12, { palmPush: 1, armAt: { 0: { front: [0.48, 0.14, 0.1], back: [-0.42, 0.04, 0.55] } }, fix: { 0: { fz: 1.6 } } }),
+  mv('kungfu', 'TAICHI', 13, { armAt: { 0: { front: [0.34, -0.04, -0.05], back: [0.32, 0, -0.05], fs: 'none', bs: 'none' }, 1: { front: [0.42, 0.12, 0.14], back: [-0.28, 0.12, 0.52], bs: 'palm' } } }), mv('kungfu', 'TAICHI', 14), mv('kungfu', 'TAICHI', 15, { armAt: { 0: { front: [0.34, -0.04, -0.05], back: [0.32, 0, -0.05], fs: 'none', bs: 'none' }, 1: { front: [0.42, 0.12, 0.14], back: [-0.28, 0.12, 0.52], bs: 'palm' } } }), mv('kungfu', 'TAICHI', 16), mv('kungfu', 'TAICHI', 17), mv('kungfu', 'TAICHI', 18, { palmPush: 1 }), mv('kungfu', 'TAICHI', 19), mv('kungfu', 'TAICHI', 20, { palmPush: 1 }), mv('kungfu', 'TAICHI', 21), mv('kungfu', 'TAICHI', 22, { palmPush: 1 }), mv('kungfu', 'TAICHI', 23, { armAt: { 1: { front: [0.34, -0.04, -0.05], back: [0.32, 0, -0.05], fs: 'none', bs: 'none' } } }), mv('kungfu', 'TAICHI', 24, { armAt: { 0: { front: [0.34, -0.04, -0.05], back: [0.32, 0, -0.05], fs: 'none', bs: 'none' } } }),
   mv('strike', 'BOXING', 'stance'), mv('strike', 'BOXING', 'jab'), mv('strike', 'BOXING', 'cross'), mv('strike', 'BOXING', 'onetwo'),
   mv('strike', 'BOXING', 'hook'), mv('strike', 'BOXING', 'upper'), mv('strike', 'BOXING', 'slip'), mv('strike', 'BOXING', 'weave'),
   mv('strike', 'BOXING', 'parry'), mv('strike', 'BOXING', 'footwork'),
@@ -1288,6 +1288,27 @@ function poseAvatar(n, theta, move, pins, who) {
       bend = bend.clone().lerp(hold.bend || bend, hold.w);
     } else if (hold && hold.w > 0) { var gp = hold.at.clone().addScaledVector(hold.at.clone().sub(S).normalize(), -(d.grip + 0.02)); T.lerp(gp, hold.w);   // (the palm on the spot, so the wrist stops short of it)
       bend = bend.clone().lerp(hold.bend || bend, hold.w); }
+    // Tai Chi (`openHands`): elbows are sunk and soft, never locked — an arm drawn fully straight stops a little short; and a
+    // raised hand is held about a fist in front of the head, never pressed against it
+    var tcFree = A === avatar && cur && cur.openHands && !(hold && hold.w > 0) && !(H.w > 0);
+    if (tcFree) {
+      var dS = T.distanceTo(S); if (dS > 0.95 * reach) T.sub(S).multiplyScalar(0.95 * reach / dS).add(S);
+      var hc = wpos(B.Head).addScaledVector(UPV, 0.06), dh = T.distanceTo(hc);
+      if (dh < 0.24) { var ov = T.clone().sub(hc); if (ov.lengthSq() < 1e-6) ov.copy(FW); ov.normalize().addScaledVector(FW, 0.6).normalize(); T.copy(hc).addScaledVector(ov, 0.24); }
+      var hiW = smooth(0.12, 0.28, T.y - S.y) * (1 - smooth(0.1, 0.3, T.clone().sub(S).dot(FW)));   // raised beside the head: brought forward, in front of the forehead
+      if (hiW > 0.01) T.addScaledVector(FW, 0.14 * hiW);
+    }
+    // …and a lower hand drawn hanging at the thigh presses palm-down beside the hip, a little forward, elbow soft
+    H.tcPress = 0;
+    if (tcFree && cur.key !== 1 && cur.key !== 24 && cur.key !== 19) {
+      var rl = T.clone().sub(S), lowF = rl.dot(FW);
+      var pw2 = smooth(0.36, 0.46, -rl.y) * (1 - smooth(0.1, 0.2, lowF));
+      if (pw2 > 0.01) {
+        var Tp = S.clone().addScaledVector(UPV, -0.44).addScaledVector(FW, 0.2).addScaledVector(RT, 0.06 * side);
+        T.lerp(Tp, pw2); H.tcPress = pw2;
+      }
+    }
+    H.tcFree = tcFree;
     if (barPush) T.addScaledVector(FW, barPush);             // the bar kept just in front of the model's legs (they have thickness, the lesson's lines do not)
     if (H.w > 0) {                                           // hand on the floor: under where the lesson's arm reaches, as far as the arm allows
       var wy = d.wristH + H.adj, dy = S.y - wy, hl = Math.hypot(H.rel.x, H.rel.z), far = Math.sqrt(Math.max(0, reach * reach - dy * dy)), hd = Math.min(hl, far);
@@ -1339,6 +1360,14 @@ function poseAvatar(n, theta, move, pins, who) {
     if (H.w > 0) A.open[H.X].forEach(function (p) { p[0].quaternion.multiply(IDQ.clone().slerp(p[1], H.w)); });
     // shaped hands (per move, `armAt`): an open palm pushing forward — fingers up, palm to the front — or a hook hand —
     // fingertips pinched together, wrist bent so the fingers point down, the back of the wrist up and out
+    // (Tai Chi pushes, per move `palmPush`: a hand reaching forward at chest to face height is an upright palm — fingers up,
+    //  palm to the front; drawn as a flat hand it read as reaching to shake hands)
+    if (H.tcPress > 0.01) setWQ(hand, wquat(hand).slerp(frameRot(tw(d.finger), UPV, FW.clone().addScaledVector(RT, 0.25 * side).normalize(), UPV).multiply(W0(H.X + 'Hand')), H.tcPress));
+    if (H.tcFree && cur.palmPush) {
+      var rel = hand.getWorldPosition(new THREE.Vector3()).sub(S), fwdD = rel.dot(FW), upD = rel.y;
+      var pw = smooth(0.28, 0.42, fwdD) * (1 - smooth(0.12, 0.3, Math.abs(upD + 0.02)));
+      if (pw > 0.01) setWQ(hand, wquat(hand).slerp(frameRot(tw(d.finger), UPV, UPV.clone().addScaledVector(FW, 0.3).normalize(), FW.clone().negate()).multiply(W0(H.X + 'Hand')), pw));
+    }
     if (hold && hold.shape && hold.w > 0 && H.w < 0.5) {
       var sw = hold.w, curl = hold.shape === 'hook' ? 0.65 : 0;
       A.fist[H.X].forEach(function (p) { p[0].quaternion.copy(p[2]).multiply(IDQ.clone().slerp(p[1], 1 - sw + curl * sw)); });
@@ -1992,7 +2021,7 @@ function fixGrips(X, n, theta, move, pins) {
   var want = {}, info = null, any = false;
   ['N', 'F'].forEach(function (k) {
     var h = X.hold[k];
-    if (!h || h.w <= 0.5 || h.barGrip) return;
+    if (!h || h.barGrip || h.w <= (h.shape !== undefined ? 0.02 : 0.5)) return;   // (planned hand spots fade their fine-tuning out with the hold — cut off at half, the hand jumped)
     // (an always-reached grip is fine-tuned too while the spot is within the arm's stretch — beyond it the arm is already straight)
     if (h.reach) { var s2 = k === 'N' ? 'Right' : 'Left', d = X.D[s2]; if (wpos(X.B[s2 + 'Arm']).distanceTo(h.at) > d.upper + d.fore + d.grip) return; }
     want[k] = h.at.clone(); any = true;
@@ -2181,19 +2210,32 @@ function bagCentre(A) {
  * middle of your shoulders — forward, up, and out to that hand's own side. `front` is the hand the lesson has further
  * forward (an open palm pushing), `back` the other (a hook hand). A side-view drawing cannot show an arm out to the side,
  * so single whip's hook hand pointed straight back and both arms made one stiff line — the mistake the lesson warns of. */
+var ARM_ROLE = null;
 function selfArmSpots(A, n, r) {
-  var AA = cur.armAt, nF = clip.frames.length, j = Math.min(nF - 1, r.seg), j2 = (j + 1) % nF, ks = r.k * r.k * (3 - 2 * r.k), B = A.B;
+  // (the key frame and the way through it from the clock: moves that only step — Tai Chi's — leave the lesson's r.seg at 0)
+  var AA = cur.armAt, fr = clip.frames, nF = fr.length, tot = 0, acc = 0, j = 0, kk = 0, B = A.B;
+  fr.forEach(function (f) { tot += f.d; });
+  var tt = ((TIME_NOW % tot) + tot) % tot;
+  for (var ii = 0; ii < nF; ii++) { if (tt < acc + fr[ii].d || ii === nF - 1) { j = ii; kk = Math.min(1, (tt - acc) / fr[ii].d); break; } acc += fr[ii].d; }
+  var j2 = (j + 1) % nF, ks = kk * kk * (3 - 2 * kk);
   var fw = A.fwd.clone().applyQuaternion(wquat(B.Hips).multiply(A.RQ.Hips.clone().invert())); fw.y = 0; fw.normalize();
   var sideN = wpos(B.RightArm).sub(wpos(B.LeftArm)); sideN.y = 0; sideN.addScaledVector(fw, -sideN.dot(fw)).normalize();
   var side = { N: sideN, F: sideN.clone().negate() }, base = wpos(B.LeftArm).add(wpos(B.RightArm)).multiplyScalar(0.5);
-  var front = n.hN.clone().sub(n.sh).dot(fw) >= n.hF.clone().sub(n.sh).dot(fw) ? 'N' : 'F', role = { front: front, back: front === 'N' ? 'F' : 'N' };
+  // which hand is the front one: decided where the lesson's hands are clearly apart, then kept (crossed at the wrists they
+  // are level, and a choice made frame by frame swapped the hands' spots back and forth)
+  var dN = n.hN.clone().sub(n.sh).dot(fw), dF = n.hF.clone().sub(n.sh).dot(fw), front;
+  if (Math.abs(dN - dF) > 0.12) { front = dN > dF ? 'N' : 'F'; ARM_ROLE = { move: cur, flip: !!state.flip, front: front }; }
+  else front = ARM_ROLE && ARM_ROLE.move === cur && ARM_ROLE.flip === !!state.flip ? ARM_ROLE.front : (dN >= dF ? 'N' : 'F');
+  var role = { front: front, back: front === 'N' ? 'F' : 'N' };
   function spot(key, rl) { var e = AA[key] && AA[key][rl]; return e ? base.clone().addScaledVector(fw, e[0]).addScaledVector(UPV, e[1]).addScaledVector(side[role[rl]], e[2]) : null; }
   var out = null;
   ['front', 'back'].forEach(function (rl) {
     var a = spot(j, rl), b = spot(j2, rl), w = (a ? 1 - ks : 0) + (b ? ks : 0);
     if (w < 0.001) return;
     out = out || {};
-    out[role[rl]] = { at: a && b ? a.lerp(b, ks) : (a || b), w: Math.min(1, w), shape: rl === 'front' ? 'palm' : 'hook', reach: 1 };
+    // (shapes: front an open pushing palm, back a hook — unless the frame says otherwise: fs / bs = 'palm', 'hook' or 'none')
+    var E = AA[ks < 0.5 && AA[j] ? j : j2] || AA[j] || {}, shp = (rl === 'front' ? E.fs : E.bs) || (rl === 'front' ? 'palm' : 'hook');
+    out[role[rl]] = { at: a && b ? a.lerp(b, ks) : (a || b), w: Math.min(1, w), shape: shp === 'none' ? null : shp, reach: 1 };
   });
   return out;
 }
