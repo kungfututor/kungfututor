@@ -1814,7 +1814,7 @@ function drawBody(time) {
   var q = lessonJoints(time), r = q.r, J = r.J, V = r.V, n = q.n;
   faceQ.setFromAxisAngle(UPV, r.theta);
   if (avatar) {
-    drawBar(r, J, V, poseAvatar(n, r.theta, cur, q.pins));
+    drawBar(r, J, V, poseOrHang(n, r.theta, q));
     drawPartner(time, q);
     drawStick(r); drawClub(r); drawKit(r, TIME_NOW);
     return r.seg;
@@ -1895,6 +1895,38 @@ function drawStick(r) {
   var zt = (r.pose.skz || 0) * Math.PI / 180 * (sidesNow().arms ? 1 : -1);
   var dir = new THREE.Vector3(Math.sin(a) * Math.cos(zt), -Math.cos(a) * Math.cos(zt), Math.sin(zt)).applyAxisAngle(UPV, r.theta);
   stick.quaternion.setFromUnitVectors(UPV, dir.normalize());
+}
+
+/* ---------- the pull-up: hands on the bar, the body hanging from them ----------
+ * Both palms are fixed on the bar a little wider than the shoulders (a hold on a fixed spot); the model's arms are not the
+ * drawing's length, so where a hand cannot reach the bar the whole body is raised until it can — it hangs from its hands. */
+// (2.25 m, a usual bar height: the model's arms are longer than the drawing's, and at 2.0 m its feet reached the floor in the dead hang)
+function pullBar() { return { x: (205 - x0) * K, y: 2.25, z: 0.27 }; }
+function poseOrHang(n, theta, q) {
+  if (!cur || cur.kit !== 'pullbar' || !avatar) return poseAvatar(n, theta, cur, q.pins);
+  var b = pullBar(), A = avatar, info;
+  // elbows point down and out to the sides (a pull-up), palms on the bar
+  A.hold = { N: { at: v3(b.x, b.y, b.z), w: 1, bend: v3(0.15, -1, 0.55) }, F: { at: v3(b.x, b.y, -b.z), w: 1, bend: v3(0.15, -1, -0.55) } };
+  // how bent the lesson's arms are: shoulder-to-hand distance against the drawn arm's length (1 = straight, a dead hang)
+  var ratio = {};
+  SIDES.forEach(function (sd) { ratio[sd.k] = Math.min(1, n['sh' + sd.k].distanceTo(n['h' + sd.k]) / ((KTFigure.DIM.upper + KTFigure.DIM.fore) * K)); });
+  for (var it = 0; it < 8; it++) {
+    info = poseAvatar(n, theta, cur, q.pins);
+    var dy = 0, cnt = 0;
+    SIDES.forEach(function (sd) {
+      var d = A.D[sd.X], S = wpos(A.B[sd.X + 'Arm']), at = A.hold[sd.k].at;
+      var want = ratio[sd.k] * (d.upper + d.fore - 0.004) + d.grip + 0.02;     // the same bend on the model's own arm
+      var hz = Math.hypot(at.x - S.x, at.z - S.z), v = at.y - S.y, need = Math.sqrt(Math.max(0, want * want - hz * hz));
+      dy += v - need; cnt++;                                // + : the body comes up, − : it hangs lower
+    });
+    dy /= cnt;
+    if (Math.abs(dy) < 0.001) break;
+    Object.keys(n).forEach(function (k) { n[k].y += dy; });
+  }
+  var gapMax = 0;
+  SIDES.forEach(function (sd) { var g = gripPoint(sd.X), c = v3(b.x, b.y, Math.max(-0.62, Math.min(0.62, g.z))); gapMax = Math.max(gapMax, g.distanceTo(c)); });
+  info.barGap = gapMax;
+  return info;
 }
 
 /* ---------- HYROX equipment and the treadmill mat ----------
@@ -2017,7 +2049,7 @@ function drawKit(r, t) {
     kbox('frame', KITM.dark, (bl + br) / 2, bt - 0.13, 0, br - bl - 0.1, 0.05, 0.16);
     kbox('legH', KITM.dark, bl + 0.12, (bt - 0.15) / 2, 0, 0.05, bt - 0.15, 0.36); kbox('legF', KITM.dark, br - 0.12, (bt - 0.15) / 2, 0, 0.05, bt - 0.15, 0.36);
   } else if (cur.kit === 'pullbar') {
-    var bx = X(205), by = (FLOOR - 0) * K + 0.02;                             // the 2D lesson's bar: x 205, y 0 (hands on its top)
+    var pb = pullBar(), bx = pb.x, by = pb.y;                                 // the 2D lesson's bar: x 205, y 0 — the palms are fixed on it
     krod('bar', KITM.steel, v3(bx, by, -0.62), v3(bx, by, 0.62), 0.016);
     [-0.62, 0.62].forEach(function (z, i) { kbox('post' + i, KITM.dark, bx, (by + 0.1) / 2, z, 0.06, by + 0.1, 0.06); kbox('foot' + i, KITM.dark, bx, 0.02, z, 0.7, 0.04, 0.08); });
   } else if (cur.kit === 'wall') {
@@ -2163,7 +2195,7 @@ var CHECK_API = {
     state.t = t; TIME_NOW = t;
     var q = lessonJoints(t), r = q.r, n = q.n;
     faceQ.setFromAxisAngle(UPV, r.theta);
-    var info = poseAvatar(n, r.theta, cur, q.pins);
+    var info = poseOrHang(n, r.theta, q);
     if (info && (cur.kit === 'push' || cur.kit === 'bench')) info.supported = 1;   // (leaning into the sled / lying on the bench: not standing on the feet)
     var pinfo = drawPartner(t, q);
     if (q.info) info = q.info;
