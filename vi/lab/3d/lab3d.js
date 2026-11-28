@@ -60,7 +60,9 @@ var MOVES = [
   mv('kungfu', 'STANCES', 'empty'), mv('kungfu', 'STANCES', 'cross'), mv('kungfu', 'STRIKES', 'punch'), mv('kungfu', 'STRIKES', 'palm'),
   // (the side kick is drawn side-on to its target, i.e. seen from the kicker's front: it needs a front-view drawing before it
   //  can be shown in 3D — as a side-view lesson it came out as a front kick)
-  mv('kungfu', 'STRIKES', 'snap'), mv('kungfu', 'STRIKES', 'heel'), mv('kungfu', 'STRIKES', 'stretch'),
+  // side kick: the 2D drawing is the kicker seen from the front (the leg goes out sideways from the hip, the body leans away) —
+  // read as a side view it came out as a front kick. Fists at the waist: arms close, forearms pointing forward (la < 1)
+  mv('kungfu', 'STRIKES', 'side', { mode: 'front', fix: { 0: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 }, 1: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 }, 2: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 }, 3: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 }, 4: { su: 12, sl: 4, laN: 0.45, fu: -12, fl: -4, laF: 0.45 } } }), mv('kungfu', 'STRIKES', 'snap'), mv('kungfu', 'STRIKES', 'heel'), mv('kungfu', 'STRIKES', 'stretch'),
   mv('kungfu', 'WINGCHUN', 'stance', { mode: 'both', gait: false, pivots: true }), mv('kungfu', 'WINGCHUN', 'punch'), mv('kungfu', 'WINGCHUN', 'chain'), mv('kungfu', 'WINGCHUN', 'tan'),
   mv('kungfu', 'WINGCHUN', 'bong', { mode: 'front' }), mv('kungfu', 'WINGCHUN', 'fuk'), mv('kungfu', 'WINGCHUN', 'pak', { mode: 'front' }), mv('kungfu', 'WINGCHUN', 'kick'),
   mv('kungfu', 'TAICHI', 1), mv('kungfu', 'TAICHI', 2), mv('kungfu', 'TAICHI', 3), mv('kungfu', 'TAICHI', 4), mv('kungfu', 'TAICHI', 5), mv('kungfu', 'TAICHI', 6), mv('kungfu', 'TAICHI', 7), mv('kungfu', 'TAICHI', 8), mv('kungfu', 'TAICHI', 9), mv('kungfu', 'TAICHI', 10, { mode: 'front' }), mv('kungfu', 'TAICHI', 11), mv('kungfu', 'TAICHI', 12),
@@ -188,7 +190,7 @@ function build(m, view) {
   var c = m.lib === 'STANCES' ? L.makeClip(m.s.id, view, 1, lang) : L.makeClip(m.s, view, 1, lang);
   // `fix` (3D only, per move): lesson pose keys changed at some key frames — { frame: { key: value } } — for what bodies with
   // thickness need and thin drawn lines do not (a partner bending further so the head meets your chest, not your face)
-  if (!m.fix || view !== 'side') return c;
+  if (!m.fix || view !== (m.mode === 'front' ? 'front' : 'side')) return c;   // (a front-view move's fixes apply to its front drawing)
   var c2 = {}, k0; for (k0 in c) c2[k0] = c[k0];
   c2.frames = c.frames.map(function (fr, i) {
     if (!m.fix[i]) return fr;
