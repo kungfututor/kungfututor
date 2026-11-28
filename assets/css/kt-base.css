@@ -107,3 +107,11 @@ button { font: inherit; color: inherit; }
 @media (max-width: 640px) { .kt-signin { padding: 6px 11px; max-width: 96px; } }
 .kt-modal [hidden] { display: none !important; }
 .kt-modal[data-view="off"] .kt-legal, .kt-modal[data-view="account"] .kt-legal { display: none; }
+
+/* the Kung Fu Tutor logo (owner's design): full logo in the header and footer, just the runner tile on phones */
+.logo-full { display: block; height: 44px; width: auto; }
+.logo-icon { display: none; width: 36px; height: 36px; }
+@media (max-width: 640px) {
+  .kt-top .logo-full, .h-top .logo-full, header .logo-full { display: none; }
+  .kt-top .logo-icon, .h-top .logo-icon, header .logo-icon { display: block; }
+}
