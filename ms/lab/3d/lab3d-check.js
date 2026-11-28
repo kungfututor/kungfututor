@@ -73,6 +73,7 @@ export function run(api) {
   function balance(P) {
     var I = P.info, n = I.n, planted = [], reach = [];
     if (I.rest > 0.3 || I.hands.N.w > 0.5 || I.hands.F.w > 0.5) return null;      // lying, sitting or propped on the hands
+    if (I.supported) return null;                                                 // leaning on equipment (the sled push)
     if (Math.min(n.kN.y, n.kF.y) < 0.12) return null;                             // kneeling: the knees carry weight too
     api.SIDES.forEach(function (s) {
       var F = I.feet[s.k], fp = footprint(s.X, F);
@@ -196,8 +197,11 @@ export function run(api) {
       var t = total * s / N, P = api.pose(t), m = measure(P);
       if (m.bal > 0.08) { off.n++; if (m.bal > off.max) { off.max = m.bal; off.dir = m.balDir; off.t = Math.round(t); } }
       // (a foot turning on its heel or on its ball has not slid: one of the two has to stay put)
+      // (on a treadmill station the mat itself moves back: a planted foot rides with it, so it is measured on the mat)
+      var belt = api.belt ? api.belt(t) : 0;
       api.SIDES.forEach(function (sd) {
         var bp = api.wpos(A.B[sd.X + 'ToeBase']), hp = api.wpos(A.B[sd.X + 'Foot']);
+        bp.x += belt; hp.x += belt;
         if (P.info.feet[sd.k].w > 0.97) {
           if (!spot[sd.k]) spot[sd.k] = [];
           spot[sd.k].forEach(function (q) {

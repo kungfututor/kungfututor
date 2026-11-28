@@ -98,6 +98,12 @@
     mb.classList.toggle('on', on);
     mb.textContent = on ? T('✓ 已標記為熟悉', '✓ Marked as mastered') : T('標記為已熟悉', 'Mark as mastered');
     $('i-master-s').textContent = T('進度只存在你的瀏覽器', 'Progress is saved in your browser only');
+    // "View in 3D": every station has a 3D version in the 3D Movement Lab (one folder up, same language)
+    var a3 = $('i-3d');
+    if (!a3) { a3 = document.createElement('a'); a3.id = 'i-3d'; a3.className = 'btn btn-3d'; mb.parentNode.insertBefore(a3, mb.nextSibling); }
+    a3.href = '../lab/3d/#m=hyrox-' + s.clip;
+    a3.textContent = T('🧊 看 3D 動作', '🧊 View in 3D');
+    a3.title = T('在 3D 動作實驗室轉動、放慢這個動作', 'Turn this move round and slow it down in the 3D Movement Lab');
     $('p-title').textContent = n + ' ' + KT.pick(s.zh, s.en) + KT.pick('動作與距離示意', ' — movement demo');
     $('p-dist').textContent = s.dist === '100 reps' ? T('100 次', '100 reps') : s.dist;
     $('bars').innerHTML = s.bars.map(function (b) {

@@ -29,7 +29,7 @@ var LIB = {
   SELFDEF: [P('防身術', 'Self-defence'), '../../self-defence/basics/'], KRAV: [P('以色列格鬥術', 'Krav Maga'), '../../self-defence/krav-maga/'],
   GYM: [P('健身房', 'Gym'), '../../fitness/gym/'], WINGCHUN: [P('詠春', 'Wing Chun'), '../../kungfu/wing-chun/'],
   SAMBO: [P('桑搏', 'Sambo'), '../../combat/sambo/'], FMA: [P('菲律賓武術', 'Filipino Martial Arts'), '../../combat/fma/'],
-  GOLF: [P('高爾夫', 'Golf'), '../../sports/golf/']
+  GOLF: [P('高爾夫', 'Golf'), '../../sports/golf/'], HYROX: [P('HYROX', 'HYROX'), '../../hyrox/']
 };
 // Which side a move shows first. The 2D lessons draw the near (right) limbs in front; these say what is correct:
 // the striking arts teach right-handers to stand left foot forward (orthodox), and each Tai Chi posture has its
@@ -48,6 +48,11 @@ function judoGrips(meLapel, meSleeve, pLapel, pSleeve) {
   if (pLapel) g.push({ by: 'partner', hand: 'N', bone: 'Spine2', at: [0.16, 0.06, -0.08], bend: [0, -1, 0], on: pLapel });
   if (pSleeve) g.push({ by: 'partner', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: pSleeve });
   return g;
+}
+// HYROX keeps its stations as STATIONS + CLIPS (its page has its own engine): give it the LIST / makeClip the lab reads
+if (window.HYROX && !window.HYROX.LIST) {
+  window.HYROX.LIST = window.HYROX.STATIONS.map(function (s) { var o = { id: s.clip }, k; for (k in s) o[k] = s[k]; return o; });
+  window.HYROX.makeClip = function (s) { return window.HYROX.CLIPS[s.clip]; };
 }
 function mv(cat, lib, key, extra) { var o = { cat: cat, lib: lib, key: key }; for (var k in extra || {}) o[k] = extra[k]; return o; }
 var MOVES = [
@@ -149,7 +154,13 @@ var MOVES = [
   mv('golf', 'GOLF', 'setup', { mode: 'front', golf: 1 }), mv('golf', 'GOLF', 'takeaway', { mode: 'front', golf: 1 }), mv('golf', 'GOLF', 'top', { mode: 'front', golf: 1 }),
   mv('golf', 'GOLF', 'downswing', { mode: 'front', golf: 1 }), mv('golf', 'GOLF', 'impact', { mode: 'front', golf: 1 }), mv('golf', 'GOLF', 'finish', { mode: 'front', golf: 1 }),
   mv('golf', 'GOLF', 'full', { mode: 'front', golf: 1 }), mv('golf', 'GOLF', 'driver', { mode: 'front', golf: 1 }), mv('golf', 'GOLF', 'chip', { mode: 'front', golf: 1 }),
-  mv('golf', 'GOLF', 'putt', { mode: 'front', golf: 1 })
+  mv('golf', 'GOLF', 'putt', { mode: 'front', golf: 1 }),
+  // HYROX: each station with its equipment (kit). The walking stations (belt) are drawn like the 2D lesson: the athlete stays in
+  // the middle and the mat slides back under the feet like a treadmill belt — the markings on it show the travel.
+  mv('fit', 'HYROX', 'ski', { kit: 'ski' }), mv('fit', 'HYROX', 'push', { kit: 'push', belt: 1, gait: false }),
+  mv('fit', 'HYROX', 'pull', { kit: 'pull' }), mv('fit', 'HYROX', 'burpee', { belt: 1, gait: false }),
+  mv('fit', 'HYROX', 'row', { kit: 'row', gait: false }), mv('fit', 'HYROX', 'carry', { kit: 'carry', belt: 1, gait: false }),
+  mv('fit', 'HYROX', 'lunge', { kit: 'lunge', belt: 1, gait: false }), mv('fit', 'HYROX', 'wallball', { kit: 'wall' })
 ].filter(function (m) { return window[m.lib] && LIB[m.lib]; }).map(function (m) {
   if (m.side === undefined) m.side = m.lib === 'TAICHI' ? TC_SIDE[m.key] : SIDE[m.lib];
   if (m.lib === 'TAICHI' && TC_STEPS[m.key]) { m.gaitOnly = TC_STEPS[m.key]; m.slides = true; }
@@ -656,6 +667,7 @@ function planGait() {
 // the lesson's joints at time t, moved so that planted feet stay planted and stepping feet step
 function lessonJoints(t) {
   var q = rawJoints(t), n = q.n, r = q.r, G = GAIT;
+  if (cur && cur.belt) beltSteps(t, n);
   if (!G) return q;
   var nF = G.key.length, j = Math.min(nF - 1, r.seg), k = r.k, S = G.seg[j], A = G.key[j], B = G.key[(j + 1) % nF], C0 = G.C[j], C1 = G.C[j + 1];
   var cx = C0.x, cz = C0.z;
@@ -1790,13 +1802,15 @@ function pushOut(n, caps) {
   });
   return moved;
 }
+var TIME_NOW = 0;
 function drawBody(time) {
+  TIME_NOW = time;
   var q = lessonJoints(time), r = q.r, J = r.J, V = r.V, n = q.n;
   faceQ.setFromAxisAngle(UPV, r.theta);
   if (avatar) {
     drawBar(r, J, V, poseAvatar(n, r.theta, cur, q.pins));
     drawPartner(time, q);
-    drawStick(r); drawClub(r);
+    drawStick(r); drawClub(r); drawKit(r, TIME_NOW);
     return r.seg;
   }
   place(parts.thighN, n.hipN, n.kN); place(parts.shinN, n.kN, n.aN); place(parts.shoeN, n.aN, n.tN);
@@ -1875,6 +1889,131 @@ function drawStick(r) {
   var zt = (r.pose.skz || 0) * Math.PI / 180 * (sidesNow().arms ? 1 : -1);
   var dir = new THREE.Vector3(Math.sin(a) * Math.cos(zt), -Math.cos(a) * Math.cos(zt), Math.sin(zt)).applyAxisAngle(UPV, r.theta);
   stick.quaternion.setFromUnitVectors(UPV, dir.normalize());
+}
+
+/* ---------- HYROX equipment and the treadmill mat ----------
+ * Simple shapes, placed from the posed model each frame: the SkiErg tower and its cords, the push sled under the hands, the pull
+ * sled and its rope, the rower, kettlebells, the sandbag on the shoulders, the wall-ball wall, target and ball.
+ * belt: the mat's travel so far (the 2D lesson's advance), shown by stripes sliding back under the feet. */
+var KIT = new THREE.Group(); scene.add(KIT);
+var KITM = { dark: std('#2A2E38', 0.6), grey: std('#C9C6BE', 0.8), steel: std('#9AA0A8', 0.35, 0.6), red: std('#D92D20', 0.6), rope: std('#8A6D3B', 0.9), black: std('#16181D', 0.5), sand: std('#B3262A', 0.85) };
+var UNIT_BOX = new THREE.BoxGeometry(1, 1, 1), UNIT_CYL = new THREE.CylinderGeometry(1, 1, 1, 20), UNIT_BALL = new THREE.SphereGeometry(1, 24, 16);
+var kitParts = {};
+function kp(name, geo, mat) {                                // a named part, made once
+  if (!kitParts[name]) { var m = new THREE.Mesh(geo, mat); m.castShadow = true; m.receiveShadow = true; KIT.add(m); kitParts[name] = m; }
+  var o = kitParts[name]; o.visible = true; o.rotation.set(0, 0, 0); o.quaternion.identity(); return o;
+}
+function kbox(name, mat, x, y, z, sx, sy, sz) { var m = kp(name, UNIT_BOX, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz); return m; }
+function kball(name, mat, p, r) { var m = kp(name, UNIT_BALL, mat); m.position.copy(p); m.scale.setScalar(r); return m; }
+function krod(name, mat, a, b, r) {                          // a round bar from a to b
+  var m = kp(name, UNIT_CYL, mat), d = b.clone().sub(a), L = d.length() || 1e-4;
+  m.position.copy(a).add(b).multiplyScalar(0.5); m.scale.set(r, L, r); m.quaternion.setFromUnitVectors(UPV, d.divideScalar(L)); return m;
+}
+var stripes = [];
+for (var si = 0; si < 13; si++) { var sm = new THREE.Mesh(new THREE.PlaneGeometry(0.05, 1.1), new THREE.MeshBasicMaterial({ color: '#B9AE98', transparent: true, opacity: 0.8 })); sm.rotation.x = -Math.PI / 2; sm.position.y = 0.003; sm.visible = false; scene.add(sm); stripes.push(sm); }
+// The belt runs at whatever speed keeps the foot on the ground still on it (the 2D drawings' legs sweep back further than their
+// "distance travelled", so following that would make the feet skate); with both feet in the air (the broad jump) it follows the
+// lesson's distance. Worked out once per move over one loop; later loops add a whole loop's travel.
+var BELT = null;
+function beltTable() {
+  if (BELT && BELT.move === cur) return BELT;
+  var total = sideP.total, N = 240, tab = [0], prev = null, prevS = 0;
+  for (var i = 0; i <= N; i++) {
+    var t = total * i / N, n = rawJoints(t).n, sN = footSpot(n, 'N'), sF = footSpot(n, 'F'), ps = sideP.poseAt(t), sNow = ps.pose.s || 0;
+    if (prev) {
+      // the foot carrying the weight is the one on the ground travelling back against the body (a foot swinging forward
+      // close to the mat is not it)
+      var cand = [['N', sN], ['F', sF]].filter(function (c) { return c[1].g > 0.8 && prev[c[0]].g > 0.8; }), d;
+      if (cand.length) { var dx = Math.min.apply(null, cand.map(function (c) { return c[1].x - prev[c[0]].x; })); d = -dx; }
+      else d = (sNow - prevS) * K;
+      tab.push(tab[tab.length - 1] + d);
+    }
+    prev = { N: sN, F: sF }; prevS = sNow;
+  }
+  BELT = { move: cur, tab: tab, total: total, N: N };
+  return BELT;
+}
+// On the belt a foot that moves forward against the belt is stepping: the 2D drawings slide it along the floor, so it is lifted
+// into a small step (higher the faster it travels: nothing at the start and end of the step, ~9 cm in the middle)
+function beltSteps(t, n) {
+  ['N', 'F'].forEach(function (f) {
+    var dt = 14, a = rawJoints(t - dt).n, b = rawJoints(t + dt).n;
+    var v = ((footSpot(b, f).x + beltAt(t + dt)) - (footSpot(a, f).x + beltAt(t - dt))) / (2 * dt / 1000);   // m/s along the belt
+    var lift = Math.min(0.09, Math.max(0, v - 0.15) * 0.035);
+    if (lift > 0.002) { n['a' + f].y += lift; n['t' + f].y += lift; n['k' + f].y += lift * 0.5; }
+  });
+}
+function beltAt(t) {
+  if (!cur || !cur.belt) return 0;
+  var T = beltTable(), cyc = Math.floor(t / T.total), u = (t - cyc * T.total) / T.total * T.N, i = Math.min(T.N - 1, Math.floor(u));
+  return cyc * T.tab[T.N] + T.tab[i] + (T.tab[i + 1] - T.tab[i]) * (u - i);
+}
+function gripPoint(X) { var B = avatar.B, w = wpos(B[X + 'Hand']); return w.add(wpos(B[X + 'HandMiddle1']).sub(w).multiplyScalar(0.62)); }
+function drawKit(r, t) {
+  Object.keys(kitParts).forEach(function (k) { kitParts[k].visible = false; });
+  var on = !!(cur && avatar && (cur.kit || cur.belt));
+  stripes.forEach(function (m, i) {
+    m.visible = !!(on && cur.belt);
+    if (m.visible) { var b = beltAt(t), x = (i - 6) * 0.5 - (((b % 0.5) + 0.5) % 0.5); m.position.x = x; m.material.opacity = 0.8 * Math.max(0, 1 - Math.abs(x) / 3); }
+  });
+  if (!on || !cur.kit) return;
+  var B = avatar.B, gN = gripPoint('Right'), gF = gripPoint('Left'), g = gN.clone().add(gF).multiplyScalar(0.5), hip = wpos(B.Hips), p = r.pose;
+  var X = function (u) { return (u - x0) * K; };
+  if (cur.kit === 'ski') {
+    var tx = hip.x + 0.78, top = new THREE.Vector3(tx - 0.06, 2.05, 0);
+    kbox('base', KITM.grey, hip.x + 0.25, 0.03, 0, 1.25, 0.06, 0.75);
+    kbox('tower', KITM.dark, tx + 0.06, 1.1, 0, 0.16, 2.2, 0.26);
+    kbox('screen', KITM.black, tx - 0.03, 1.5, 0, 0.05, 0.16, 0.22);
+    kball('pulley', KITM.steel, top, 0.05);
+    [['N', gN], ['F', gF]].forEach(function (h) {
+      krod('cord' + h[0], KITM.black, top, h[1], 0.006);
+      krod('handle' + h[0], KITM.red, h[1].clone().add(v3(0, 0.07, 0)), h[1].clone().add(v3(0, -0.07, 0)), 0.018);
+    });
+  } else if (cur.kit === 'push') {
+    var fx = g.x + 0.04, w2 = Math.max(0.25, Math.abs(gN.z - gF.z) / 2 + 0.02);
+    kbox('tray', KITM.grey, fx + 0.42, 0.09, g.z, 0.9, 0.1, w2 * 2 + 0.1);
+    kbox('skid', KITM.dark, fx + 0.42, 0.025, g.z, 0.95, 0.05, w2 * 2 + 0.12);
+    [['N', gN], ['F', gF]].forEach(function (h) { krod('pole' + h[0], KITM.dark, h[1], v3(fx, 0.14, h[1].z), 0.02); });
+    [[0.28, 0.22, KITM.black], [0.45, 0.25, KITM.red], [0.62, 0.2, KITM.black]].forEach(function (pl, i) {
+      var c = v3(fx + pl[0], 0.14 + pl[1], g.z), m = kp('plate' + i, UNIT_CYL, pl[2]); m.position.copy(c); m.scale.set(pl[1], 0.06, pl[1]); m.rotation.z = Math.PI / 2;
+    });
+  } else if (cur.kit === 'pull') {
+    var sx = X(p.sledX || 392) * 0.45 + 0.6, vis = (p.sledO === undefined ? 1 : p.sledO) > 0.5;
+    if (vis) {
+      kbox('tray', KITM.grey, sx + 0.3, 0.09, 0, 0.7, 0.1, 0.55); kbox('skid', KITM.dark, sx + 0.3, 0.025, 0, 0.75, 0.05, 0.6);
+      var m1 = kp('plate0', UNIT_CYL, KITM.black); m1.position.set(sx + 0.22, 0.36, 0); m1.scale.set(0.22, 0.06, 0.22); m1.rotation.z = Math.PI / 2;
+      var m2 = kp('plate1', UNIT_CYL, KITM.red); m2.position.set(sx + 0.38, 0.33, 0); m2.scale.set(0.19, 0.06, 0.19); m2.rotation.z = Math.PI / 2;
+      krod('rope', KITM.rope, g, v3(sx, 0.12, 0), 0.012);
+    }
+    krod('tail', KITM.rope, g, v3(hip.x - 0.45, 0.01, 0), 0.012);           // the rope already pulled in, behind
+  } else if (cur.kit === 'row') {
+    kbox('rail', KITM.dark, X(262) , 0.1, 0, X(372) - X(150), 0.05, 0.12);
+    kbox('legB', KITM.dark, X(150), 0.05, 0, 0.05, 0.1, 0.5); kbox('legF', KITM.dark, X(372), 0.05, 0, 0.05, 0.1, 0.5);
+    var fw = kp('flywheel', UNIT_CYL, KITM.grey); fw.position.set(X(366), 0.33, 0); fw.scale.set(0.2, 0.36, 0.2); fw.rotation.x = Math.PI / 2;
+    kbox('seat', KITM.black, hip.x, 0.16, 0, 0.3, 0.06, 0.3);
+    kbox('foot', KITM.grey, X(300), 0.13, 0, 0.05, 0.22, 0.34).rotation.z = 0.5;
+    krod('bar', KITM.black, v3(g.x, g.y, -0.22), v3(g.x, g.y, 0.22), 0.016);
+    krod('chain', KITM.steel, v3(X(352), 0.36, 0), g, 0.006);
+    kbox('screen', KITM.black, X(352), 0.85, 0, 0.04, 0.18, 0.26); krod('arm', KITM.dark, v3(X(362), 0.5, 0), v3(X(352), 0.78, 0), 0.015);
+  } else if (cur.kit === 'carry') {
+    [['N', gN], ['F', gF]].forEach(function (h) {
+      krod('kbH' + h[0], KITM.black, h[1].clone().add(v3(-0.06, -0.02, 0)), h[1].clone().add(v3(0.06, -0.02, 0)), 0.014);
+      kball('kb' + h[0], KITM.black, h[1].clone().add(v3(0, -0.15, 0)), 0.11);
+    });
+  } else if (cur.kit === 'lunge') {
+    var nk = wpos(B.Neck), sp2 = wpos(B.Spine2), bk = nk.clone().lerp(sp2, 0.35);
+    var fwd2 = avatar.fwd.clone().applyQuaternion(wquat(B.Spine2).multiply(avatar.RQ.Spine2.clone().invert()));
+    bk.addScaledVector(fwd2, -0.1);
+    var bag = kbox('bag', KITM.sand, bk.x, bk.y, bk.z, 0.22, 0.17, 0.62);   // a flat bag lying across the shoulders
+  } else if (cur.kit === 'wall') {
+    var wx = hip.x + 0.95, tgt = 3.0;
+    kbox('wall', KITM.grey, wx + 0.1, 1.75, 0, 0.2, 3.5, 0.34);           // a narrow target post (a wide wall would hide you from the front)
+    var ring2 = kp('target', UNIT_CYL, KITM.red); ring2.position.set(wx - 0.005, tgt, 0); ring2.scale.set(0.17, 0.01, 0.17); ring2.rotation.z = Math.PI / 2;
+    var inn = Math.max(0, Math.min(1, p.ballIn === undefined ? 1 : p.ballIn));
+    var held = g.clone().add(v3(0.12, 0.05, 0)), at = v3(wx - 0.18, tgt, 0), bp = at.clone().lerp(held, inn);
+    if (inn < 1) bp.y += Math.sin(Math.PI * (1 - inn)) * 0.25;
+    kball('ball', KITM.black, bp, 0.17);
+  }
 }
 
 /* ---------- player state + UI ---------- */
@@ -1999,20 +2138,22 @@ if (MOVES.length) {
 var CHECK_API = {
   THREE: THREE, MOVES: MOVES, K: K, SIDES: SIDES, plateR: function () { return PLATE_R; }, scene: scene, barbell: barbell, wpos: wpos, stick: stick,
   avatar: function () { return avatar; },
+  belt: function (t) { return beltAt(t); },
   partner: function () { return cur && cur.duo ? AVS.partner : null; },
   gait: function () { return GAIT; },
   load: function (i) { setPlaying(false); setMove(i, true); return state.total; },
   frames: function () { return clip.frames; },
   name: function (m) { return KT.name(m.s); },
   pose: function (t) {
-    state.t = t;
+    state.t = t; TIME_NOW = t;
     var q = lessonJoints(t), r = q.r, n = q.n;
     faceQ.setFromAxisAngle(UPV, r.theta);
     var info = poseAvatar(n, r.theta, cur, q.pins);
+    if (info && cur.kit === 'push') info.supported = 1;              // (leaning into the sled: the hands carry weight)
     var pinfo = drawPartner(t, q);
     if (q.info) info = q.info;
     drawBar(r, r.J, r.V, info);
-    drawStick(r); drawClub(r);
+    drawStick(r); drawClub(r); drawKit(r, TIME_NOW);
     return { info: info, n: n, theta: r.theta, partner: pinfo };
   }
 };
