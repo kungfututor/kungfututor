@@ -79,7 +79,12 @@ var MOVES = [
   mv('strike', 'FMA', 'disarm', { stick: 1 }), mv('strike', 'FMA', 'empty'),
   // (double-leg takedown and sprawl lean on an opponent, and the technical stand-up props the body on a hand behind the hips:
   //  they come back with the two-person / ground moves, which need their own floor-support handling)
-  mv('grapple', 'WRESTLING', 'stance'),
+  // wrestling: a 2D 'lying' pose leaning forward (UP, FLAT) is face down in 3D — the turns onto the back are rolls (oroll)
+  mv('grapple', 'WRESTLING', 'stance', { duo: 1 }), mv('grapple', 'WRESTLING', 'double', { duo: 1 }), mv('grapple', 'WRESTLING', 'sprawl', { duo: 1 }),
+  mv('grapple', 'WRESTLING', 'armdrag', { duo: 1 }), mv('grapple', 'WRESTLING', 'bodylock', { duo: 1 }),
+  mv('grapple', 'WRESTLING', 'gutwrench', { duo: 1, fix: { 0: { oroll: 0 }, 1: { oroll: 0 }, 2: { oroll: 90, oa1: 40, oa2: 70, ob1: 30, ob2: 60 }, 3: { oroll: 180 } } }),   // (rolled over, their arms stay in at the chest)
+  mv('grapple', 'WRESTLING', 'standup', { duo: 1 }),
+  mv('grapple', 'WRESTLING', 'halfnelson', { duo: 1, fix: { 0: { oroll: 0 }, 1: { oroll: 0 }, 2: { oroll: 90 }, 3: { oroll: 180 } } }),
   mv('grapple', 'JUDO', 'stance', { duo: 1, oz: 10, fix: { 0: { ox: 296 }, 1: { ox: 296 } }, holds:   // (bow further apart: heads have size)
     judoGrips([3, 4, 5], [3, 4, 5], [3, 4, 5], [3, 4, 5]) }),
   mv('grapple', 'JUDO', 'breakfall'),
@@ -1535,7 +1540,12 @@ function partnerJoints(t, q, raw) {
     var ax = n.sh.clone().sub(n.hip).normalize(), pc = n.sh.clone().add(n.hip).multiplyScalar(0.5), low = 1e9;
     Object.keys(n).forEach(function (k) { n[k].sub(pc).applyAxisAngle(ax, roll).add(pc); });
     Object.keys(n).forEach(function (k) { if (k !== 'head') low = Math.min(low, n[k].y); });
-    if (low < 0.02) Object.keys(n).forEach(function (k) { n[k].y += 0.02 - low; });   // (nothing ends up under the mat)
+    // turned over, their lowest point rests on the mat (plus any lift the lesson gives) — rolled sideways, legs and arms that
+    // hung down now stick out at hip height, so without this the body would float; eased in over the first 30° of roll
+    var want = 0.02 + Math.max(0, (p.olift || 0) * K), ease = Math.min(1, Math.abs(roll) / (30 * DEG));
+    var dy = low < 0.02 ? 0.02 - low : (want - low) * ease;
+    if (low + dy < 0.02) dy = 0.02 - low;
+    Object.keys(n).forEach(function (k) { n[k].y += dy; });
   }
   if (cur.oyaw) {
     var pv = n[cur.opivot || 'shF'].clone(), yaw = cur.oyaw * DEG, keep = cur.okeep || [];

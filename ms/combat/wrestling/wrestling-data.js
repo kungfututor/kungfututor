@@ -22,7 +22,8 @@
   var UP = { ot: 88, oh: 0, ola: -88, olb: -92, ol: 88, olf: 92, oa1: 150, oa2: 130, ob1: 140, ob2: 120, olift: 0 };
   var FALL = { ot: -55, ola: 70, olb: 62, ol: -30, olf: -20, oa1: 120, oa2: 140, ob1: 110, ob2: 130, olift: 10 };
   // partner on hands and knees, facing left (par terre / referee's position bottom)
-  var FOURS = { ot: 80, oh: -8, ola: 0, olb: -90, ol: 0, olf: -90, oa1: 0, oa2: 0, ob1: 0, ob2: 0, olift: 0 };
+  // (the far shin's key has the opposite sign: +90 lays it back along the mat like the near one)
+  var FOURS = { ot: 80, oh: -8, ola: 0, olb: -90, ol: 0, olf: 90, oa1: 0, oa2: 0, ob1: 0, ob2: 0, olift: 0 };
   // partner flat on their stomach, head to the left
   var FLAT = { ot: 88, oh: 0, ola: -86, olb: -90, ol: 86, olf: 90, oa1: 80, oa2: 85, ob1: 75, ob2: 80, olift: 0 };   // arms along the mat (lower arms pushed the body up off it)
   // you kneeling (relative targets: shins on the mat behind you)
@@ -73,8 +74,8 @@
       { d: 900, p: P(UP, KNEEL, { face: -1, ox: 176, x: 236, t: 50, h: 0, su: 30, sl: 70, fu: 20, fl: 60 }), c: cap('對方背部翻過墊子 —— 自由式和古典式得 2 分，可以繼續翻', 'Their back crosses the mat — 2 points in freestyle and Greco-Roman, and you can keep rolling') }
     ] },
     standup: { hit: null, trail: 'head', frames: [
-      { d: 900, p: P(FOURS_ME, { face: -1, x: 200, ox: 236, ot: 70, oh: -10, ola: 0, olb: -90, ol: 0, olf: -90, oa1: 10, oa2: -10, ob1: 0, ob2: -20 }), c: cap('裁判位置：你在下面雙手雙膝著地，對方在上面', 'Referee\'s position: you are on hands and knees underneath, they are on top') },
-      { d: 500, p: P({ face: -1, x: 196, t: 30, h: -6, fN: { x: 18, y: 80 }, fF: { x: -40, y: 44 }, ftN: 90, ftF: -90, su: 30, sl: 60, fu: 20, fl: 50, ox: 236, ot: 60, oh: -10, ola: 0, olb: -90, ol: 0, olf: -90, oa1: 20, oa2: 0, ob1: 10, ob2: -10 }), c: cap('外側腳踩地，抬起胸口，頭往後靠向對方', 'Step your outside foot up, lift your chest and drive your head back into them') },
+      { d: 900, p: P(FOURS_ME, { face: -1, x: 200, ox: 236, ot: 70, oh: -10, ola: 0, olb: -90, ol: 0, olf: 90, oa1: 10, oa2: -10, ob1: 0, ob2: -20 }), c: cap('裁判位置：你在下面雙手雙膝著地，對方在上面', 'Referee\'s position: you are on hands and knees underneath, they are on top') },
+      { d: 500, p: P({ face: -1, x: 196, t: 30, h: -6, fN: { x: 18, y: 80 }, fF: { x: -40, y: 44 }, ftN: 90, ftF: -90, su: 30, sl: 60, fu: 20, fl: 50, ox: 236, ot: 60, oh: -10, ola: 0, olb: -90, ol: 0, olf: 90, oa1: 20, oa2: 0, ob1: 10, ob2: -10 }), c: cap('外側腳踩地，抬起胸口，頭往後靠向對方', 'Step your outside foot up, lift your chest and drive your head back into them') },
       { d: 500, p: P({ face: -1, x: 200, t: 2, h: 0, fN: { x: 16, y: 80 }, fF: { x: -20, y: 80 }, su: 20, sl: 70, fu: 10, fl: 60, ox: 230, ot: 30, oh: 0, ola: 20, olb: 6, ol: 20, olf: 12, oa1: 60, oa2: 70, ob1: 50, ob2: 60 }), c: cap('站起來，雙手控制對方扣在你腰上的手', 'Stand up while your hands control the hands round your waist') },
       { d: 900, p: P({ face: 1, x: 176, ox: 284, ot: 20, oa1: 52, oa2: 100, ob1: 42, ob2: 104, ola: 26, olb: 6, ol: 26, olf: 14 }), c: cap('撥開對方的手，轉身面對對方 —— 逃脫得 1 分', 'Peel their hands off and turn to face them — an escape scores 1 point') }
     ] },
