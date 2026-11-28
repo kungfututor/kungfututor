@@ -73,7 +73,10 @@ var MOVES = [
   mv('strike', 'LETHWEI', 'stance'), mv('strike', 'LETHWEI', 'straight'), mv('strike', 'LETHWEI', 'hook'), mv('strike', 'LETHWEI', 'headbutt'),
   mv('strike', 'LETHWEI', 'elbow'), mv('strike', 'LETHWEI', 'flyknee'), mv('strike', 'LETHWEI', 'kick'), mv('strike', 'LETHWEI', 'push'),
   mv('strike', 'LETHWEI', 'cover'),
-  mv('strike', 'MMA', 'stance'), mv('strike', 'MMA', 'onetwo'), mv('strike', 'MMA', 'overhand'), mv('strike', 'MMA', 'lowkick'),
+  // MMA: the opponent is drawn in every lesson (strikes: a little further off than the stick figures — bodies have thickness); in the mount (ground and pound) your knees are on the mat either side of them
+  mv('strike', 'MMA', 'stance', { duo: 1 }), mv('strike', 'MMA', 'onetwo', { duo: 1, odx: 30 }), mv('strike', 'MMA', 'overhand', { duo: 1, odx: 30 }), mv('strike', 'MMA', 'lowkick', { duo: 1, odx: 16 }),
+  mv('strike', 'MMA', 'double', { duo: 1 }), mv('strike', 'MMA', 'sprawl', { duo: 1 }),
+  mv('strike', 'MMA', 'gnp', { duo: 1, fix: { 0: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 }, 1: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 }, 2: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 }, 3: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 } } }), mv('strike', 'MMA', 'standup', { duo: 1 }),
   mv('strike', 'FMA', 'stance', { stick: 1 }), mv('strike', 'FMA', 'forehand', { stick: 1 }), mv('strike', 'FMA', 'backhand', { stick: 1 }),
   mv('strike', 'FMA', 'thrust', { stick: 1 }), mv('strike', 'FMA', 'eight', { stick: 1 }), mv('strike', 'FMA', 'roof', { stick: 1 }),
   mv('strike', 'FMA', 'disarm', { stick: 1 }), mv('strike', 'FMA', 'empty'),

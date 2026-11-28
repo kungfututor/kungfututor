@@ -78,11 +78,12 @@
       { d: 300, p: P({ x: X0 + 44, t: 42, h: -18, fN: { x: -8, y: 50 }, ftN: 0, fF: { x: -60, y: 40 }, ftF: 10, su: 60, sl: 80, fu: 56, fl: 84, ox: 236, ot: -40, ola: 40, hit: 1 }), c: cap('雙手抱住大腿後側，用腳往前推', 'Grab behind both thighs and drive forward off your feet') },
       { d: 900, p: P(DOWN, { x: X0 + 105, t: 20, h: 0, fN: { x: -34, y: 44 }, fF: { x: -38, y: 44 }, ftN: -90, ftF: -90, ox: 230, hit: 0 }), c: cap('對方倒地，你在上方控制', 'They go down; you land on top in control') }
     ] },
+    // (sprawled on, the shooter is flattened: both knees on the mat, hips sunk back, chest low — your weight is on their back)
     sprawl: { hit: null, trail: 'hip', frames: [
       { d: 700, p: P({ ox: 236 }), c: cap('站架，看對方的髖部', 'Stance; watch their hips') },
       { d: 220, p: P({ ox: 206, ot: 55, oh: -20, oa1: 62, oa2: 50, ob1: 58, ob2: 46, ola: 70, olb: 0 }), c: cap('對方低身衝向你的腳', 'They shoot low for your legs') },
-      { d: 260, p: P({ t: 78, h: -30, fN: { x: -62, y: 36 }, fF: { x: -72, y: 38 }, ftN: 10, ftF: 10, su: 40, sl: 70, fu: 35, fl: 75, ox: 212, ot: 72, oh: -10, oa1: 62, oa2: 50, ob1: 58, ob2: 46, ola: 80, olb: 0 }), e: 'out', c: cap('雙腳往後甩、髖部壓下，用體重壓在對方背上', 'Throw the legs back and drop the hips, putting your weight on their back') },
-      { d: 700, p: P({ t: 78, h: -30, fN: { x: -62, y: 36 }, fF: { x: -72, y: 38 }, ftN: 10, ftF: 10, su: 40, sl: 70, fu: 35, fl: 75, ox: 212, ot: 72, oh: -10, oa1: 62, oa2: 50, ob1: 58, ob2: 46, ola: 80, olb: 0 }), c: cap('雙手壓住對方頭與肩，不讓對方抓到腳', 'Hands push down on their head and shoulders so they can\'t reach your legs') },
+      { d: 260, p: P({ t: 78, h: -30, fN: { x: -62, y: 36 }, fF: { x: -72, y: 38 }, ftN: 10, ftF: 10, su: 40, sl: 70, fu: 35, fl: 75, ox: 212, ot: 80, oh: -10, oa1: 62, oa2: 50, ob1: 58, ob2: 46, ola: 60, olb: -90, ol: -60, olf: 90 }), e: 'out', c: cap('雙腳往後甩、髖部壓下，用體重壓在對方背上', 'Throw the legs back and drop the hips, putting your weight on their back') },
+      { d: 700, p: P({ t: 78, h: -30, fN: { x: -62, y: 36 }, fF: { x: -72, y: 38 }, ftN: 10, ftF: 10, su: 40, sl: 70, fu: 35, fl: 75, ox: 212, ot: 80, oh: -10, oa1: 62, oa2: 50, ob1: 58, ob2: 46, ola: 60, olb: -90, ol: -60, olf: 90 }), c: cap('雙手壓住對方頭與肩，不讓對方抓到腳', 'Hands push down on their head and shoulders so they can\'t reach your legs') },
       { d: 600, p: P({ ox: 240 }), c: cap('站起來回到站架', 'Get back up to your stance') }
     ] },
     gnp: { hit: 'hNF', trail: 'hF', frames: [
