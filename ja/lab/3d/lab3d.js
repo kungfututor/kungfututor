@@ -49,6 +49,34 @@ function judoGrips(meLapel, meSleeve, pLapel, pSleeve) {
   if (pSleeve) g.push({ by: 'partner', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: pSleeve });
   return g;
 }
+// Throws: your sleeve hand keeps the sleeve until they are down (as judo teaches — it controls and protects their fall).
+// While they fall, their pulled right arm stays in your left hand (their hand reaches yours); once down, your hand follows
+// their wrist wherever it lies (reach: 1). fall = the key frames they are falling through, land = the key frame they lie on.
+function keepSleeve(fall, land) {
+  return [{ by: 'me', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: fall }, { by: 'me', hand: 'F', bone: 'RightHand', at: [0, 0, 0], on: [land], reach: 1 },
+    { by: 'partner', hand: 'N', bone: 'LeftHand', at: [0, 0, 0], on: fall.concat([land]) }];
+}
+// …and the fall that goes with it: pulled round by the sleeve they fall a little closer and turn as they go (oturn), landing
+// across in front of you, shoulders just off the mat (chin tucked), the pulled arm up to your hand; you bend over them to
+// keep it. fall/land = key frames, oxFall/oxLand = the lesson's partner places on them, n = the move's number of frames.
+function sleeveFall(n, fall, land, oxFall, oxLand) {
+  var f = {};
+  for (var i = 0; i < n; i++) f[i] = { oturn: 0 };
+  f[fall] = { ox: oxFall - 12, oturn: 30 };
+  f[land] = { ox: oxLand - 26, ot: -74, oturn: 70, oa1: 160, oa2: 165, t: 60, fN: { x: 16, y: 72 }, fF: { x: -18, y: 72 } };
+  return f;
+}
+// Takedowns: the double-leg grabs behind both thighs on the drive, then lands over their belly, hands on their chest;
+// the body lock keeps both arms round their back to the mat, then round their chest on top. Their arms rest on the mat.
+function doubleLegHolds() {   // (facing you, their left side is on your right: each hand takes the side in front of it)
+  return [{ by: 'me', hand: 'N', bone: 'LeftUpLeg', at: [-0.08, -0.18, 0], on: [3] }, { by: 'me', hand: 'F', bone: 'RightUpLeg', at: [-0.08, -0.18, 0], on: [3] },
+    { by: 'me', hand: 'N', bone: 'Spine2', at: [0, 0, -0.16], on: [4] }, { by: 'me', hand: 'F', bone: 'Spine2', at: [0, 0, 0.16], on: [4] }];
+}
+function bodyLockHolds() {
+  return [{ by: 'me', hand: 'N', bone: 'Spine1', at: [-0.12, 0, -0.1], on: [1, 2, 3] }, { by: 'me', hand: 'F', bone: 'Spine1', at: [-0.12, 0, 0.1], on: [1, 2, 3] },
+    { by: 'me', hand: 'N', bone: 'Spine2', at: [0, 0, -0.16], on: [4] }, { by: 'me', hand: 'F', bone: 'Spine2', at: [0, 0, 0.16], on: [4] }];
+}
+var ON_TOP = { 4: { t: 55, oa1: 100, oa2: 102, ob1: 98, ob2: 100 } };
 // HYROX keeps its stations as STATIONS + CLIPS (its page has its own engine): give it the LIST / makeClip the lab reads
 if (window.HYROX && !window.HYROX.LIST) {
   window.HYROX.LIST = window.HYROX.STATIONS.map(function (s) { var o = { id: s.clip }, k; for (k in s) o[k] = s[k]; return o; });
@@ -82,7 +110,7 @@ var MOVES = [
   mv('strike', 'LETHWEI', 'cover'),
   // MMA: the opponent is drawn in every lesson (strikes: a little further off than the stick figures — bodies have thickness); in the mount (ground and pound) your knees are on the mat either side of them
   mv('strike', 'MMA', 'stance', { duo: 1 }), mv('strike', 'MMA', 'onetwo', { duo: 1, odx: 30 }), mv('strike', 'MMA', 'overhand', { duo: 1, odx: 30 }), mv('strike', 'MMA', 'lowkick', { duo: 1, odx: 16 }),
-  mv('strike', 'MMA', 'double', { duo: 1 }), mv('strike', 'MMA', 'sprawl', { duo: 1 }),
+  mv('strike', 'MMA', 'double', { duo: 1, fix: ON_TOP, holds: doubleLegHolds() }), mv('strike', 'MMA', 'sprawl', { duo: 1 }),
   mv('strike', 'MMA', 'gnp', { duo: 1, fix: { 0: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 }, 1: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 }, 2: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 }, 3: { kzN: 26, kzF: -26, fzN: 2.6, fzF: 2.6 } } }), mv('strike', 'MMA', 'standup', { duo: 1 }),
   mv('strike', 'FMA', 'stance', { stick: 1 }), mv('strike', 'FMA', 'forehand', { stick: 1 }), mv('strike', 'FMA', 'backhand', { stick: 1 }),
   mv('strike', 'FMA', 'thrust', { stick: 1 }), mv('strike', 'FMA', 'eight', { stick: 1 }), mv('strike', 'FMA', 'roof', { stick: 1 }),
@@ -90,8 +118,8 @@ var MOVES = [
   // (double-leg takedown and sprawl lean on an opponent, and the technical stand-up props the body on a hand behind the hips:
   //  they come back with the two-person / ground moves, which need their own floor-support handling)
   // wrestling: a 2D 'lying' pose leaning forward (UP, FLAT) is face down in 3D — the turns onto the back are rolls (oroll)
-  mv('grapple', 'WRESTLING', 'stance', { duo: 1 }), mv('grapple', 'WRESTLING', 'double', { duo: 1 }), mv('grapple', 'WRESTLING', 'sprawl', { duo: 1 }),
-  mv('grapple', 'WRESTLING', 'armdrag', { duo: 1 }), mv('grapple', 'WRESTLING', 'bodylock', { duo: 1 }),
+  mv('grapple', 'WRESTLING', 'stance', { duo: 1 }), mv('grapple', 'WRESTLING', 'double', { duo: 1, fix: ON_TOP, holds: doubleLegHolds() }), mv('grapple', 'WRESTLING', 'sprawl', { duo: 1 }),
+  mv('grapple', 'WRESTLING', 'armdrag', { duo: 1 }), mv('grapple', 'WRESTLING', 'bodylock', { duo: 1, fix: { 4: { t: 60, oa1: 100, oa2: 102, ob1: 98, ob2: 100 } }, holds: bodyLockHolds() }),
   mv('grapple', 'WRESTLING', 'gutwrench', { duo: 1, fix: { 0: { oroll: 0 }, 1: { oroll: 0 }, 2: { oroll: 90, oa1: 40, oa2: 70, ob1: 30, ob2: 60 }, 3: { oroll: 180 } } }),   // (rolled over, their arms stay in at the chest)
   mv('grapple', 'WRESTLING', 'standup', { duo: 1 }),
   mv('grapple', 'WRESTLING', 'halfnelson', { duo: 1, fix: { 0: { oroll: 0 }, 1: { oroll: 0 }, 2: { oroll: 90 }, 3: { oroll: 180 } } }),
@@ -99,9 +127,9 @@ var MOVES = [
     judoGrips([3, 4, 5], [3, 4, 5], [3, 4, 5], [3, 4, 5]) }),
   mv('grapple', 'JUDO', 'breakfall'),
   // foot sweep: your right foot sweeps their left ankle from the outside, so their left foot is just inside your right
-  mv('grapple', 'JUDO', 'deashi', { duo: 1, oz: -6, holds: judoGrips([0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2], [0, 1, 2]) }),
+  mv('grapple', 'JUDO', 'deashi', { duo: 1, oz: -6, fix: sleeveFall(5, 3, 4, 240, 266), holds: judoGrips([0, 1, 2, 3], [0, 1, 2], [0, 1, 2], [0, 1, 2]).concat(keepSleeve([3], 4)) }),
   // minor inner reap: your right foot hooks their left heel from between their feet
-  mv('grapple', 'JUDO', 'kouchi', { duo: 1, oz: 12, holds: judoGrips([0, 1, 2, 3], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3], [0, 1, 2, 3]) }),
+  mv('grapple', 'JUDO', 'kouchi', { duo: 1, oz: 12, fix: sleeveFall(6, 4, 5, 246, 274), holds: judoGrips([0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3]).concat(keepSleeve([4], 5)) }),
   // hip throw: your right arm round their waist (on their back), left hand keeps the sleeve
   mv('grapple', 'JUDO', 'ogoshi', { duo: 1, oz: 0,
     // (bodies with thickness: your back against their front needs more room than the drawn lines, and they land a little
@@ -114,9 +142,9 @@ var MOVES = [
       // (over and down, the sleeve's end: their pulled arm stays up in your hand, and you bend to keep it)
       { by: 'me', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: [3] }, { by: 'me', hand: 'F', bone: 'RightHand', at: [0, 0, 0], on: [4, 5], reach: 1 },
       { by: 'partner', hand: 'N', bone: 'LeftHand', at: [0, 0, 0], on: [4] }]
-      .concat(judoGrips([0, 1], [0, 1, 2], [0, 1], [0, 1])) }), mv('grapple', 'JUDO', 'osoto', { duo: 1, oz: 30, holds: [   // right hand on their left lapel, left hand on their right sleeve — and theirs the same on you
-    { by: 'me', hand: 'N', bone: 'Spine2', at: [0.16, 0.06, -0.08], bend: [0, -1, 0], on: [0, 1, 2, 3] }, { by: 'me', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: [0, 1, 2, 3, 4, 5] },
-    { by: 'partner', hand: 'N', bone: 'Spine2', at: [0.16, 0.06, -0.08], bend: [0, -1, 0], on: [0, 1, 2, 3] }, { by: 'partner', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: [0, 1, 2, 3] }] }), mv('grapple', 'JUDO', 'kesa', { duo: 1, oz: 42,
+      .concat(judoGrips([0, 1], [0, 1, 2], [0, 1], [0, 1])) }), mv('grapple', 'JUDO', 'osoto', { duo: 1, oz: 30, fix: sleeveFall(6, 4, 5, 246, 276), holds: [   // right hand on their left lapel, left hand on their right sleeve — and theirs the same on you
+    { by: 'me', hand: 'N', bone: 'Spine2', at: [0.16, 0.06, -0.08], bend: [0, -1, 0], on: [0, 1, 2, 3] }, { by: 'me', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: [0, 1, 2, 3] },
+    { by: 'partner', hand: 'N', bone: 'Spine2', at: [0.16, 0.06, -0.08], bend: [0, -1, 0], on: [0, 1, 2, 3] }, { by: 'partner', hand: 'F', bone: 'RightForeArm', at: [0, -0.05, 0], on: [0, 1, 2, 3] }].concat(keepSleeve([4], 5)) }), mv('grapple', 'JUDO', 'kesa', { duo: 1, oz: 42,
     // you sit at their right side and lean sideways on to their chest (the drawing's forward lean), right arm round the neck,
     // left hand on their right sleeve, their right arm trapped against your side
     // (both legs spread out on the side away from them: right leg forward, left leg back)
@@ -131,12 +159,15 @@ var MOVES = [
     fix: { 0: { fN: { x: 306, y: 179 }, fF: { x: 300, y: 181 }, fzN: 34, fzF: -30, kzN: 24, kzF: -20 }, 1: { fN: { x: 306, y: 179 }, fF: { x: 300, y: 181 }, fzN: 34, fzF: -30, kzN: 24, kzF: -20 }, 2: { fN: { x: 306, y: 179 }, fF: { x: 300, y: 181 }, fzN: 34, fzF: -30, kzN: 24, kzF: -20 }, 3: { fN: { x: 306, y: 179 }, fF: { x: 300, y: 181 }, fzN: 34, fzF: -30, kzN: 24, kzF: -20 } } }),
   mv('grapple', 'SAMBO', 'stance', { duo: 1, oz: 10, holds: judoGrips([2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4]) }),
   mv('grapple', 'SAMBO', 'breakfall'),
-  mv('grapple', 'SAMBO', 'footsweep', { duo: 1, oz: -6, holds: judoGrips([0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2], [0, 1, 2]) }),
+  mv('grapple', 'SAMBO', 'footsweep', { duo: 1, oz: -6, fix: sleeveFall(5, 3, 4, 240, 266), holds: judoGrips([0, 1, 2, 3], [0, 1, 2], [0, 1, 2], [0, 1, 2]).concat(keepSleeve([3], 4)) }),
   // back trip: your lead leg steps deep behind their lead leg, from the outside
-  mv('grapple', 'SAMBO', 'backtrip', { duo: 1, oz: 30, holds: judoGrips([0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2], [0, 1, 2]) }),
+  mv('grapple', 'SAMBO', 'backtrip', { duo: 1, oz: 30, fix: sleeveFall(5, 3, 4, 246, 274), holds: judoGrips([0, 1, 2, 3], [0, 1, 2], [0, 1, 2], [0, 1, 2]).concat(keepSleeve([3], 4)) }),
   // single-leg pick-up: both hands behind their lead (left) knee
-  mv('grapple', 'SAMBO', 'legpick', { duo: 1, oz: 8, holds: [
-    { by: 'me', hand: 'N', bone: 'LeftLeg', at: [-0.07, 0.06, -0.03], on: [2, 3] }, { by: 'me', hand: 'F', bone: 'LeftLeg', at: [-0.07, 0.1, 0.04], on: [2, 3] }] }),
+  // (you keep the leg as they fall: they land on their back near you with that leg still up in your arms)
+  mv('grapple', 'SAMBO', 'legpick', { duo: 1, oz: 8, fix: { 4: { ox: 232, oz: 38, ola: 145, olb: 145, ol: -133, olf: 0, t: 60, fN: { x: 16, y: 72 }, fF: { x: -18, y: 72 } } }, holds: [
+    { by: 'me', hand: 'N', bone: 'LeftLeg', at: [-0.07, 0.06, -0.03], on: [2, 3] }, { by: 'me', hand: 'F', bone: 'LeftLeg', at: [-0.07, 0.1, 0.04], on: [2, 3] },
+    // (down: the leg straight up beside your hip, held round the calf; their other knee bent, its foot clear of yours)
+    { by: 'me', hand: 'N', bone: 'LeftLeg', at: [-0.05, -0.18, -0.04], on: [4], reach: 1 }, { by: 'me', hand: 'F', bone: 'LeftLeg', at: [-0.05, -0.28, 0.04], on: [4], reach: 1 }] }),
   // side hold-down: you kneel at their side, chest across their chest — they lie across you, not in line (oyaw)
   mv('grapple', 'SAMBO', 'holddown', { duo: 1, oyaw: 90, opivot: 'sh', odx: -10, oz: 18, holds: [
     // (turned across you their right side is nearest: your right arm goes under their neck, the hand cupping the far side of it;
@@ -146,7 +177,7 @@ var MOVES = [
     { by: 'me', hand: 'N', bone: 'Spine2', at: [0.12, 0.02, -0.04], on: [0], reach: 1 }, { by: 'me', hand: 'N', bone: 'Neck', at: [-0.06, 0.04, -0.12], on: [1, 2, 3], reach: 1 },
     { by: 'me', hand: 'F', bone: 'RightArm', at: [0, 0.02, 0], on: [0, 1, 2, 3], reach: 1 }], fix: { 0: { t: 66, y: 172, oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 1: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 2: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 3: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 } } }),   // (their arms down by their sides on the mat, not up in the air)
   mv('grapple', 'SAMBO', 'anklelock', { duo: 1, fix: { 0: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 1: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 2: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 }, 3: { oa1: 96, oa2: 100, ob1: 94, ob2: 98 } } }),   // (lying back, arms on the mat by their sides)
-  mv('grapple', 'SAMBO', 'combat', { duo: 1, oz: 10, holds: judoGrips([3, 4], [3, 4, 5], null, null) }), // BJJ (ground): in the guard your knees go out round their waist, ankles crossed behind; in the mount your knees are on the
+  mv('grapple', 'SAMBO', 'combat', { duo: 1, oz: 10, holds: judoGrips([3, 4], [3, 4], null, null) }),   // (gloves: the grips go as they fall — you stay up with your guard ready) // BJJ (ground): in the guard your knees go out round their waist, ankles crossed behind; in the mount your knees are on the
   // mat either side of them; in side control you are turned across their chest (myaw); on top of you they kneel astride (ospread)
   mv('grapple', 'BJJ', 'guard', { duo: 1, odx: 14, fix: { 0: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 1: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 2: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 }, 3: { kzN: 12, kzF: -12, fzN: 0.6, fzF: 0.6, myaw: 0 } } }), mv('grapple', 'BJJ', 'shrimp'),
   // mount escape: you bridge and turn onto your shoulder, and they roll over SIDEWAYS onto their back (oroll) — the 2D
@@ -1618,6 +1649,12 @@ function partnerJoints(t, q, raw) {
   if (cur.oyaw) {
     var pv = n[cur.opivot || 'shF'].clone(), yaw = cur.oyaw * DEG, keep = cur.okeep || [];
     Object.keys(n).forEach(function (k) { if (keep.indexOf(k) < 0) n[k].sub(pv).applyAxisAngle(UPV, yaw).add(pv); });
+  }
+  // `oturn` (3D only, per frame): the partner turned that many degrees about their own hips — thrown with the sleeve pulled
+  // round (foot sweep, reaps, trips), they land across in front of you, not straight out from your feet
+  if (typeof p.oturn === 'number' && p.oturn) {
+    var tc = n.hip.clone(), ty = p.oturn * DEG;
+    Object.keys(n).forEach(function (k) { n[k].sub(tc).applyAxisAngle(UPV, ty).add(tc); });
   }
   if (!raw) partnerSteps(t, n);
   return n;
