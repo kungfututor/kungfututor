@@ -16,6 +16,9 @@
   var $ = function (id) { return d.getElementById(id); };
   var $$ = function (q) { return [].slice.call(d.querySelectorAll(q)); };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  // the list of moves that have a 3D version (assets/js/kt-3d-moves.js, written by engine/lab3d_index.py) sits next to this
+  // script; it is loaded when a lesson page starts, and the "View in 3D" button appears once it is in
+  var SRC = (d.currentScript && d.currentScript.src) || '';
 
   function KTLesson(cfg) {
     var KT = w.KT, L = cfg.list, P = 'kt.' + cfg.prefix + '.';
@@ -29,6 +32,29 @@
     if (hm && +hm[1] >= 1 && +hm[1] <= L.length) st.idx = +hm[1] - 1;
     function T(zh, en, vars) { return KT.fmt(KT.pick(zh, en), vars); }
     function cur() { return L[st.idx]; }
+    // "View in 3D": the 3D Movement Lab (lab/3d/, two folders up from every lesson page, in the same language) opened on
+    // this move — when the move has a 3D version
+    function link3d(s) {
+      var K = w.KT3D, lib = null;
+      if (!K) return null;
+      Object.keys(K).forEach(function (k) { if (!lib && w[k] && w[k].LIST === L) lib = k; });
+      if (!lib) return null;
+      var key = K[lib].indexOf(s.id) > -1 ? s.id : K[lib].indexOf(s.n) > -1 ? s.n : null;
+      return key === null ? null : (cfg.labRoot || '../../') + 'lab/3d/#m=' + lib.toLowerCase() + '-' + key;
+    }
+    function render3d() {
+      var box = $('i-master') && $('i-master').parentNode, a = $('i-3d'), href = link3d(cur());
+      if (!box) return;
+      if (!a) { a = d.createElement('a'); a.id = 'i-3d'; a.className = 'btn btn-3d'; box.insertBefore(a, $('i-master').nextSibling); }
+      a.hidden = !href;
+      if (href) { a.href = href; a.textContent = T('🧊 看 3D 動作', '🧊 View in 3D'); a.title = T('在 3D 動作實驗室轉動、放慢這個動作', 'Turn this move round and slow it down in the 3D Movement Lab'); }
+    }
+    if (!w.KT3D && SRC) {
+      var sc = d.createElement('script');
+      sc.src = SRC.replace(/kt-lesson\.js(\?.*)?$/, 'kt-3d-moves.js');
+      sc.onload = function () { render3d(); };
+      d.head.appendChild(sc);
+    }
     function pad(n) { return ('0' + n).slice(-2); }
     var api = { T: T, cur: cur, st: st };
 
@@ -124,6 +150,7 @@
       mb.classList.toggle('on', on);
       mb.textContent = on ? T('✓ 已標記為熟悉', '✓ Marked as mastered') : T('標記為已熟悉', 'Mark as mastered');
       $('i-master-s').textContent = T('進度只存在你的瀏覽器', 'Progress is saved in your browser only');
+      render3d();
       $('p-title').textContent = pad(s.n) + ' ' + KT.name(s) + KT.pick('動作示意', ' — demo');
       if ($('p-py')) $('p-py').textContent = s.py;
       $('bars').innerHTML = s.bars.map(function (b) {

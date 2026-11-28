@@ -88,6 +88,9 @@ html[lang="en"] .hx { font-family: var(--f-body); }
 .btn:hover { background: #E4E3DD; }
 .btn.on { background: var(--jade); border-color: var(--jade); color: #fff; }
 .master span { font-size: 12px; color: var(--muted); }
+.btn-3d { text-decoration: none; color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
+.btn-3d[hidden] { display: none; }
+.master { flex-wrap: wrap; }
 
 /* animation panel */
 .panel { background: var(--paper); border: 1.5px solid var(--ink); }
